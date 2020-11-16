@@ -1,0 +1,7 @@
+.idea
+.antlr
+bin
+*.err
+*.out
+*.tokens
+script/antlr.jar

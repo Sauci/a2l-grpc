@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+import "protobufs/A2L.proto";
+
+option go_package = "./../pkg/a2l";
+
+service A2L {
+  rpc GetTree (GetTreeRequest) returns (RootNodeType) {}
+}
+
+// The request message containing the user's name.
+message GetTreeRequest {
+  string a2l = 1;
+}

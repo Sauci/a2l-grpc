@@ -1,0 +1,1782 @@
+syntax = "proto3";
+
+import "protobufs/A2ML.proto";
+import "protobufs/IF_DATA.proto";
+import "protobufs/shared.proto";
+
+option go_package = "./../pkg/a2l";
+
+message AddrTypeType {
+  string Value = 1 [json_name="Value"];
+}
+
+// typedef enum datatype { UBYTE, SBYTE, UWORD, SWORD, ULONG, SLONG, FLOAT32_IEEE, FLOAT64_IEEE }
+//
+// Enumeration for description of the basic data types in the ECU program.
+message DataTypeType {
+  string Value = 1 [json_name="Value"];
+}
+
+// Enumeration for description of the axis point sequence in the memory.
+//
+// - INDEX_INCR: Increasing index with increasing address
+// - INDEX_DECR: decreasing index with increasing address
+message IndexOrderType {
+  string Value = 1 [json_name="Value"];
+}
+
+message A2MLType {
+  repeated declaration Declaration = 1 [json_name="Declaration"];
+}
+
+message A2MLVersionType {
+  IntType VersionNo = 1 [json_name="VersionNo"];
+  IntType UpgradeNo = 2 [json_name="UpgradeNo"];
+}
+
+// Address of the EPROM identifier
+message AddrEpkType {
+  // Address of the EPROM identifier
+  LongType Address = 1 [json_name="Address"];
+}
+
+// In complex objects (maps and axis) the alignment of a value may not coincide with the bit width of a value. This
+// keyword is used to define the alignment in the case of bytes. Used in MOD_COMMON and RECORD_LAYOUT.
+message AlignmentByteType {
+  // describes the border at which the value is aligned to, i.e. its memory address must be dividable by the value
+  // Alignment Border.
+  IntType AlignmentBorder = 1 [json_name="AlignmentBorder"];
+}
+
+// In complex objects (maps and axis) the alignment of a value may not coincide with the bit width of a value. This
+// keyword is used to define the alignment in the case of 32bit floats.
+//
+// Used in MOD_COMMON and RECORD_LAYOUT.
+message AlignmentFloat32IeeeType {
+  // describes the border at which the value is aligned to, i.e. its memory address must be dividable by the value
+  // Alignment Border.
+  IntType AlignmentBorder = 1 [json_name="AlignmentBorder"];
+}
+
+// In complex objects (maps and axis) the alignment of a value may not coincide with the bit width of a value. This
+// keyword is used to define the alignment in the case of 64bit floats.
+//
+// Used in MOD_COMMON and RECORD_LAYOUT.
+message AlignmentFloat64IeeeType {
+  // describes the border at which the value is aligned to, i.e. its memory address must be dividable by the value
+  // Alignment Border.
+  IntType AlignmentBorder = 1 [json_name="AlignmentBorder"];
+}
+
+// In complex objects (maps and axis) the alignment of a value may not coincide with the bit width of a value. This
+// keyword is used to define the alignment in the case of longs.
+//
+// Used in MOD_COMMON and RECORD_LAYOUT.
+message AlignmentLongType {
+  // describes the border at which the value is aligned to, i.e. its memory address must be dividable by the value
+  // Alignment Border.
+  IntType AlignmentBorder = 1 [json_name="AlignmentBorder"];
+}
+
+// In complex objects (maps and axis) the alignment of a value may not coincide with the bit width of a value. This
+// keyword is used to define the alignment in the case of words. The alignment is 2 if the parameter is missing.
+//
+// Used in MOD_COMMON and RECORD_LAYOUT.
+message AlignmentWordType {
+  // describes the border at which the value is aligned to, i.e. its memory address must be dividable by the value
+  // Alignment Border.
+  IntType AlignmentBorder = 1 [json_name="AlignmentBorder"];
+}
+
+// Assign a title to an annotation. Useful as a definition can contain more than one annotation. Recommendation : The
+// ANNOTATION_LABEL shall describe the usecase of the ANNOTATION, e.g. „Calibration Note“.
+message AnnotationLabelType {
+  // label or title of the annotation
+  StringType Label = 1 [json_name="Label"];
+}
+
+// To identify who or which system has created an annotation.
+message AnnotationOriginType {
+  // creator or creating system of the annotation
+  StringType Origin = 1 [json_name="Origin"];
+}
+
+// One ANNOTATION_TEXT may represent a multi-line ASCII description text (voluminous description). Its purpose is to be
+// an application note which explains the function of an identifier for the calibration engineer.
+message AnnotationTextType {
+  // Annotation text
+  repeated StringType AnnotationText = 1 [json_name="AnnotationText"];
+}
+
+// One ANNOTATION may represent a voluminous description. Its purpose is to be e.g. an application note which explains
+// the function of an identifier for the calibration engineer.
+//
+// Note: An ANNOTATION may occur several times within a definition (due to compatibility with MSR/MEDOC SW-DTD, the
+// future ASAP2 V2.0).
+message AnnotationType {
+  optional AnnotationLabelType ANNOTATION_LABEL = 1 [json_name="ANNOTATION_LABEL"];
+  optional AnnotationOriginType ANNOTATION_ORIGIN = 2 [json_name="ANNOTATION_ORIGIN"];
+  optional AnnotationTextType ANNOTATION_TEXT = 3 [json_name="ANNOTATION_TEXT"];
+}
+
+message ArraySizeType {
+  IntType Number = 1 [json_name="Number"];
+}
+
+message ASAP2VersionType {
+  IntType VersionNo = 1 [json_name="VersionNo"];
+  IntType UpgradeNo = 2 [json_name="UpgradeNo"];
+}
+
+message AxisDescrType {
+  string Attribute = 1 [json_name="Attribute"];
+  IdentType InputQuantity = 2 [json_name="InputQuantity"];
+  IdentType Conversion = 3 [json_name="Conversion"];
+  IntType MaxAxisPoints = 4 [json_name="MaxAxisPoints"];
+  FloatType LowerLimit = 5 [json_name="LowerLimit"];
+  FloatType UpperLimit = 6 [json_name="UpperLimit"];
+  optional ReadOnlyType READ_ONLY = 7 [json_name="READ_ONLY"];
+  optional FormatType FORMAT = 8 [json_name="FORMAT"];
+  repeated AnnotationType ANNOTATION = 9 [json_name="ANNOTATION"];
+  optional AxisPtsRefType AXIS_PTS_REF = 10 [json_name="AXIS_PTS_REF"];
+  optional MaxGradType MAX_GRAD = 11 [json_name="MAX_GRAD"];
+  optional MonotonyType MONOTONY = 12 [json_name="MONOTONY"];
+  optional ByteOrderType BYTE_ORDER = 13 [json_name="BYTE_ORDER"];
+  optional ExtendedLimitsType EXTENDED_LIMITS = 14 [json_name="EXTENDED_LIMITS"];
+  optional FixAxisParType FIX_AXIS_PAR = 15 [json_name="FIX_AXIS_PAR"];
+  optional FixAxisParDistType FIX_AXIS_PAR_DIST = 16 [json_name="FIX_AXIS_PAR_DIST"];
+  optional FixAxisParListType FIX_AXIS_PAR_LIST = 17 [json_name="FIX_AXIS_PAR_LIST"];
+  optional DepositType DEPOSIT = 18 [json_name="DEPOSIT"];
+  optional CurveAxisRefType CURVE_AXIS_REF = 19 [json_name="CURVE_AXIS_REF"];
+}
+
+message AxisPtsRefType {
+  IdentType AxisPoints = 1 [json_name="AxisPoints"];
+}
+
+message AxisPtsType {
+  IdentType Name = 1 [json_name="Name"];
+  StringType LongIdentifier = 2 [json_name="LongIdentifier"];
+  LongType Address = 3 [json_name="Address"];
+  IdentType InputQuantity = 4 [json_name="InputQuantity"];
+  IdentType DepositR = 5 [json_name="DepositR"];
+  FloatType MaxDiff = 6 [json_name="MaxDiff"];
+  IdentType Conversion = 7 [json_name="Conversion"];
+  IntType MaxAxisPoints = 8 [json_name="MaxAxisPoints"];
+  FloatType LowerLimit = 9 [json_name="LowerLimit"];
+  FloatType UpperLimit = 10 [json_name="UpperLimit"];
+  optional DisplayIdentifierType DISPLAY_IDENTIFIER = 11 [json_name="DISPLAY_IDENTIFIER"];
+  optional ReadOnlyType READ_ONLY = 12 [json_name="READ_ONLY"];
+  optional FormatType FORMAT = 13 [json_name="FORMAT"];
+  optional DepositType DEPOSIT = 14 [json_name="DEPOSIT"];
+  optional ByteOrderType BYTE_ORDER = 15 [json_name="BYTE_ORDER"];
+  optional FunctionListType FUNCTION_LIST = 16 [json_name="FUNCTION_LIST"];
+  optional RefMemorySegmentType REF_MEMORY_SEGMENT = 17 [json_name="REF_MEMORY_SEGMENT"];
+  optional GuardRailsType GUARD_RAILS = 18 [json_name="GUARD_RAILS"];
+  optional ExtendedLimitsType EXTENDED_LIMITS = 19 [json_name="EXTENDED_LIMITS"];
+  repeated AnnotationType ANNOTATION = 20 [json_name="ANNOTATION"];
+  repeated IfDataType IF_DATA = 21 [json_name="IF_DATA"];
+  optional CalibrationAccessType CALIBRATION_ACCESS = 22 [json_name="CALIBRATION_ACCESS"];
+  optional EcuAddressExtensionType ECU_ADDRESS_EXTENSION = 23 [json_name="ECU_ADDRESS_EXTENSION"];
+}
+
+// Description of the number of axis points in an adjustable object
+message AxisPtsXType {
+  // Position of the number of axis points in the deposit structure
+  IntType Position = 1 [json_name="Position"];
+  // Data type of the number of axis points
+  DataTypeType DataType = 2 [json_name="DataType"];
+}
+
+// Description of the number of axis points in an adjustable object
+message AxisPtsYType {
+  // Position of the number of axis points in the deposit structure
+  IntType Position = 1 [json_name="Position"];
+  // Data type of the number of axis points
+  DataTypeType DataType = 2 [json_name="DataType"];
+}
+
+// Description of the number of axis points in an adjustable object
+message AxisPtsZType {
+  // Position of the number of axis points in the deposit structure
+  IntType Position = 1 [json_name="Position"];
+  // Data type of the number of axis points
+  DataTypeType DataType = 2 [json_name="DataType"];
+}
+
+// Description of rescaling the axis values of an adjustable object. A rescale axis consists mainly of a number of
+// rescaling axis points pairs (axis[i] , virtual[i]) which describe a rescale mapping between the axis points and a
+// virtual axis that is used for the access of the table function values deposited in the control unit. Between two
+// pairs the mapping is linear. Both, the axis points and the virtual axis points must be in ascending order.
+message AxisRescaleXType {
+  // position of the rescale axis point value pairs in the deposit structure (description of sequence of elements in the
+  // data record).
+  IntType Position = 1 [json_name="Position"];
+  // Data type of the rescale axis point values
+  DataTypeType DataType = 2 [json_name="DataType"];
+  // maximum number of rescaling axis point pairs (see NO_RESCALE_PTS_X/_Y/_Z)
+  IntType MaxNumberOfRescalePairs = 3 [json_name="MaxNumberOfRescalePairs"];
+  // Decreasing or increasing index with increasing addresses
+  IndexOrderType IndexIncr = 4 [json_name="IndexIncr"];
+  // Addressing of the table values (see enum addrtype).
+  AddrTypeType Addressing = 5 [json_name="Addressing"];
+}
+
+// Description of rescaling the axis values of an adjustable object. A rescale axis consists mainly of a number of
+// rescaling axis points pairs (axis[i] , virtual[i]) which describe a rescale mapping between the axis points and a
+// virtual axis that is used for the access of the table function values deposited in the control unit. Between two
+// pairs the mapping is linear. Both, the axis points and the virtual axis points must be in ascending order.
+message AxisRescaleYType {
+  // position of the rescale axis point value pairs in the deposit structure (description of sequence of elements in the
+  // data record).
+  IntType Position = 1 [json_name="Position"];
+  // Data type of the rescale axis point values
+  DataTypeType DataType = 2 [json_name="DataType"];
+  // maximum number of rescaling axis point pairs (see NO_RESCALE_PTS_X/_Y/_Z)
+  IntType MaxNumberOfRescalePairs = 3 [json_name="MaxNumberOfRescalePairs"];
+  // Decreasing or increasing index with increasing addresses
+  IndexOrderType IndexIncr = 4 [json_name="IndexIncr"];
+  // Addressing of the table values (see enum addrtype).
+  AddrTypeType Addressing = 5 [json_name="Addressing"];
+}
+
+// Description of rescaling the axis values of an adjustable object. A rescale axis consists mainly of a number of
+// rescaling axis points pairs (axis[i] , virtual[i]) which describe a rescale mapping between the axis points and a
+// virtual axis that is used for the access of the table function values deposited in the control unit. Between two
+// pairs the mapping is linear. Both, the axis points and the virtual axis points must be in ascending order.
+message AxisRescaleZType {
+  // position of the rescale axis point value pairs in the deposit structure (description of sequence of elements in the
+  // data record).
+  IntType Position = 1 [json_name="Position"];
+  // Data type of the rescale axis point values
+  DataTypeType DataType = 2 [json_name="DataType"];
+  // maximum number of rescaling axis point pairs (see NO_RESCALE_PTS_X/_Y/_Z)
+  IntType MaxNumberOfRescalePairs = 3 [json_name="MaxNumberOfRescalePairs"];
+  // Decreasing or increasing index with increasing addresses
+  IndexOrderType IndexIncr = 4 [json_name="IndexIncr"];
+  // Addressing of the table values (see enum addrtype).
+  AddrTypeType Addressing = 5 [json_name="Addressing"];
+}
+
+message BitOperationType {
+  optional LeftShiftType LEFT_SHIFT = 1 [json_name="LEFT_SHIFT"];
+  optional RightShiftType RIGHT_SHIFT = 2 [json_name="RIGHT_SHIFT"];
+  optional SignExtendType SIGN_EXTEND = 3 [json_name="SIGN_EXTEND"];
+}
+
+message BitMaskType {
+  LongType Mask = 1 [json_name="Mask"];
+}
+
+message ByteOrderType {
+  string ByteOrder = 1 [json_name="ByteOrder"];
+}
+
+message CalibrationAccessType {
+  string Type = 1 [json_name="Type"];
+}
+
+// Definition of the calibration method specific. The interpretation of this data depends on the calibration method
+// used. Used in CALIBRATION_METHOD
+message CalibrationHandleType {
+  // Handle for the calibration method
+  repeated LongType Handle = 1 [json_name="Handle"];
+}
+
+// This keyword is used to indicate the different methods of access that are implemented in the ECU and that can be used
+// regardless of the actual interface of the ECU. Used in MOD_PAR.
+message CalibrationMethodType {
+  // the string identifies the calibration method to be used. A convention regarding the meaning of the calibration
+  // methods. The following strings are already in use: ‘InCircuit’, ‘SERAM’, ‘DSERAP’, ‘BSERAP’
+  StringType Method = 1 [json_name="Method"];
+  // Version number of the method used
+  LongType Version = 2 [json_name="Version"];
+  // Contains the (method specific) arguments for the calibration method. The arguments themselves and their meaning are
+  // dependent of the calibration method.
+  repeated CalibrationHandleType CALIBRATION_HANDLE = 3 [json_name="CALIBRATION_HANDLE"];
+}
+
+// Specification of the parameters for the processing of an adjustable object.
+message CharacteristicType {
+  // unique identifier in the ECU program
+  //
+  //Note: The name of the adjustable object has to be unique within all measurement objects and adjustable objects of
+  // the ASAP2 MODULE, i.e. there must not be another AXIS_PTS, CHARACTERISTIC or MEASUREMENT object with the the same
+  // identifier in the MODULE.
+  IdentType Name = 1 [json_name="Name"];
+  // comment, description
+  StringType LongIdentifier = 2 [json_name="LongIdentifier"];
+  // - VALUE
+  // - CURVE
+  // - MAP
+  // - CUBOID
+  // - VAL_BLK (array of values)
+  // - ASCII (string)
+  string Type = 3 [json_name="Type"];
+  // address of the adjustable object in the emulation memory
+  LongType Address = 4 [json_name="Address"];
+  // reference to the corresponding data record for description of the record layout (see RECORD_LAYOUT)
+  IdentType Deposit = 5 [json_name="Deposit"];
+  // maximum float with respect to an adjustment of a table value
+  //
+  // Note: This value is interpreted as an absolute value, not as a percentage.
+  FloatType MaxDiff = 6 [json_name="MaxDiff"];
+  // Reference to the relevant record of the description of the conversion method (see COMPU_METHOD). If there is no
+  // conversion method, as in the case of CURVE_AXIS, the parameter ‘Conversion’ should be set to “NO_COMPU_METHOD”
+  // (application systems must be able to handle this case).
+  IdentType Conversion = 7 [json_name="Conversion"];
+  // plausible range of table values, lower limit
+  FloatType LowerLimit = 8 [json_name="LowerLimit"];
+  // plausible range of table values, upper limit
+  FloatType UpperLimit = 9 [json_name="UpperLimit"];
+  // Can be used as a display name (alternative to the ‘name’ attribute).
+  optional DisplayIdentifierType DISPLAY_IDENTIFIER = 10 [json_name="DISPLAY_IDENTIFIER"];
+  // With deviation from the display format specified with keyword COMPU_TAB referenced by parameter <Conversion> a
+  // special display format can be specified to be used to display the table values.
+  optional FormatType FORMAT = 11 [json_name="FORMAT"];
+  // Where the standard value does not apply this parameter can be used to specify the byte order (Intel format,
+  // Motorola format) if the standard value is not to be used.
+  optional ByteOrderType BYTE_ORDER = 12 [json_name="BYTE_ORDER"];
+  // This parameter can be used to specify a bit mask for the handling of single bits.
+  optional BitMaskType BIT_MASK = 13 [json_name="BIT_MASK"];
+  // This keyword can be used to specify a list of 'functions' to which the relevant adjustable object is allocated
+  // (function orientation).
+  //
+  // Note: Since ASAP2 version 1.20 the keyword FUNCTION comprises some additional features to describe functional
+  // structure and dependencies. The keyword FUNCTION_LIST is going to be canceled at ASAP2 version 2.00.
+  optional FunctionListType FUNCTION_LIST = 14 [json_name="FUNCTION_LIST"];
+  // For the adjustable object types 'fixed value block' (VAL_BLK) and 'string' (ASCII), this keyword specifies the
+  // number of fixed values and characters respectively.
+  optional NumberType NUMBER = 15 [json_name="NUMBER"];
+  // This keyword can be used to specify an extended range of values. In the application system, for example, when
+  // leaving the standard range of values (lower limit...upper limit) a warning could be generated (extended limits
+  // enabled only for "power user").
+  optional ExtendedLimitsType EXTENDED_LIMITS = 16 [json_name="EXTENDED_LIMITS"];
+  // This keyword can be used to indicate that the adjustable object cannot be changed (but can be read only). This
+  // keyword indicates the adjustable object to be read only at all (table values and axis points). The optional keyword
+  // used at AXIS_DESCR record indicates the related axis points to be read only.
+  optional ReadOnlyType READ_ONLY = 17 [json_name="READ_ONLY"];
+  // This keyword is used to indicate that an adjustable CURVE or MAP uses guard rails. The Measurement and Calibration
+  // System does not allow the user to edit the outermost values of the adjustable object (see GUARD_RAILS).
+  optional GuardRailsType GUARD_RAILS = 18 [json_name="GUARD_RAILS"];
+  // For the adjustable object type CUBOID which are `sliced', this keyword specifies the MAPs which comprise the
+  // cuboid.
+  optional MapListType MAP_LIST = 19 [json_name="MAP_LIST"];
+  // Maximum refresh rate of this (adaptive) characteristic in the control unit. The existence of the keyword implies
+  // that the value of the characteristic is changed by the control unit (adaptive characteristics).
+  optional MaxRefreshType MAX_REFRESH = 20 [json_name="MAX_REFRESH"];
+  // Describes the formula and references to characteristics, upon which this characteristic depends on.
+  //
+  // Note: The dependence graph described by the dependence relation must be acyclic. This must be ensured by the
+  // producer of the ASAP2 file. This keyword is only valid for characteristics of type VALUE
+  optional DependentCharacteristicType DEPENDENT_CHARACTERISTIC = 21 [json_name="DEPENDENT_CHARACTERISTIC"];
+  // Marks a characteristic as being virtual, i.e. not existing in the memory of the control unit. The address can
+  // therefore be ignored for virtual characteristic. Initial value of the virtual characteristic depends on the values
+  // of other characteristic.
+  //
+  // Note: The corresponding graph (in analogy to the dependence graph) must also be acyclic and each sink of the graph
+  // must be a non virtual characteristic. This must be ensured by the producer of the ASAP2 file. This keyword is only
+  // valid for characteristics of type VALUE.
+  optional VirtualCharacteristicType VIRTUAL_CHARACTERISTIC = 22 [json_name="VIRTUAL_CHARACTERISTIC"];
+  // Reference to the memory segment which is needed if the address is not unique (this occurs in the case of lapping
+  // address ranges (overlapping memory segments).
+  optional RefMemorySegmentType REF_MEMORY_SEGMENT = 23 [json_name="REF_MEMORY_SEGMENT"];
+  // Set of notes (represented as multi-line ASCII description texts) which are related. Can serve e.g. as application
+  // note.
+  repeated AnnotationType ANNOTATION = 24 [json_name="ANNOTATION"];
+  // This keyword references a valid MEASUREMENT in the ASAP2 file. Semantic Interpretation (for a CURVE, a
+  // CHARACTERISTIC with only one AXIS_DESC) : The conventional work point for a -CURVE has only one input quantity
+  // (assigned to AXIS_DESCR) and moves on the CURVE. The 'free-moving' work point in an xy diagram of a CURVE is
+  // described by two quantities (the conventional input quantity with the AXIS_DESC, the x axis, and an additional
+  // comparison quantity described as an optional attribute directly with the CURVE, the y-axis).The 'free-moving'
+  // work point does not move on the CURVE, but on the xy-diagram in which the CURVE is located. The crossing of the
+  // free-moving work point and the CURVE would describe an EVENT. Such display is required by calibration engineers of
+  // automatic transmission control (EVENT=gear shift). When this keyword with a CURVE is present, the work point
+  // display of the MCD system shall apply the INPUT_QUANTITY and the COMPARISON_QUANTITY in the xy-diagram.
+  optional ComparisonQuantityType COMPARISON_QUANTITY = 25 [json_name="COMPARISON_QUANTITY"];
+  // Date record to describe the interface specific description data (BLOB:binary large object). The parameters
+  // associated with this keyword are described in the ASAP2 metalanguage (in short A2ML) by the control unit supplier
+  // or the interface module supplier.
+  repeated IfDataType IF_DATA = 26 [json_name="IF_DATA"];
+  // This keyword is used to specify the parameters for the axis description (with characteristic curves and maps). The
+  // first parameter block describes the X-axis, the second parameter block the Y-axis.
+  repeated AxisDescrType AXIS_DESCR = 27 [json_name="AXIS_DESCR"];
+  // This keyword specifies the access of the characteristic for calibration. Use it instead of the READ_ONLY Attribute.
+  optional CalibrationAccessType CALIBRATION_ACCESS = 28 [json_name="CALIBRATION_ACCESS"];
+  // Shows the size and dimension of a multidimensional characteristic (e.g. VAL_BLK). If the MATRIX_DIM keyword is
+  // used, then the option NUMBER is not needed. However, if the keywords NUMBER and MATRIX_DIM are both used, the
+  // resulting value in NUMBER must be the same as xDim * yDim * zDim for MATRIX_DIM. If the keyword is missing the
+  // array has only one dimension with the size given at NUMBER.
+  optional MatrixDimType MATRIX_DIM = 29 [json_name="MATRIX_DIM"];
+  // This keyword is an additional address information. For instance it can be used, to distinguish different address
+  // spaces of an ECU (multi-microcontroller devices).
+  optional EcuAddressExtensionType ECU_ADDRESS_EXTENSION = 30 [json_name="ECU_ADDRESS_EXTENSION"];
+}
+
+// Specification of coefficients for the formula f(x) = (axx + bx + c) / (dxx + ex + f). This term describes the
+// conversion from physical values to control unit internal values:
+//
+// INT = f(PHYS);
+//
+// Important: For these coefficients restrictions have to be defined because this general equation cannot always be
+// inverted.
+message CoeffsType {
+  // a coefficient for the specified formula:
+  //
+  // f(x) = (axx + bx + c) / (dxx + ex + f)
+  FloatType A = 1 [json_name="A"];
+  // b coefficient for the specified formula:
+  //
+  // f(x) = (axx + bx + c) / (dxx + ex + f)
+  FloatType B = 2 [json_name="B"];
+  // c coefficient for the specified formula:
+  //
+  // f(x) = (axx + bx + c) / (dxx + ex + f)
+  FloatType C = 3 [json_name="C"];
+  // d coefficient for the specified formula:
+  //
+  // f(x) = (axx + bx + c) / (dxx + ex + f)
+  FloatType D = 4 [json_name="D"];
+  // e coefficient for the specified formula:
+  //
+  // f(x) = (axx + bx + c) / (dxx + ex + f)
+  FloatType E = 5 [json_name="E"];
+  // f coefficient for the specified formula:
+  //
+  // f(x) = (axx + bx + c) / (dxx + ex + f)
+  FloatType F = 6 [json_name="F"];
+}
+
+message ComparisonQuantityType {
+  IdentType Name = 1 [json_name="Name"];
+}
+
+// Specification of a conversion method
+message CompuMethodType {
+  // Unique identifier in the program for the conversion method
+  //
+  // Note: The name of the conversion method has to be unique within all conversion methods of the ASAP2 MODULE, i.e.
+  // there must not be another COMPU_METHOD object with the same identifier in the MODULE.
+  IdentType Name = 1 [json_name="Name"];
+  // Comment, description
+  StringType LongIdentifier = 2 [json_name="LongIdentifier"];
+  // - TAB_INTP: table with interpolation
+  // - TAB_NOINTP: table without interpolation
+  // - TAB_VERB: verbal conversion table
+  // - RAT_FUNC: fractional rational function of the following type
+  //   f(x)=(axx + bx + c)/(dxx + ex + f)
+  //   for which:
+  //   INT = f(PHYS)
+  //   Coefficients a, b, c, d, e, f are specified by the optional COEFFS keyword.
+  //   Important: For these coefficients restrictions have to be defined because this general equation cannot always
+  //   be inverted.
+  // - FORM: conversion based on the formula specified by the optional FORMULA keyword.
+  string ConversionType = 3 [json_name="ConversionType"];
+  //  display format in %[length].[layout]; length indicates the overall length; layout indicates the decimal places.
+  //  The format string should never be empty as "".
+  StringType Format = 4 [json_name="Format"];
+  // Physical unit
+  StringType Unit = 5 [json_name="Unit"];
+  // Formula to be used for the conversion
+  optional FormulaType FORMULA = 6 [json_name="FORMULA"];
+  // This keyword is used to specify coefficients a, b, c, d, e, f for the fractional rational function of the following
+  // type (axx + bx + c) / (dxx + ex + f)
+  optional CoeffsType COEFFS = 7 [json_name="COEFFS"];
+  // This keyword is used to specify a conversion table (reference to COMPU_TAB data record).
+  optional CompuTabRefType COMPU_TAB_REF = 8 [json_name="COMPU_TAB_REF"];
+  // This keyword is used to reference a measurement unit (e.g. an object of type UNIT). The string parameter Unit is a
+  // redundant information because the record referenced by REF_UNIT contain it too. Just for the purpose of
+  // compatibility with previous versions of ASAP2 the parameter REF_UNIT is optional. The string parameter Unit is
+  // going to be canceled at ASAP2 version 2.00.
+  optional RefUnitType REF_UNIT = 9 [json_name="REF_UNIT"];
+}
+
+// Reference to the data record which contains the conversion table (see keyword COMPU_TAB).
+//
+// Note: COMPU_TAB_REF may only refer to objects of type COMPU_TAB, COMPU_VTAB or COMPU_VTAB_RANGE.
+message CompuTabRefType {
+  // Reference to the data record which contains the conversion table (see COMPU_TAB).
+  IdentType ConversionTable = 1 [json_name="ConversionTable"];
+}
+
+// Conversion table for conversions that cannot be represented as a function.
+message CompuTabType {
+  message InValOutValType {
+    // axis point
+    FloatType InVal = 1 [json_name="InVal"];
+    // axis value
+    FloatType OutVal = 2 [json_name="OutVal"];
+  }
+  // unique identifier in the program for the conversion table
+  //
+  // Note: The name of the conversion table has to be unique within all conversion tables of the ASAP2 MODULE, i.e.
+  // there must not be another COMPU_TAB, COMPU_VTAB or COMPU_VTAB_RANGE object with the the same identifier in the
+  // MODULE.
+  IdentType Name = 1 [json_name="Name"];
+  // comment, description
+  StringType LongIdentifier = 2 [json_name="LongIdentifier"];
+  // following types are possible:
+  // - TAB_INTP: table with interpolation
+  // - TAB_NOINTP: table without interpolation
+  //
+  // Note: This parameter is redundant information because the record defined with COMPU_METHOD also contains it.
+  string ConversionType = 3 [json_name="ConversionType"];
+  // number of successive value pairs for this conversion table
+  IntType NumberValuePairs = 4 [json_name="NumberValuePairs"];
+  repeated InValOutValType InValOutVal = 5 [json_name="InValOutVal"];
+  // string used as OutVal for display when the ECU value is out of any declared range. This string shall not be
+  // selectable for calibration (when writing to the ECU).
+  optional DefaultValueType DEFAULT_VALUE = 6 [json_name="DEFAULT_VALUE"];
+}
+
+// Conversion table for the assignment of display strings to a value range. In particular this is useful for ASAP2
+// definitions with the data type ‘floating point’ (referred as FLOAT definitions).
+//
+// For FLOAT definitions, the declared string is displayed for InValMin <= ECU value < InValMax, with InValMin, InValMax
+// as floating point values.
+//
+// For non-FLOAT definitions, the declared string is displayed for InValMin <= ECU value <= InValMax, with InValMin,
+// InVal as integer values.
+message CompuVTabRangeType {
+  message InValMinInValMaxOutValType {
+    // lower limit as float value, needs to be integer ECU value when assigned to “non-float” definitions.
+    FloatType InValMin = 1 [json_name="InValMin"];
+    // upper limit as float value, needs to be integer ECU value when assigned to “non-float” definitions.
+    FloatType InValMax = 2 [json_name="InValMax"];
+    // display string for the value range
+    StringType OutVal = 3 [json_name="OutVal"];
+  }
+  // unique identifier in the program for the verbal range based conversion table
+  //
+  // Note: The name of the conversion table has to be unique within all conversion tables of the ASAP2 MODULE, i.e.
+  // there must not be another COMPU_TAB, COMPU_VTAB or COMPU_VTAB_RANGE object with the the same identifier in the
+  // MODULE.
+  IdentType Name = 1 [json_name="Name"];
+  // comment, description
+  StringType LongIdentifier = 2 [json_name="LongIdentifier"];
+  // number of successive value triples for this verbal range based conversion table
+  IntType NumberOfValuesTriples = 3 [json_name="NumberOfValuesTriples"];
+  repeated InValMinInValMaxOutValType InValMinInValMaxOutVal = 4 [json_name="InValMinInValMaxOutVal"];
+  // string used as OutVal for display when the ECU value is out of any declared range. This string shall not be
+  // selectable for calibration (when writing to the ECU).
+  optional DefaultValueType DEFAULT_VALUE = 5 [json_name="DEFAULT_VALUE"];
+}
+
+// Conversion table for the visualisation of bit patterns
+message CompuVTabType {
+  message InValOutValType {
+    // internal value
+    //
+    // Note: Datatype “float” is used for the input value of COMPU_TAB and COMPU_VTAB. Since the accepted use case of
+    // COMPU_VTAB input values are integers, all float values are rounded to the nearest integer by following the
+    // formula (0.5 <= x_raw < 1.5 lead to x = 1). Only float input values used with COMPU_VTAB_RANGE remain float
+    // values without truncation. If you want to use float as internal values (without truncation), you should use
+    // COMPU_VTAB_RANGE.
+    FloatType InVal = 1 [json_name="InVal"];
+    // description (meaning) of the corresponding byte value
+    StringType OutVal = 2 [json_name="OutVal"];
+  }
+  // unique identifier in the program for the verbal conversion table
+  //
+  // Note: The name of the conversion table has to be unique within all conversion tables of the ASAP2 MODULE, i.e.
+  // there must not be another COMPU_TAB, COMPU_VTAB or COMPU_VTAB_RANGE object with the the same identifier in the
+  // MODULE.
+  IdentType Name = 1 [json_name="Name"];
+  // comment, description
+  StringType LongIdentifier = 2 [json_name="LongIdentifier"];
+  // at present only the following types are possible:
+  // - TAB_VERB: verbal conversion table
+  //
+  // Note: This parameter is a redundant information because the record defined with COMPU_METHOD also contains it.
+  // Therefore this parameter is going to be canceled at ASAP2 version 2.00.
+  string ConversionType = 3 [json_name="ConversionType"];
+  // number of successive value pairs for this conversion table
+  IntType NumberValuePairs = 4 [json_name="NumberValuePairs"];
+  repeated InValOutValType InValOutVal = 5 [json_name="InValOutVal"];
+  // string used as OutVal for display when the ECU value is out of any declared range. This string shall not be
+  // selectable for calibration (when writing to the ECU).
+  optional DefaultValueType DEFAULT_VALUE = 6 [json_name="DEFAULT_VALUE"];
+}
+
+// CPU identification
+message CpuTypeType {
+  // CPU identifier
+  StringType Cpu = 1 [json_name="Cpu"];
+}
+
+message CurveAxisRefType {
+  IdentType CurveAxis = 1 [json_name="CurveAxis"];
+}
+
+// Customer number as string.
+message CustomerNoType {
+  // customer number
+  StringType Number = 1 [json_name="Number"];
+}
+
+// This keyword allows a customer name to be specified.
+message CustomerType {
+  // customer name
+  StringType Customer = 1 [json_name="Customer"];
+}
+
+// typedef enum datasize {BYTE, WORD, LONG}
+message DataSizeType {
+  string Value = 1 [json_name="Value"];
+}
+
+// Optional String which can be applied with COMPU_TAB, COMPU_VTAB and COMPU_VTAB_RANGE, used as OutVal for display when
+// the ECU value is out of any declared range. This string shall not be selectable for calibration (when writing to the
+// ECU).
+message DefaultValueType {
+  // Display string.
+  StringType DisplayString = 1 [json_name="DisplayString"];
+}
+
+// This keyword can be used to declare some adjustable objects to be defined in respective function (function
+// orientation).
+//
+// Note: DEF_CHARACTERISTIC may only refer to objects of type AXIS_PTS or CHARACTERISTIC.
+message DefCharacteristicType {
+  // Identifier of those adjustable objects that are defined in respective function.
+  repeated IdentType Identifier = 1 [json_name="Identifier"];
+}
+
+// This keyword allows dependent characteristics to be specified. For this, other characteristics can be combined into
+// one characteristic whose consistent value is automatically derived by the application system. Upon adjusting one of
+// the characteristics, this characteristic is then also automatically adjusted according to the chosen formula (see
+// also VIRTUAL_CHARACTERISTIC)
+message DependentCharacteristicType {
+  // Formula to be used for the calculation of the physical value of the characteristic from the physical value of other
+  // characteristics.
+  StringType Formula = 1 [json_name="Formula"];
+  // Identifier of those adjustable objects that are used for the calculation of this characteristic.
+  repeated IdentType Characteristic = 2 [json_name="Characteristic"];
+}
+
+// The axis points of a characteristic can be deposited in two different ways in the memory:
+//
+// a) The individual axis point values are deposited as absolute values.
+//
+// b) The individual axis points are deposited as differences. Each axis point value is determined on the basis of the
+// adjacent axis point (predecessor) and the corresponding difference. As reference point for the first axis point
+// <maxvalue> is used:
+//
+// 1-byte-size: <maxvalue> = 28 (256)
+// 2-byte-size: <maxvalue> = 216 (65536)
+// 4-byte-size: <maxvalue> = 232
+message DepositType {
+  string Mode = 1 [json_name="Mode"];
+}
+
+message DisplayIdentifierType {
+  IdentType DisplayName = 1 [json_name="DisplayName"];
+}
+
+// Description of the distance operand in the deposit structure to compute the axis points for fixed characteristic
+// curves and fixed characteristic maps (see also keyword FIX_AXIS_PAR_DIST).
+message DistOpXType {
+  // Position of the distance operand in the deposit structure.
+  IntType Position = 1 [json_name="Position"];
+  // Data type of the distance operand.
+  DataTypeType DataType = 2 [json_name="DataType"];
+}
+
+// Description of the distance operand in the deposit structure to compute the axis points for fixed characteristic
+// curves and fixed characteristic maps (see also keyword FIX_AXIS_PAR_DIST).
+message DistOpYType {
+  // Position of the distance operand in the deposit structure.
+  IntType Position = 1 [json_name="Position"];
+  // Data type of the distance operand.
+  DataTypeType DataType = 2 [json_name="DataType"];
+}
+
+// Description of the distance operand in the deposit structure to compute the axis points for fixed characteristic
+// curves and fixed characteristic maps (see also keyword FIX_AXIS_PAR_DIST).
+message DistOpZType {
+  // Position of the distance operand in the deposit structure.
+  IntType Position = 1 [json_name="Position"];
+  // Data type of the distance operand.
+  DataTypeType DataType = 2 [json_name="DataType"];
+}
+
+// This keyword is used to specify additional address information. For instance it can be used, to distinguish different
+// address spaces of an ECU (multi-microcontroller devices). ECU_ADDRESS_EXTENSION is an optional keyword of
+// MEASUREMENT, AXIS_PTS and CHARACTERISTIC.
+message EcuAddressExtensionType {
+  // Address extension of the ECU address
+  IntType Extension = 1 [json_name="Extension"];
+}
+
+message EcuAddressType {
+  LongType Address = 1 [json_name="Address"];
+}
+
+// ECU_CALIBRATION_OFFSET is used to describe a fixed address offset when accessing characteristics in the control unit
+// due to:
+//
+// - near pointers in calibration objects. Some record layouts include near pointers inside a calibration objects from
+// which the calibration system has to compute the absolute values by adding the ECU_CALIBRATION_OFFSET (CDAMOS)
+// - variant coding. Some ECU projects include multiple data sets for different engine or vehicle projects served by one
+// common ECU. By using the ECU_CALIBRATION_OFFSET, a selection for project base address can be made Used in MOD_PAR.
+message EcuCalibrationOffsetType {
+  // Offset that has to be added to each address of a characteristic
+  LongType Offset = 1 [json_name="Offset"];
+}
+
+// String for identification of the control unit.
+message EcuType {
+  // control unit identifier
+  StringType ControlUnit = 1 [json_name="ControlUnit"];
+}
+
+// EPROM identifier string.
+message EpkType {
+  // EPROM identifier
+  StringType Identifier = 1 [json_name="Identifier"];
+}
+
+message ErrorMaskType {
+  LongType Mask = 1 [json_name="Mask"];
+}
+
+// This keyword can be used to specify an extended range of values. In the application system, for example, when leaving
+// the standard range of values (mandatory parameters 'lower limit' and 'upper limit' in the CHARACTERISTIC data record)
+// a warning could be generated (extended limits enabled only for "power user")
+message ExtendedLimitsType {
+  // extended range of table values, lower limit
+  FloatType LowerLimit = 1 [json_name="LowerLimit"];
+  // extended range of table values, upper limit
+  FloatType UpperLimit = 2 [json_name="UpperLimit"];
+}
+
+message FixAxisParDistType {
+  IntType Offset = 1 [json_name="Offset"];
+  IntType Distance = 2 [json_name="Distance"];
+  IntType Numberapo = 3 [json_name="Numberapo"];
+}
+
+message FixAxisParListType {
+  repeated FloatType AxisPtsValue = 1 [json_name="AxisPtsValue"];
+}
+
+message FixAxisParType {
+  IntType Offset = 1 [json_name="Offset"];
+  IntType Shift = 2 [json_name="Shift"];
+  IntType Numberapo = 3 [json_name="Numberapo"];
+}
+
+// This keyword indicates that all characteristic curves or characteristic maps are allocated a fixed number of X-axis
+// and Y-axis points. In a RECORD_LAYOUT data record, this keyword cannot be used simultaneously with the keyword
+// NO_AXIS_PTS_X (for FIX_NO_AXIS_PTS_X) or NO_AXIS_PTS_Y (for FIX_NO_AXIS_PTS_Y)
+message FixNoAxisPtsXType {
+  // Dimensioning of characteristic curves or characteristic maps with a fixed number of axis points
+  IntType NumberOfAxisPoints = 1 [json_name="NumberOfAxisPoints"];
+}
+
+// This keyword indicates that all characteristic curves or characteristic maps are allocated a fixed number of X-axis
+// and Y-axis points. In a RECORD_LAYOUT data record, this keyword cannot be used simultaneously with the keyword
+// NO_AXIS_PTS_X (for FIX_NO_AXIS_PTS_X) or NO_AXIS_PTS_Y (for FIX_NO_AXIS_PTS_Y)
+message FixNoAxisPtsYType {
+  // Dimensioning of characteristic curves or characteristic maps with a fixed number of axis points
+  IntType NumberOfAxisPoints = 1 [json_name="NumberOfAxisPoints"];
+}
+
+// This keyword indicates that all characteristic curves or characteristic maps are allocated a fixed number of X-axis
+// and Y-axis points. In a RECORD_LAYOUT data record, this keyword cannot be used simultaneously with the keyword
+// NO_AXIS_PTS_X (for FIX_NO_AXIS_PTS_X) or NO_AXIS_PTS_Y (for FIX_NO_AXIS_PTS_Y)
+message FixNoAxisPtsZType {
+  // Dimensioning of characteristic curves or characteristic maps with a fixed number of axis points
+  IntType NumberOfAxisPoints = 1 [json_name="NumberOfAxisPoints"];
+}
+
+// Description of the table values (function values) of an adjustable object. If the ALTERNATE option is used, the
+// position parameter of values and axis-points indicates their order.
+message FncValuesType {
+  // position of table values (function values) in the deposit structure (description of sequence of elements in the
+  // data record).
+  IntType Position = 1 [json_name="Position"];
+  // data type of the table values
+  DataTypeType DataType = 2 [json_name="DataType"];
+  // for characteristic maps, this attribute is used to describe how the 2-dimensional table values are mapped onto the
+  // 1-dimensional address space:
+  //
+  // - COLUMN_DIR deposited in columns
+  // - ROW_DIR deposited in rows
+  //
+  //Both concepts 'columns' and 'rows' relate to the XY coordinate system (see also Appendix B: Record layouts). For
+  // characteristic cuboids each XY plane is mapped as above. The cuboid is stored as an array of maps with incremental
+  // Z coordinates.
+  string IndexMode = 3 [json_name="IndexMode"];
+  // addressing of the table values (see enum addrtype).
+  AddrTypeType AddressType = 4 [json_name="AddressType"];
+}
+
+message FormatType {
+  StringType FormatString = 1 [json_name="FormatString"];
+}
+
+// This keyword allows any kind of formula to be specified for the conversion of measurement values, axis points or
+// table values of an adjustable object from their physical format into the hexadecimal (ECU internal) format. The
+// interpretation of the formula must be supported by a formula interpreter in the operating system.
+//
+// Note: FORMULA_INV is necessary if used for CHARACTERISTIC objects. Only MEASUREMENT objects do not need an inverse
+// formula.
+message FormulaInvType {
+  // Function for calculation of the hexadecimal, control unit internal value from the physical value. The
+  // interpretation proceeds from left to right. Operator preferences, such as power before product/quotient before
+  // sum/difference, are taken into account. Brackets are allowed.
+  StringType GX = 1 [json_name="GX"];
+}
+
+// This keyword allows any kind of formula to be specified for the conversion of measurement values, axis points or
+// table values of an adjustable object from their hexadecimal (ECU internal) format into the physical format. The
+// interpretation of the formula must be supported by a formula interpreter in the operating system.
+//
+// Note: When converting from internal values to physical values, the use of “X” is customary. For reasons of backward
+// compatibility, if only one input value is necessary, use either X or X1.
+message FormulaType {
+  // Function to calculate the physical value from the hexadecimal, control unit internal value. The interpretation
+  // proceeds from left to right. Operator preferences, such as power before product/quotient before sum/difference, are
+  // taken into account. Brackets are allowed.
+  StringType FX = 1 [json_name="FX"];
+  // function to calculate the hexadecimal, control unit internal value from the physical value. This parameter is
+  // mandatory in formulas used for the conversion of adjustable objects. It is optional only for measurement objects.
+  //
+  // Note: Certain functions in the application system can only be used for those measurement objects for which this
+  // parameter is specified (e.g. scalable DAC output, triggering).
+  optional FormulaInvType FORMULA_INV = 2 [json_name="FORMULA_INV"];
+}
+
+// This keyword can be used to define quantities of respective FRAME.
+message FrameMeasurementType {
+  // Identifier of quantity of respective FRAME (reference to measurement object).
+  repeated IdentType Identifier = 1 [json_name="Identifier"];
+}
+
+// For the structuring of a car network involving a very large number of measuring channels, function frames can be
+// defined. These function frames shall be used in the application system to allow the selection lists for the selection
+// of measuring channels to be represented in a structured manner on the basis of functional viewpoints (function
+// orientation). This will also be used to describe the packaging of measurement data into sources for CAN frames in a
+// network environment.
+message FrameType {
+  // unique identifier in the program, referencing is based on this 'name'
+  //
+  // Note: The name of the frame has to be unique within all frames of the ASAP2 MODULE, i.e. there must not be another
+  // FRAME object with the the same identifier in the MODULE.
+  IdentType Name = 1 [json_name="Name"];
+  // comment, description
+  StringType LongIdentifier = 2 [json_name="LongIdentifier"];
+  // This parameter defines the basic scaling unit. The following parameter 'Rate' relates on this scaling unit. The
+  // value of ScalingUnit is coded as shown in ‘Table 4: Codes for scaling units (CSE)’ (page144).
+  IntType ScalingUnit = 3 [json_name="ScalingUnit"];
+  // The maximum refresh rate of the concerning measurement source in the control unit. The unit is defined with
+  // parameter 'ScalingUnit'.
+  LongType Rate = 4 [json_name="Rate"];
+  // Use this keyword to define the frames measurement objects.
+  optional FrameMeasurementType FRAME_MEASUREMENT = 5 [json_name="FRAME_MEASUREMENT"];
+  // Interface-specific description data (BLOB: binary large object) used at ASAP1b device at call of the command
+  // InitRead(). The parameters associated with this keyword are described in the ASAP2 metalanguage (in short A2ML) by
+  // the ECU supplier or the interface module supplier.
+  repeated IfDataType IF_DATA = 6 [json_name="IF_DATA"];
+}
+
+// This keyword can be used to specify a list of 'functions' to which the relevant adjustable object has been allocated
+// (function orientation).
+//
+// Note: Since ASAP2 version 1.20 the keyword FUNCTION comprises some additional features to describe functional
+// structure and dependencies. The keyword FUNCTION_LIST is going to be canceled at ASAP2 version 2.00.
+message FunctionListType {
+  // List of references to higher-order functions (see FUNCTION).
+  repeated IdentType Name = 1 [json_name="Name"];
+}
+
+message FunctionType {
+  IdentType Name = 1 [json_name="Name"];
+  StringType LongIdentifier = 2 [json_name="LongIdentifier"];
+  repeated AnnotationType ANNOTATION = 3 [json_name="ANNOTATION"];
+  optional DefCharacteristicType DEF_CHARACTERISTIC = 4 [json_name="DEF_CHARACTERISTIC"];
+  optional RefCharacteristicType REF_CHARACTERISTIC = 5 [json_name="REF_CHARACTERISTIC"];
+  optional InMeasurementType IN_MEASUREMENT = 6 [json_name="IN_MEASUREMENT"];
+  optional OutMeasurementType OUT_MEASUREMENT = 7 [json_name="OUT_MEASUREMENT"];
+  optional LocMeasurementType LOC_MEASUREMENT = 8 [json_name="LOC_MEASUREMENT"];
+  optional SubFunctionType SUB_FUNCTION = 9 [json_name="SUB_FUNCTION"];
+  optional FunctionVersionType FUNCTION_VERSION = 10 [json_name="FUNCTION_VERSION"];
+}
+
+// String for identification of the version of a function with maximum MAX_STRING (at present 255) characters.
+message FunctionVersionType {
+  // short identifier for the version
+  StringType VersionIdentifier = 1 [json_name="VersionIdentifier"];
+}
+
+message GroupType {
+  IdentType GroupName = 1 [json_name="GroupName"];
+  StringType GroupLongIdentifier = 2 [json_name="GroupLongIdentifier"];
+  repeated AnnotationType ANNOTATION = 3 [json_name="ANNOTATION"];
+  optional RootType ROOT = 4 [json_name="ROOT"];
+  optional RefCharacteristicType REF_CHARACTERISTIC = 5 [json_name="REF_CHARACTERISTIC"];
+  optional RefMeasurementType REF_MEASUREMENT = 6 [json_name="REF_MEASUREMENT"];
+  optional FunctionListType FUNCTION_LIST = 7 [json_name="FUNCTION_LIST"];
+  optional SubGroupType SUB_GROUP = 8 [json_name="SUB_GROUP"];
+}
+
+message GuardRailsType {}
+
+// Header information on a project. A project can comprise several ASAP devices.
+message HeaderType {
+  // Comment: comment, description
+  StringType Comment = 1 [json_name="Comment"];
+  // Version: version number
+  optional VersionType VERSION = 2 [json_name="VERSION"];
+  // ProjectNo: project number
+  optional ProjectNoType PROJECT_NO = 3 [json_name="PROJECT_NO"];
+}
+
+// Description of an 'identifier' in an adjustable object (see BOSCH: C-DAMOS deposit).
+message IdentificationType {
+  // position of the 'identifier' in the deposit structure.
+  IntType Position = 1 [json_name="Position"];
+  // word length of the 'identifier"
+  DataTypeType DataType = 2 [json_name="DataType"];
+}
+
+// This keyword can be used to define input quantities of respective function.
+//
+// Note: IN_MEASUREMENT may only refer to objects of type MEASUREMENT.
+message InMeasurementType {
+  // Identifier of input quantity of respective function (reference to measurement object).
+  repeated IdentType Identifier = 1 [json_name="Identifier"];
+}
+
+message LeftShiftType {
+  LongType BitCount = 1 [json_name="BitCount"];
+}
+
+// This keyword can be used to define local quantities of respective function.
+//
+// Note: LOC_MEASUREMENT may only refer to objects of type MEASUREMENT.
+message LocMeasurementType {
+  // Identifier of local quantity of respective function (reference to measurement object).
+  repeated IdentType Identifier = 1 [json_name="Identifier"];
+}
+
+// This keyword can be used to specify the list of MAPs which comprise a CUBOID. This keyword is required because CUBOID
+// data will not be at contiguous memory locations if a CUBOID is composed of several MAPs.
+message MapListType {
+  // identifier of a MAP (see CHARACTERISTIC)
+  repeated IdentType Name = 1 [json_name="Name"];
+}
+
+// This keyword is used to describe the dimensions of a multidimensional array of values (MEASUREMENT or
+// CHARACTERISTIC).
+//
+// xDim * yDim *zDim = number of values.
+//
+// If NUMBER or ARRAY_SIZE are used in the CHARACTERISTIC or MEASUREMENT record the result must be the same as the value
+// given at this option.
+message MatrixDimType {
+  // number of values in dimension of x
+  IntType XDim = 1 [json_name="XDim"];
+  // number of values in dimension of y
+  IntType YDim = 2 [json_name="YDim"];
+  // number of values in dimension of z
+  IntType ZDim = 3 [json_name="ZDim"];
+}
+
+message MaxGradType {
+  FloatType MaxGradient = 1 [json_name="MaxGradient"];
+}
+
+// This optional keyword can be used to specify the maximum refresh rate in the control unit.
+message MaxRefreshType {
+  // this parameter defines the basic scaling unit. The following parameter 'Rate' relates on this scaling unit. The
+  // value of ScalingUnit is coded as shown below in ‘Table 4: Codes for scaling units (CSE)’.
+  IntType ScalingUnit = 1 [json_name="ScalingUnit"];
+  // the maximum refresh rate of the concerning measurement object in the control unit. The unit is defined with
+  // parameter 'ScalingUnit'.
+  LongType Rate = 2 [json_name="Rate"];
+}
+
+// The MEASUREMENT keyword is used to describe the parameters for the processing of a measurement object.
+message MeasurementType {
+  // Unique identifier in the ECU program
+  //
+  // Note: The name of the measurement object has to be unique within all measurement objects and adjustable objects of
+  // the ASAP2 MODULE, i.e. there must not be another AXIS_PTS, CHARACTERISTIC or MEASUREMENT object with the same
+  // identifier in the MODULE.
+  IdentType Name = 1 [json_name="Name"];
+  // Comment, description
+  StringType LongIdentifier = 2 [json_name="LongIdentifier"];
+  // Data type of the measurement
+  DataTypeType DataType = 3 [json_name="DataType"];
+  // Reference to the relevant record of the description of the conversion method (see COMPU_METHOD). If there is no
+  // conversion method, as in the case of CURVE_AXIS, the parameter ‘Conversion’ should be set to “NO_COMPU_METHOD”
+  // (application systems must be able to handle this case).
+  IdentType Conversion = 4 [json_name="Conversion"];
+  // Smallest possible change in bits
+  IntType Resolution = 5 [json_name="Resolution"];
+  // Possible variation from exact value in %
+  FloatType Accuracy = 6 [json_name="Accuracy"];
+  // The limit values are to be interpreted as physical values and not internal values.
+  FloatType LowerLimit = 7 [json_name="LowerLimit"];
+  // The limit values are to be interpreted as physical values and not internal values.
+  FloatType UpperLimit = 8 [json_name="UpperLimit"];
+  optional DisplayIdentifierType DISPLAY_IDENTIFIER = 9 [json_name="DISPLAY_IDENTIFIER"];
+  optional ReadWriteType READ_WRITE = 10 [json_name="READ_WRITE"];
+
+  // With deviation from the display format specified with keyword COMPU_TAB referenced by parameter <Conversion> a
+  // special display format can be specified to be used to display the measurement values.
+  optional FormatType FORMAT = 11 [json_name="FORMAT"];
+
+  // This keyword marks a measurement object as an array of measurement values.
+  optional ArraySizeType ARRAY_SIZE = 12 [json_name="ARRAY_SIZE"];
+  // With deviation from the standard value 0xFFFFFFFF this parameter can be used to mask out bits.
+  optional BitMaskType BIT_MASK = 13 [json_name="BIT_MASK"];
+  optional BitOperationType BIT_OPERATION = 14 [json_name="BIT_OPERATION"];
+
+  // With deviation from the standard value this parameter can be used to specify the byte order (Intel format, Motorola
+  // format)
+  optional ByteOrderType BYTE_ORDER = 15 [json_name="BYTE_ORDER"];
+  optional MaxRefreshType MAX_REFRESH = 16 [json_name="MAX_REFRESH"];
+  optional VirtualType VIRTUAL = 17 [json_name="VIRTUAL"];
+  optional FunctionListType FUNCTION_LIST = 18 [json_name="FUNCTION_LIST"];
+
+  // Address of the measurement in the memory of the control unit.
+  optional EcuAddressType ECU_ADDRESS = 19 [json_name="ECU_ADDRESS"];
+  optional ErrorMaskType ERROR_MASK = 20 [json_name="ERROR_MASK"];
+  optional RefMemorySegmentType REF_MEMORY_SEGMENT = 21 [json_name="REF_MEMORY_SEGMENT"];
+  repeated AnnotationType ANNOTATION = 22 [json_name="ANNOTATION"];
+
+  // Date record to describe the interface specific description data. The parameters associated with this keyword are
+  // described in A2ML by the control unit supplier or the interface module supplier.
+  repeated IfDataType IF_DATA = 23 [json_name="IF_DATA"];
+
+  // Shows the size and dimension of a multidimensional measurement. If the MATRIX_DIM keyword is used, then the option
+  // ARRAY_SIZE is not needed. However, if the keywords ARRAY_SIZE and MATRIX_DIM are both used, the resulting value in
+  // ARRAY_SIZE must be the same as xDim * yDim *zDim for MATRIX_DIM. If the keyword is missing the array has only one
+  // dimension with the size given at ARRAY_SIZE.
+  optional MatrixDimType MATRIX_DIM = 24 [json_name="MATRIX_DIM"];
+  // This keyword is an additional address information. For instance, it can be used, to distinguish different address
+  // spaces of an ECU (multi-microcontroller devices).
+  optional EcuAddressExtensionType ECU_ADDRESS_EXTENSION = 25 [json_name="ECU_ADDRESS_EXTENSION"];
+}
+
+// This data record is used to describe an ECU program. The description indicates how the emulation memory is divided
+// into the individual segments.
+message MemoryLayoutType {
+  // Description of the program segments divided into:
+  // - PRG_CODE = program code
+  // - PRG_DATA = program data
+  // - PRG_RESERVED = other
+  string PrgType = 1 [json_name="PrgType"];
+  // Initial address of the program segment to be described.
+  LongType Address = 2 [json_name="Address"];
+  // Length of the program segment to be described.
+  LongType Size = 3 [json_name="Size"];
+  // BOSCH feature: In special ECU programs, so-called 'mirrored segments' may occur (see Figure 8). A mirrored segment
+  // is a copy of another program segment. During adjustment the data changes are introduced in the relevant memory
+  // segment as well as in all mirrored segments.
+  repeated LongType Offset = 4 [json_name="Offset"]; // should be array of 5 elements...
+  // Date record to describe the interface specific description data used at ASAP1b device. The parameters associated
+  // with this keyword are described in the ASAP2 metalanguage (in short A2ML) by the control unit supplier or the
+  // interface module supplier.
+  repeated IfDataType IF_DATA = 5 [json_name="IF_DATA"];
+}
+
+// The new keyword MEMORY_SEGMENT is used to replace the existing keyword MEMORY_LAYOUT. The advantages of
+// MEMORY_SEGMENT are that they are given a name which can be used for references from IF_DATA Blobs and the more
+// accurate description of the memory by memory types and attributes (INTERN and EXTERN).
+//
+// Used in MOD_PAR. The keywords MEMORY_SEGMENT and MEMORY_LAYOUT can be used in parallel. The parameter Offset is to be
+// used (as within the former MEMORY_LAYOUT) to describe several mirrored segments. MEMORY_SEGMENTS with the same
+// MemoryType and the same Attribute may not overlap. Also all MEMORY_SEGMENTS with the PrgType CODE, DATA,
+// OFFLINE_DATA, RESERVED may not overlap mutually to get a linear address space for access on calibration data. All
+// other MEMORY_SEGMENTS with different MemoryType or different Attribute may however overlap, e.g. internal and
+// external memory segments.
+message MemorySegmentType {
+  // identifier, reference to IF_DATA Blob is based on this ´name´
+  IdentType Name = 1 [json_name="Name"];
+  // comment, description
+  StringType LongIdentifier = 2 [json_name="LongIdentifier"];
+  // - CODE: program code
+  // - DATA: program data allowed for online calibration
+  // - OFFLINE_DATA: program data allowed only for offline calibration
+  // - VARIABLES: program variables
+  // - SERAM: program data for serial emulation
+  // - RESERVED: reserved segments
+  // - CALIBRATION_VARIABLES: Values which are available in the ECU but do not exist in the Hex-file. There is no upload
+  //   required to get access to the ECU data. The ECU will never be touched by the instrumentation tool except by
+  //   upload.
+  // - EXCLUDE_FROM_FLASH: values existing in the ECU but not dropped down in the binary file. There should no upload be
+  //   needed to get access to the ECU data. The ECU will never be touched by the instrumentation tool except by upload.
+  string PrgType = 3 [json_name="PrgType"];
+  // Description of the type of memory used
+  // - RAM: segment of RAM
+  // - EEPROM: segment of EEPROM
+  // - EPROM: segment of EPROM
+  // - ROM: segment of ROM
+  // - REGISTER: segment of CPU registers
+  // - FLASH: segment of FLASH
+  string MemoryType = 4 [json_name="MemoryType"];
+  // attributes:
+  // - INTERN: internal segment
+  // - EXTERN: external segment
+  string Attribute = 5 [json_name="Attribute"];
+  // Initial address
+  LongType Address = 6 [json_name="Address"];
+  // Length of the segment
+  LongType Size = 7 [json_name="Size"];
+  // Offset address of mirrored segments
+  repeated LongType Offset = 8 [json_name="Offset"];
+  // Date record to describe the interface specific description data used at ASAP1b device. The parameters associated
+  // with this keyword are described in the ASAP2 metalanguage (in short A2ML) by the control unit supplier or the
+  // interface module supplier
+  repeated IfDataType IF_DATA = 9 [json_name="IF_DATA"];
+}
+
+message ModCommonType {
+  StringType Comment = 1 [json_name="Comment"];
+  optional SRecLayoutType S_REC_LAYOUT = 2 [json_name="S_REC_LAYOUT"];
+  optional DepositType DEPOSIT = 3 [json_name="DEPOSIT"];
+  optional ByteOrderType BYTE_ORDER = 4 [json_name="BYTE_ORDER"];
+  optional DataSizeType DATA_SIZE = 5 [json_name="DATA_SIZE"];
+  optional AlignmentByteType ALIGNMENT_BYTE = 6 [json_name="ALIGNMENT_BYTE"];
+  optional AlignmentWordType ALIGNMENT_WORD = 7 [json_name="ALIGNMENT_WORD"];
+  optional AlignmentLongType ALIGNMENT_LONG = 8 [json_name="ALIGNMENT_LONG"];
+  optional AlignmentFloat32IeeeType ALIGNMENT_FLOAT32_IEEE = 9 [json_name="ALIGNMENT_FLOAT32_IEEE"];
+  optional AlignmentFloat64IeeeType ALIGNMENT_FLOAT64_IEEE = 10 [json_name="ALIGNMENT_FLOAT64_IEEE"];
+}
+
+message ModParType {
+  StringType Comment = 1 [json_name="Comment"];
+  optional VersionType VERSION = 2 [json_name="VERSION"];
+  repeated AddrEpkType ADDR_EPK = 3 [json_name="ADDR_EPK"];
+  optional EpkType EPK = 4 [json_name="EPK"];
+  optional SupplierType SUPPLIER = 5 [json_name="SUPPLIER"];
+  optional CustomerType CUSTOMER = 6 [json_name="CUSTOMER"];
+  optional CustomerNoType CUSTOMER_NO = 7 [json_name="CUSTOMER_NO"];
+  optional UserType USER = 8 [json_name="USER"];
+  optional PhoneNoType PHONE_NO = 9 [json_name="PHONE_NO"];
+  optional EcuType ECU = 10 [json_name="ECU"];
+  optional CpuTypeType CPU_TYPE = 11 [json_name="CPU_TYPE"];
+  optional NoOfInterfacesType NO_OF_INTERFACES = 12 [json_name="NO_OF_INTERFACES"];
+  optional EcuCalibrationOffsetType ECU_CALIBRATION_OFFSET = 13 [json_name="ECU_CALIBRATION_OFFSET"];
+  repeated CalibrationMethodType CALIBRATION_METHOD = 14 [json_name="CALIBRATION_METHOD"];
+  repeated MemoryLayoutType MEMORY_LAYOUT = 15 [json_name="MEMORY_LAYOUT"];
+  repeated MemorySegmentType MEMORY_SEGMENT = 16 [json_name="MEMORY_SEGMENT"];
+  repeated SystemConstantType SYSTEM_CONSTANT = 17 [json_name="SYSTEM_CONSTANT"];
+}
+
+// The MODULE keyword describes a complete ASAP device with all adjustable and measurement objects, conversion methods
+// and functions. To this, the format description of the interface-specific parameters by the ECU supplier must be
+// added.
+//
+//Note: It is possible to have a measurement object and a computation method with equal names within the same MODULE. It
+// is NOT possible to have a measurement object and a calibration object with equal names within the same MODULE.
+message ModuleType {
+  // ASAP device identifier
+  IdentType Name = 1 [json_name="Name"];
+  // comment, description
+  StringType LongIdentifier = 2 [json_name="LongIdentifier"];
+  optional A2MLType A2ML = 3 [json_name="A2ML"];
+  optional ModParType MOD_PAR = 4 [json_name="MOD_PAR"];
+  optional ModCommonType MOD_COMMON = 5 [json_name="MOD_COMMON"];
+  repeated IfDataType IF_DATA = 6 [json_name="IF_DATA"];
+  repeated CharacteristicType CHARACTERISTIC = 7 [json_name="CHARACTERISTIC"];
+  repeated AxisPtsType AXIS_PTS = 8 [json_name="AXIS_PTS"];
+
+  // Keyword for the description of the measurement objects
+  repeated MeasurementType MEASUREMENT = 9 [json_name="MEASUREMENT"];
+
+  repeated CompuMethodType COMPU_METHOD = 10 [json_name="COMPU_METHOD"];
+  repeated CompuTabType COMPU_TAB = 11 [json_name="COMPU_TAB"];
+  repeated CompuVTabType COMPU_VTAB = 12 [json_name="COMPU_VTAB"];
+  repeated CompuVTabRangeType COMPU_VTAB_RANGE = 13 [json_name="COMPU_VTAB_RANGE"];
+  repeated FunctionType FUNCTION = 14 [json_name="FUNCTION"];
+  repeated GroupType GROUP = 15 [json_name="GROUP"];
+  repeated RecordLayoutType RECORD_LAYOUT = 16 [json_name="RECORD_LAYOUT"];
+  optional VariantCodingType VARIANT_CODING = 17 [json_name="VARIANT_CODING"];
+  optional FrameType FRAME = 18 [json_name="FRAME"];
+  repeated UserRightsType USER_RIGHTS = 19 [json_name="USER_RIGHTS"];
+  repeated UnitType UNIT = 20 [json_name="UNIT"];
+}
+
+message MonotonyType {
+  string Monotony = 1 [json_name="Monotony"];
+}
+
+// Description of the number of axis points in an adjustable object
+message NoAxisPtsXType {
+  // Position of the number of axis points in the deposit structure
+  IntType Position = 1 [json_name="Position"];
+  // Data type of the number of axis points
+  DataTypeType DataType = 2 [json_name="DataType"];
+}
+
+// Description of the number of axis points in an adjustable object
+message NoAxisPtsYType {
+  // Position of the number of axis points in the deposit structure
+  IntType Position = 1 [json_name="Position"];
+  // Data type of the number of axis points
+  DataTypeType DataType = 2 [json_name="DataType"];
+}
+
+// Description of the number of axis points in an adjustable object
+message NoAxisPtsZType {
+  // Position of the number of axis points in the deposit structure
+  IntType Position = 1 [json_name="Position"];
+  // Data type of the number of axis points
+  DataTypeType DataType = 2 [json_name="DataType"];
+}
+
+// Keyword for the number of interfaces
+message NoOfInterfacesType {
+  // Number of interfaces
+  IntType Num = 1 [json_name="Num"];
+}
+
+// Actual number of rescaling axis point value pairs. Used in RECORD_LAYOUT.
+message NoRescaleXType {
+  // position of the actual number of rescale axis point value pairs in the deposit structure (description of sequence
+  // of elements in the data record).
+  IntType Position = 1 [json_name="Position"];
+  // Data type of the number of rescale axis point value pairs
+  DataTypeType DataType = 2 [json_name="DataType"];
+}
+
+// Actual number of rescaling axis point value pairs. Used in RECORD_LAYOUT.
+message NoRescaleYType {
+  // position of the actual number of rescale axis point value pairs in the deposit structure (description of sequence
+  // of elements in the data record).
+  IntType Position = 1 [json_name="Position"];
+  // Data type of the number of rescale axis point value pairs
+  DataTypeType DataType = 2 [json_name="DataType"];
+}
+
+// Actual number of rescaling axis point value pairs. Used in RECORD_LAYOUT.
+message NoRescaleZType {
+  // position of the actual number of rescale axis point value pairs in the deposit structure (description of sequence
+  // of elements in the data record).
+  IntType Position = 1 [json_name="Position"];
+  // Data type of the number of rescale axis point value pairs
+  DataTypeType DataType = 2 [json_name="DataType"];
+}
+
+message NumberType {
+  IntType Number = 1 [json_name="Number"];
+}
+
+// Description of the 'offset' parameter in the deposit structure to compute the axis points for fixed characteristic
+// curves and fixed characteristic maps (see also keyword FIX_AXIS_PAR).
+message OffsetXType {
+  // Position of the 'offset' parameter in the deposit structure to compute the X-axis points for fixed characteristic
+  // curves and fixed characteristic maps.
+  IntType Position = 1 [json_name="Position"];
+  // Data type of the 'offset' parameter.
+  DataTypeType DataType = 2 [json_name="DataType"];
+}
+
+// Description of the 'offset' parameter in the deposit structure to compute the axis points for fixed characteristic
+// curves and fixed characteristic maps (see also keyword FIX_AXIS_PAR).
+message OffsetYType {
+  // Position of the 'offset' parameter in the deposit structure to compute the X-axis points for fixed characteristic
+  // curves and fixed characteristic maps.
+  IntType Position = 1 [json_name="Position"];
+  // Data type of the 'offset' parameter.
+  DataTypeType DataType = 2 [json_name="DataType"];
+}
+
+// Description of the 'offset' parameter in the deposit structure to compute the axis points for fixed characteristic
+// curves and fixed characteristic maps (see also keyword FIX_AXIS_PAR).
+message OffsetZType {
+  // Position of the 'offset' parameter in the deposit structure to compute the X-axis points for fixed characteristic
+  // curves and fixed characteristic maps.
+  IntType Position = 1 [json_name="Position"];
+  // Data type of the 'offset' parameter.
+  DataTypeType DataType = 2 [json_name="DataType"];
+}
+
+// This keyword can be used to define output quantities of respective function.
+//
+// Note: OUT_MEASUREMENT may only refer to objects of type MEASUREMENT.
+message OutMeasurementType {
+  // Identifier of output quantity of respective function (reference to measurement object).
+  repeated IdentType Identifier = 1 [json_name="Identifier"];
+}
+
+// This keyword is used to specify a phone number, e.g. of the applications engineer responsible.
+message PhoneNoType {
+  // phone number
+  StringType TelNum = 1 [json_name="TelNum"];
+}
+
+// String used to identify the project number with maximum MAX_IDENT (at present MAX_IDENT = 10) characters.
+message ProjectNoType {
+  // Short identifier of the project number
+  IdentType ProjectNumber = 1 [json_name="ProjectNumber"];
+}
+
+// Project description with project header and all ASAP devices belonging to the project. The PROJECT keyword covers the
+// description of several control units, and possibly also of several suppliers.
+message ProjectType {
+  // Project identifier in the program
+  IdentType Name = 1 [json_name="Name"];
+  // Comment, description
+  StringType LongIdentifier = 2 [json_name="LongIdentifier"];
+  // Project header
+  HeaderType HEADER = 3 [json_name="HEADER"];
+  // This keyword is used to describe the module (ASAP device) belonging to the project.
+  repeated ModuleType MODULE = 4 [json_name="MODULE"];
+}
+
+message ReadOnlyType {}
+
+message ReadWriteType {}
+
+message RecordLayoutType {
+  IdentType Name = 1 [json_name="Name"];
+  optional FncValuesType FNC_VALUES = 2 [json_name="FNC_VALUES"];
+  optional IdentificationType IDENTIFICATION = 3 [json_name="IDENTIFICATION"];
+  optional AxisPtsXType AXIS_PTS_X = 4 [json_name="AXIS_PTS_X"];
+  optional AxisPtsYType AXIS_PTS_Y = 5 [json_name="AXIS_PTS_Y"];
+  optional AxisPtsZType AXIS_PTS_Z = 6 [json_name="AXIS_PTS_Z"];
+  optional AxisRescaleXType AXIS_RESCALE_X = 7 [json_name="AXIS_RESCALE_X"];
+  optional AxisRescaleYType AXIS_RESCALE_Y = 8 [json_name="AXIS_RESCALE_Y"];
+  optional AxisRescaleZType AXIS_RESCALE_Z = 9 [json_name="AXIS_RESCALE_Z"];
+  optional NoAxisPtsXType NO_AXIS_PTS_X = 10 [json_name="NO_AXIS_PTS_X"];
+  optional NoAxisPtsYType NO_AXIS_PTS_Y = 11 [json_name="NO_AXIS_PTS_Y"];
+  optional NoAxisPtsZType NO_AXIS_PTS_Z = 12 [json_name="NO_AXIS_PTS_Z"];
+  optional NoRescaleXType NO_RESCALE_X = 13 [json_name="NO_RESCALE_X"];
+  optional NoRescaleYType NO_RESCALE_Y = 14 [json_name="NO_RESCALE_Y"];
+  optional NoRescaleZType NO_RESCALE_Z = 15 [json_name="NO_RESCALE_Z"];
+  optional FixNoAxisPtsXType FIX_NO_AXIS_PTS_X = 16 [json_name="FIX_NO_AXIS_PTS_X"];
+  optional FixNoAxisPtsYType FIX_NO_AXIS_PTS_Y = 17 [json_name="FIX_NO_AXIS_PTS_Y"];
+  optional FixNoAxisPtsZType FIX_NO_AXIS_PTS_Z = 18 [json_name="FIX_NO_AXIS_PTS_Z"];
+  optional SrcAddrXType SRC_ADDR_X = 19 [json_name="SRC_ADDR_X"];
+  optional SrcAddrYType SRC_ADDR_Y = 20 [json_name="SRC_ADDR_Y"];
+  optional SrcAddrZType SRC_ADDR_Z = 21 [json_name="SRC_ADDR_Z"];
+  optional RipAddrXType RIP_ADDR_X = 22 [json_name="RIP_ADDR_X"];
+  optional RipAddrYType RIP_ADDR_Y = 23 [json_name="RIP_ADDR_Y"];
+  optional RipAddrZType RIP_ADDR_Z = 24 [json_name="RIP_ADDR_Z"];
+  optional RipAddrWType RIP_ADDR_W = 25 [json_name="RIP_ADDR_W"];
+  optional ShiftOpXType SHIFT_OP_X = 26 [json_name="SHIFT_OP_X"];
+  optional ShiftOpYType SHIFT_OP_Y = 27 [json_name="SHIFT_OP_Y"];
+  optional ShiftOpZType SHIFT_OP_Z = 28 [json_name="SHIFT_OP_Z"];
+  optional OffsetXType OFFSET_X = 29 [json_name="OFFSET_X"];
+  optional OffsetYType OFFSET_Y = 30 [json_name="OFFSET_Y"];
+  optional OffsetZType OFFSET_Z = 31 [json_name="OFFSET_Z"];
+  optional DistOpXType DIST_OP_X = 32 [json_name="DIST_OP_X"];
+  optional DistOpYType DIST_OP_Y = 33 [json_name="DIST_OP_Y"];
+  optional DistOpZType DIST_OP_Z = 34 [json_name="DIST_OP_Z"];
+  optional AlignmentByteType ALIGNMENT_BYTE = 35 [json_name="ALIGNMENT_BYTE"];
+  optional AlignmentWordType ALIGNMENT_WORD = 36 [json_name="ALIGNMENT_WORD"];
+  optional AlignmentLongType ALIGNMENT_LONG = 37 [json_name="ALIGNMENT_LONG"];
+  optional AlignmentFloat32IeeeType ALIGNMENT_FLOAT32_IEEE = 38 [json_name="ALIGNMENT_FLOAT32_IEEE"];
+  optional AlignmentFloat64IeeeType ALIGNMENT_FLOAT64_IEEE = 39 [json_name="ALIGNMENT_FLOAT64_IEEE"];
+  repeated ReservedType RESERVED = 40 [json_name="RESERVED"];
+}
+
+// This keyword can be used to define some adjustable objects that are referenced in respective function or group.
+//
+// Note: REF_CHARACTERISTIC may only refer to objects of type CHARACTERISTIC or AXIS_PTS.
+message RefCharacteristicType {
+  // Identifier of those adjustable objects that are referred to respective function or group.
+  repeated IdentType Identifier = 1 [json_name="Identifier"];
+}
+
+// This keyword can be used to refer groups which control the access rights of users logging into an .MCD system.
+message RefGroupType {
+  // Identifier of those groups which are referred in USER_RIGHTS
+  repeated IdentType Identifier = 1 [json_name="Identifier"];
+}
+
+// This keyword can be used to define measurement quantities which are member of the respective function.
+message RefMeasurementType {
+  // Identifier of those measurement quantities which are referred to the group.
+  repeated IdentType Identifier = 1 [json_name="Identifier"];
+}
+
+// The reference to a memory segment is needed in characteristics and measurements. The memory segment, the
+// characteristic belongs to can not be detected by the address itself in the case of overlapping memory segments.
+//
+// Used in CHARACTERISTIC, AXIS_PTS, MEASUREMENT.
+message RefMemorySegmentType {
+  // Name of memory segments
+  IdentType Name = 1 [json_name="Name"];
+}
+
+// This keyword can be used to reference to the data record which describes a measurement unit. It can be used in
+// COMPU_METHOD and UNIT.
+//
+// REF_UNIT may only refer to objects of type UNIT.
+//
+// Note: The string parameter Unit of a COMPU_METHOD is a redundant information because the record referenced by
+// REF_UNIT contain it too. Just for the purpose of compatibility with previous versions of ASAP2 the parameter REF_UNIT
+// is optional. Therefore the string parameter Unit is going to be canceled at ASAP2 version 2.00.
+message RefUnitType {
+  // Reference to the data record which describes a measurement unit
+  IdentType Unit = 1 [json_name="Unit"];
+}
+
+// This keyword can be used to skip specific elements in an adjustable object whose meaning must not be interpreted by
+// the application system (e.g. for extensions: new parameters in the adjustable objects).
+message ReservedType {
+  // Position of the reserved parameter in the deposit structure
+  IntType Position = 1 [json_name="Position"];
+  // Word length of the reserved parameter.
+  DataSizeType DataSize = 2 [json_name="DataSize"];
+}
+
+message RightShiftType {
+  LongType BitCount = 1 [json_name="BitCount"];
+}
+
+// The description of this parameter should be based on the example of a characteristic curve (RIP: Result of
+// Interpolation).
+//
+// When the ECU program accesses the characteristic curve it first determines the adjacent axis points of the current
+// value of the input quantity (see Figure 9: Xi, Xi+1). The output value is derived from these axis points and the two
+// allocated table values by means of interpolation.
+message RipAddrWType {
+  // Position of the address to the result of the ECU-internal interpolation (see below) in the deposit structure.
+  IntType Position = 1 [json_name="Position"];
+  // Data type of the address.
+  //
+  // Remark: Relating to version 1.0 of ASAP2-Specification this is an additional parameter.
+  DataTypeType DataType = 2 [json_name="DataType"];
+}
+
+// The description of this parameter should be based on the example of a characteristic curve (RIP: Result of
+// Interpolation).
+//
+// When the ECU program accesses the characteristic curve it first determines the adjacent axis points of the current
+// value of the input quantity (see Figure 9: Xi, Xi+1). The output value is derived from these axis points and the two
+// allocated table values by means of interpolation.
+message RipAddrXType {
+  // Position of the address to the result of the ECU-internal interpolation (see below) in the deposit structure.
+  IntType Position = 1 [json_name="Position"];
+  // Data type of the address.
+  //
+  // Remark: Relating to version 1.0 of ASAP2-Specification this is an additional parameter.
+  DataTypeType DataType = 2 [json_name="DataType"];
+}
+
+// The description of this parameter should be based on the example of a characteristic curve (RIP: Result of
+// Interpolation).
+//
+// When the ECU program accesses the characteristic curve it first determines the adjacent axis points of the current
+// value of the input quantity (see Figure 9: Xi, Xi+1). The output value is derived from these axis points and the two
+// allocated table values by means of interpolation.
+message RipAddrYType {
+  // Position of the address to the result of the ECU-internal interpolation (see below) in the deposit structure.
+  IntType Position = 1 [json_name="Position"];
+  // Data type of the address.
+  //
+  // Remark: Relating to version 1.0 of ASAP2-Specification this is an additional parameter.
+  DataTypeType DataType = 2 [json_name="DataType"];
+}
+
+// The description of this parameter should be based on the example of a characteristic curve (RIP: Result of
+// Interpolation).
+//
+// When the ECU program accesses the characteristic curve it first determines the adjacent axis points of the current
+// value of the input quantity (see Figure 9: Xi, Xi+1). The output value is derived from these axis points and the two
+// allocated table values by means of interpolation.
+message RipAddrZType {
+  // Position of the address to the result of the ECU-internal interpolation (see below) in the deposit structure.
+  IntType Position = 1 [json_name="Position"];
+  // Data type of the address.
+  //
+  // Remark: Relating to version 1.0 of ASAP2-Specification this is an additional parameter.
+  DataTypeType DataType = 2 [json_name="DataType"];
+}
+
+message RootNodeType {
+  ASAP2VersionType ASAP2_VERSION = 1 [json_name="ASAP2_VERSION"];
+  A2MLVersionType A2ML_VERSION = 2 [json_name="A2ML_VERSION"];
+  ProjectType PROJECT = 3 [json_name="PROJECT"];
+}
+
+// This keyword ROOT indicates that the related group is presented as a root of a navigation tree in the group selection
+// mechanism of the MCD system. The keyword ROOT can indicate that groups referred to this root group constitute a
+// grouping mechanism.
+message RootType {}
+
+// Description of the shift operand in the deposit structure to compute the axis points for fixed characteristic curves
+// and fixed characteristic maps (see also keyword FIX_AXIS_PAR).
+message ShiftOpXType {
+  // Position of the shift operand in the deposit structure.
+  IntType Position = 1 [json_name="Position"];
+  // Data type of the shift operand.
+  DataTypeType DataType = 2 [json_name="DataType"];
+}
+
+// Description of the shift operand in the deposit structure to compute the axis points for fixed characteristic curves
+// and fixed characteristic maps (see also keyword FIX_AXIS_PAR).
+message ShiftOpYType {
+  // Position of the shift operand in the deposit structure.
+  IntType Position = 1 [json_name="Position"];
+  // Data type of the shift operand.
+  DataTypeType DataType = 2 [json_name="DataType"];
+}
+
+// Description of the shift operand in the deposit structure to compute the axis points for fixed characteristic curves
+// and fixed characteristic maps (see also keyword FIX_AXIS_PAR).
+message ShiftOpZType {
+  // Position of the shift operand in the deposit structure.
+  IntType Position = 1 [json_name="Position"];
+  // Data type of the shift operand.
+  DataTypeType DataType = 2 [json_name="DataType"];
+}
+
+// Specification of the seven base dimensions required to define an extended SI unit.
+message SiExponentsType {
+  // exponent of the base dimension length with unit metre
+  IntType Length = 1 [json_name="Length"];
+  // exponent of the base dimension mass with unit kilogram
+  IntType Mass = 2 [json_name="Mass"];
+  // exponent of the base dimension time with unit second
+  IntType Time = 3 [json_name="Time"];
+  // exponent of the base dimension electric current with unit ampere
+  IntType ElectricCurrent = 4 [json_name="ElectricCurrent"];
+  // exponent of the base dimension thermodynamic temperature with unit kelvin
+  IntType Temperature = 5 [json_name="Temperature"];
+  // exponent of the base dimension amount of substance with unit mole
+  IntType AmountOfSubstance = 6 [json_name="AmountOfSubstance"];
+  // exponent of the base dimension luminous intensity with unit candela
+  IntType LuminousIntensity = 7 [json_name="LuminousIntensity"];
+}
+
+message SignExtendType {}
+
+// Description of the address of the input quantity in an adjustable object
+message SrcAddrXType {
+  // Position of the address of the input quantity in the deposit structure.
+  IntType Position = 1 [json_name="Position"];
+  // Data type of the address.
+  //
+  // Remark: Relating to version 1.0 of ASAP2-Specification this is an additional parameter. The appropriate parameter
+  // in the corresponding measuring channel data record is not any longer used.
+  DataTypeType DataType = 2 [json_name="DataType"];
+}
+
+// Description of the address of the input quantity in an adjustable object
+message SrcAddrYType {
+  // Position of the address of the input quantity in the deposit structure.
+  IntType Position = 1 [json_name="Position"];
+  // Data type of the address.
+  //
+  // Remark: Relating to version 1.0 of ASAP2-Specification this is an additional parameter. The appropriate parameter
+  // in the corresponding measuring channel data record is not any longer used.
+  DataTypeType DataType = 2 [json_name="DataType"];
+}
+
+// Description of the address of the input quantity in an adjustable object
+message SrcAddrZType {
+  // Position of the address of the input quantity in the deposit structure.
+  IntType Position = 1 [json_name="Position"];
+  // Data type of the address.
+  //
+  // Remark: Relating to version 1.0 of ASAP2-Specification this is an additional parameter. The appropriate parameter
+  // in the corresponding measuring channel data record is not any longer used.
+  DataTypeType DataType = 2 [json_name="DataType"];
+}
+
+// This keyword can be used to specify the name of a standard record layout which will then apply to all characteristics
+// in the entire module. Exceptions can be specified for the relevant characteristics.
+//
+// Note: S_REC_LAYOUT may only refer to objects of type RECORD_LAYOUT.
+message SRecLayoutType {
+  IdentType Name = 1 [json_name="Name"];
+}
+
+// This keyword can be used to define the hierarchical structure of functions.
+//
+// Note: SUB_FUNCTION may only refer to objects of type FUNCTION.
+message SubFunctionType {
+  // Reference to function record. This function record is declared as subfunction of respective function.
+  repeated IdentType Identifier = 1 [json_name="Identifier"];
+}
+
+// This keyword can be used to define the hierarchical structure of groups. In particular, a set of groups referenced
+// from a root group (with optional keyword ROOT) constitute a grouping mechanism.
+message SubGroupType {
+  // Reference to a group record. This group record is declared as sub-group of the respective GROUP.
+  repeated IdentType Identifier = 1 [json_name="Identifier"];
+}
+
+// String used to identify the manufacturer or supplier.
+message SupplierType {
+  // Name of the ECU manufacturer
+  StringType Manufacturer = 1 [json_name="Manufacturer"];
+}
+
+// System-defined constant.
+message SystemConstantType {
+  // system constant identifier
+  StringType Name = 1 [json_name="Name"];
+  // value of the system constant as a string
+  StringType Value = 2 [json_name="Value"];
+}
+
+// Specification of the linear relationship between two measurement units given by describing the conversion from the
+// referenced unit to the derived unit:
+//
+// derived_unit = f(referenced_unit)
+//
+// The referenced measurement unit had to be specified with parameter REF_UNIT.
+message UnitConversionType {
+  // gradient of the linear relationship between two measurement units:
+  //
+  // f(x) = gradient * x + offset
+  FloatType Gradient = 1 [json_name="Gradient"];
+  // offset of the linear relationship between two measurement units:
+  //
+  // f(x) = gradient * x + offset
+  FloatType Offset = 2 [json_name="Offset"];
+}
+
+message UnitType {
+  IdentType Name = 1 [json_name="Name"];
+  StringType LongIdentifier = 2 [json_name="LongIdentifier"];
+  StringType Display = 3 [json_name="Display"];
+  string Type = 4 [json_name="Type"];
+  optional SiExponentsType SI_EXPONENTS = 5 [json_name="SI_EXPONENTS"];
+  optional RefUnitType REF_UNIT = 6 [json_name="REF_UNIT"];
+  optional UnitConversionType UNIT_CONVERSION = 7 [json_name="UNIT_CONVERSION"];
+}
+
+message UserRightsType {
+  IdentType UserLevelId = 1 [json_name="UserLevelId"];
+  repeated RefGroupType REF_GROUP = 2 [json_name="REF_GROUP"];
+  optional ReadOnlyType READ_ONLY = 3 [json_name="READ_ONLY"];
+}
+
+// Specification of the user name.
+message UserType {
+  // Name of the user
+  StringType UserName = 1 [json_name="UserName"];
+}
+
+// This keyword can be used to define a list of start addresses of variant coded adjustable objects (see keyword
+// VAR_CHARACTERISTIC). The number of addresses agrees with number of valid combinations of adjustable objects variant
+// criteria (forbidden combinations excluded). The order of addresses corresponds to the order of variant criteria
+// defined with parameter 'CriterionName' at keyword VAR_CHARACTERISTIC.
+message VarAddressType {
+  // Start address of one variant of variant coded adjustable object.
+  repeated LongType Address = 1 [json_name="Address"];
+}
+
+// This keyword defines one adjustable object to be variant coded, i.e. this adjustable objects is multiple deposited in
+// control unit software corresponding to the assigned variant criteria. The number of variants results on valid
+// combinations (forbidden combinations excluded) of variant criteria.
+//
+// Note: If an AXIS_PTS object is variant coded, the curves and maps using this common axis must be variant coded in the
+// same way, i.e. they have to refer the same variant criteria in the same order.
+message VarCharacteristicType {
+  // Identifier of variant coded adjustable object (refers to CHARACTERISTIC or AXIS_PTS record).
+  IdentType Name = 1 [json_name="Name"];
+  // Corresponding to each combination of variant criteria defined with this parameter the control unit software
+  // contains variants of concerning adjustable object.
+  repeated IdentType CriterionName = 2 [json_name="CriterionName"];
+  // Definition of start address of adjustable objects variants.
+  optional VarAddressType VAR_ADDRESS = 3 [json_name="VAR_ADDRESS"];
+}
+
+// This keyword describes a variant criterion, i.e. some adjustable objects are multiple deposited in control unit
+// software corresponding to the enumeration of variant criterion values.
+message VarCriterionType {
+  // Identifier of variant criterion.
+  IdentType Name = 1 [json_name="Name"];
+  // Comment to describe the variant criterion.
+  StringType LongIdentifier = 2 [json_name="LongIdentifier"];
+  // Enumeration of criterion values.
+  repeated IdentType Value = 3 [json_name="Value"];
+  // This keyword can be used to specify a special measurement object. This measurement object indicates with its
+  // current value the variant which has effect on running control unit software.
+  optional VarMeasurementType VAR_MEASUREMENT = 4 [json_name="VAR_MEASUREMENT"];
+  // This keyword is used to specify a special characteristic to change the variant of software which is running on
+  // control unit.
+  optional VarSelectionCharacteristicType VAR_SELECTION_CHARACTERISTIC = 5 [json_name="VAR_SELECTION_CHARACTERISTIC"];
+}
+
+// This keyword describes a forbidden combination of values of different variant criteria.
+message VarForbiddenCombType {
+  message CriterionType {
+    // Identifier of variant criterion.
+    IdentType CriterionName = 1 [json_name="CriterionName"];
+    // Value of variant criterion 'CriterionName'.
+    IdentType CriterionValue = 2 [json_name="CriterionValue"];
+  }
+  repeated CriterionType CriterionNameCriterionValue = 1 [json_name="CriterionNameCriterionValue"];
+}
+
+message VariantCodingType {
+  optional VarSeparatorType VAR_SEPARATOR = 1 [json_name="VAR_SEPARATOR"];
+  optional VarNamingType VAR_NAMING = 2 [json_name="VAR_NAMING"];
+  repeated VarCriterionType VAR_CRITERION = 3 [json_name="VAR_CRITERION"];
+  repeated VarForbiddenCombType VAR_FORBIDDEN_COMB = 4 [json_name="VAR_FORBIDDEN_COMB"];
+  repeated VarCharacteristicType VAR_CHARACTERISTIC = 5 [json_name="VAR_CHARACTERISTIC"];
+}
+
+// This keyword can be used to specify a special measurement object. This measurement object indicates with its current
+// value the variant which has effect on running control unit software. The value 0 (zero) of measurement object
+// corresponds to the first variant value defined at relative VAR_CRITERION record (see parameter 'Value' at keyword
+// VAR_CRITERION), the value 1 to the second and so on.
+message VarMeasurementType {
+  // Identifier of measurement object which indicates the actual criterion value. This parameter refers to a MEASUREMENT
+  // record of description file.
+  IdentType Name = 1 [json_name="Name"];
+}
+
+// This keyword defines the format of variant extension (index) of adjustable objects name. The extension is used at MCD
+// to distinguish the different variants of adjustable objects.
+message VarNamingType {
+  // Format of variant extension (index). Possible values:
+  // - NUMERIC: variant extension is a number (integer: 0,1,2,3...).
+  // This parameter is reserved for future extension (e.g. ALPHA = { A, B, C, D....}).
+  string Tag = 1 [json_name="Tag"];
+}
+
+// This keyword can be used to specify a special characteristic object. This characteristic object changes with its
+// current value the variant which has effect on running control unit software. Referenced VAR_SELECTION_CHARACTERISTIC
+// could have a 'verbal conversion table' and the strings defined at COMPU_VTAB could correspond to criterion values at
+// VAR_CRITERION record.
+message VarSelectionCharacteristicType {
+  // Identifier of characteristic object which indicates the actual criterion value. This parameter refers to a
+  // CHARACTERISTIC record of description file.
+  IdentType Name = 1 [json_name="Name"];
+}
+
+// This keyword can be used to define the separating symbol between the two parts of adjustable objects name: 1.)
+// identifier 2.) variant extension.
+//
+// Remark: The identifier of description record of variant coded adjustable objects contains no variant extension. The
+// extension is needed to distinguish the variants at MCD.
+message VarSeparatorType {
+  // This parameter defines the separating symbol of variant extension.
+  StringType Separator = 1 [json_name="Separator"];
+}
+
+// String for identification of the version with maximum MAX_STRING (at present 255) characters.
+message VersionType {
+  // short identifier for the version
+  StringType VersionIdentifier = 1 [json_name="VersionIdentifier"];
+}
+
+// This keyword allows to define characteristics that are not deposited in the memory of the control unit, but can be
+// used to indirectly calibrate other characteristic values in the control unit, if these are declared to be dependent
+// on this characteristic. The introduction of virtual characteristic is therefore useful for saving memory in the case
+// the calibration with dependent characteristics is used.
+message VirtualCharacteristicType {
+  // Formula to be used for the calculation of the initial physical value of the characteristic from the physical value
+  // of other characteristics.
+  StringType Formula = 1 [json_name="Formula"];
+  // Identifier of those adjustable objects that are used for the calculation of this characteristic.
+  repeated IdentType Characteristic = 2 [json_name="Characteristic"];
+}
+
+message VirtualType {
+  repeated IdentType MeasuringChannel = 1 [json_name="MeasuringChannel"];
+}

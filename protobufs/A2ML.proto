@@ -1,0 +1,104 @@
+syntax = "proto3";
+
+option go_package = "./../pkg/a2l";
+
+import "protobufs/shared.proto";
+
+message declaration {
+  oneof oneof {
+    type_definition type_definition = 1 [json_name="type_definition"];
+    block_definition block_definition = 2 [json_name="block_definition"];
+  }
+}
+
+message type_definition {
+  type_name type_name = 1 [json_name="type_name"];
+}
+
+message type_name {
+  oneof oneof  {
+    predefined_type_name predefined_type_name = 1 [json_name="predefined_type_name"];
+    struct_type_name struct_type_name = 2 [json_name="struct_type_name"];
+    taggedstruct_type_name taggedstruct_type_name = 3 [json_name="taggedstruct_type_name"];
+    taggedunion_type_name taggedunion_type_name = 4 [json_name="taggedunion_type_name"];
+    enum_type_name enum_type_name = 5 [json_name="enum_type_name"];
+  }
+}
+
+message predefined_type_name {
+  string name = 1 [json_name="name"];
+}
+
+message block_definition {
+  optional TagType tag = 1 [json_name="tag"];
+  oneof oneof {
+    type_name type_name = 2 [json_name="type_name"];
+    member member = 3 [json_name="member"]; // This is not part of the specification. However, Canape generates A2L with this format...
+  }
+}
+
+message enum_type_name {
+  optional IdentType identifier = 1 [json_name="identifier"];
+  repeated enumerator enumerator_list = 2 [json_name="enumerator_list"];
+}
+
+message enumerator {
+  string keyword = 1 [json_name="keyword"];
+  LongType constant = 2 [json_name="constant"];
+}
+
+message struct_type_name {
+  optional IdentType identifier = 1 [json_name="identifier"];
+  repeated struct_member struct_member_list = 2 [json_name="struct_member_list"];
+}
+
+message struct_member {
+  member member = 1 [json_name="member"];
+  bool star = 2 [json_name="star"];
+}
+
+message member {
+  type_name type_name = 1 [json_name="type_name"];
+  optional array_specifier array_specifier = 2 [json_name="array_specifier"];
+}
+
+message array_specifier {
+  repeated LongType constant = 1 [json_name="constant"];
+}
+
+message taggedstruct_type_name {
+  optional IdentType identifier = 1 [json_name="identifier"];
+  repeated taggedstruct_member taggedstruct_member_list = 2 [json_name="taggedstruct_member_list"];
+}
+
+message taggedstruct_member {
+  oneof oneof {
+    taggedstruct_definition taggedstruct_definition = 1 [json_name="taggedstruct_definition"];
+    block_definition block_definition = 2 [json_name="block_definition"];
+  }
+  bool star = 3 [json_name="star"];
+}
+
+message taggedstruct_definition {
+  optional TagType tag = 1 [json_name="tag"];
+  member member = 2 [json_name="member"];
+  bool star = 3 [json_name="star"];
+}
+
+message taggedunion_type_name {
+  optional IdentType identifier = 1 [json_name="identifier"];
+  repeated taggedunion_member taggedunion_member_list = 2 [json_name="taggedunion_member_list"];
+}
+
+message taggedunion_member {
+  oneof oneof {
+    tag_member tag_member = 1 [json_name="tag_member"];
+    block_definition block_definition = 2 [json_name="block_definition"];
+  }
+}
+
+// not part of the specification...
+message tag_member {
+  optional TagType tag = 1 [json_name="tag"];
+  member member = 2 [json_name="member"];
+}
