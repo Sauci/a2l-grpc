@@ -1,0 +1,41 @@
+name: build
+
+on: [push]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{github.repository}}
+
+jobs:
+  generate-antlr-sources:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - run: ./generate_antlr.sh
+      - uses: actions/upload-artifact@v3
+        with:
+          name: antlr4
+          path: |
+            pkg/a2l/parser
+
+#  generate-grpc-sources:
+#
+#  build-linux:
+#    name: Build and push build image
+#    runs-on: ubuntu-22.04
+#    steps:
+#      - uses: actions/checkout@v3
+#      - name: Log in to the Docker container registry
+#        run: ./ci-linux.sh install-dependencies
+#      - name: Extract metadata (tags, labels) for Docker
+#        id: meta
+#        uses: docker/metadata-action@v4
+#        with:
+#          images: ${{env.REGISTRY}}/${{env.IMAGE_NAME}}
+#      - name: Build and push Docker image
+#        uses: docker/build-push-action@v4
+#        with:
+#          context: .
+#          push: true
+#          tags: ${{steps.meta.outputs.tags}}
+#          labels: ${{steps.meta.outputs.labels}}
