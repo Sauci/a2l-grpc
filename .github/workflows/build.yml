@@ -48,3 +48,28 @@ jobs:
             *.so
             *.h
             protobufs
+  build-windows:
+    runs-on: windows-2019
+    needs:
+      - generate-antlr-sources
+      - generate-grpc-sources
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: antlr4
+          path: pkg/a2l/parser
+      - uses: actions/download-artifact@v3
+        with:
+          name: grpc
+          path: pkg/a2l
+      - run: |
+          go get github.com/antlr4-go/antlr/v4
+          go build --buildmode=c-shared -o a2l_grpc.dll ./cmd/a2l/a2l.go
+      - uses: actions/upload-artifact@v3
+        with:
+          name: a2l_grpc_windows
+          path: |
+            *.dll
+            *.h
+            protobufs
