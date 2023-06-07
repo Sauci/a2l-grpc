@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-import "protobufs/A2L.proto";
+import "protobuf/A2L.proto";
 
 option go_package = "./../pkg/a2l";
 

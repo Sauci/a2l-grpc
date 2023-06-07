@@ -2,7 +2,7 @@ syntax = "proto3";
 
 option go_package = "./../pkg/a2l";
 
-import "protobufs/shared.proto";
+import "protobuf/shared.proto";
 
 message declaration {
   oneof oneof {

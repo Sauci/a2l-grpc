@@ -22,7 +22,7 @@ jobs:
         with:
           name: grpc
           path: |
-            pkg/a2l/protobufs
+            pkg/a2l/protobuf
   build-linux:
     runs-on: ubuntu-22.04
     needs:
@@ -40,14 +40,13 @@ jobs:
           path: pkg/a2l
       - run: |
           go get github.com/antlr4-go/antlr/v4
-          go build --buildmode=c-shared -o a2l_grpc_$(uname -p).so ./cmd/a2l/a2l.go
+          go build --buildmode=c-shared -o a2l_grpc_$(go env GOOS)_$(go env GOARCH).so ./cmd/a2l/a2l.go
       - uses: actions/upload-artifact@v3
         with:
-          name: a2l_grpc_linux
+          name: linux
           path: |
             *.so
             *.h
-            protobufs
   build-windows:
     runs-on: windows-2019
     needs:
@@ -65,11 +64,52 @@ jobs:
           path: pkg/a2l
       - run: |
           go get github.com/antlr4-go/antlr/v4
-          go build --buildmode=c-shared -o a2l_grpc.dll ./cmd/a2l/a2l.go
+          go build --buildmode=c-shared -o a2l_grpc_$(go env GOOS)_$(go env GOARCH).dll ./cmd/a2l/a2l.go
       - uses: actions/upload-artifact@v3
         with:
-          name: a2l_grpc_windows
+          name: windows
           path: |
             *.dll
             *.h
-            protobufs
+  export-protobuf-definitions:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/upload-artifact@v3
+        with:
+          name: protobuf
+          path: |
+            protobuf
+  release:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    needs:
+      - build-linux
+      - build-windows
+      - export-protobuf-definitions
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/checkout@v3
+      - run: mkdir a2l_grpc
+      - uses: actions/download-artifact@v3
+        with:
+          name: linux
+          path: a2l_grpc
+      - uses: actions/download-artifact@v3
+        with:
+          name: windows
+          path: a2l_grpc
+      - uses: actions/download-artifact@v3
+        with:
+          name: protobuf
+          path: a2l_grpc/protobuf
+      - run: |
+          tar czf a2l_grpc.tar.gz a2l_grpc
+          rm -rf a2l_grpc
+      - uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ github.ref_name }}
+          commit: main
+          artifacts: "a2l_grpc.tar.gz"
+          bodyFile: "CHANGELOG.md"

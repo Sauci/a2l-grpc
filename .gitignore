@@ -1,7 +1,5 @@
 .idea
-.antlr
-bin
-*.err
-*.out
-*.tokens
-script/antlr.jar
+*.jar
+*.ps1
+pkg/a2l/*.pb.go
+pkg/a2l/parser
