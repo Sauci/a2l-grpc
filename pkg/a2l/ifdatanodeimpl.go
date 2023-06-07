@@ -1,7 +1,7 @@
 package a2l
 
 import (
-	"stash.lmb.liebherr.i/tel/gomodparser/pkg/a2l/parser"
+	"github.com/sauci/a2l-grpc/pkg/a2l/parser"
 )
 
 func (n *Listener) EnterIfData(ctx *parser.IfDataContext) {

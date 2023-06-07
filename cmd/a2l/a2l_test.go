@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/antlr/antlr4/runtime/Go/antlr/v4"
+	"github.com/antlr4-go/antlr/v4"
+	"github.com/sauci/a2l-grpc/pkg/a2l"
+	"github.com/sauci/a2l-grpc/pkg/a2l/parser"
 	"log"
 	"os"
-	"stash.lmb.liebherr.i/tel/gomodparser/pkg/a2l"
-	"stash.lmb.liebherr.i/tel/gomodparser/pkg/a2l/parser"
 	"testing"
 )
 

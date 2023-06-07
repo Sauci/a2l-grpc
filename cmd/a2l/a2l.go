@@ -4,14 +4,14 @@ import (
 	"C"
 	"context"
 	"fmt"
-	"github.com/antlr/antlr4/runtime/Go/antlr/v4"
+	"github.com/antlr4-go/antlr/v4"
 	"google.golang.org/grpc"
 	"os"
 
+	"github.com/sauci/a2l-grpc/pkg/a2l"
+	"github.com/sauci/a2l-grpc/pkg/a2l/parser"
 	"log"
 	"net"
-	"stash.lmb.liebherr.i/tel/gomodparser/pkg/a2l"
-	"stash.lmb.liebherr.i/tel/gomodparser/pkg/a2l/parser"
 )
 
 func NewTreeFromString(a2lContent string) (tree *a2l.RootNodeType, err error) {

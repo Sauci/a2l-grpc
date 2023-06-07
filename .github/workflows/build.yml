@@ -2,10 +2,6 @@ name: build
 
 on: [push]
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{github.repository}}
-
 jobs:
   generate-antlr-sources:
     runs-on: ubuntu-22.04
@@ -16,7 +12,7 @@ jobs:
         with:
           name: antlr4
           path: |
-            pkg/a2l/parser
+            pkg/a2l/parser/grammar
   generate-grpc-sources:
     runs-on: ubuntu-22.04
     steps:
@@ -27,23 +23,28 @@ jobs:
           name: grpc
           path: |
             pkg/a2l/protobufs
-#
-#  build-linux:
-#    name: Build and push build image
-#    runs-on: ubuntu-22.04
-#    steps:
-#      - uses: actions/checkout@v3
-#      - name: Log in to the Docker container registry
-#        run: ./ci-linux.sh install-dependencies
-#      - name: Extract metadata (tags, labels) for Docker
-#        id: meta
-#        uses: docker/metadata-action@v4
-#        with:
-#          images: ${{env.REGISTRY}}/${{env.IMAGE_NAME}}
-#      - name: Build and push Docker image
-#        uses: docker/build-push-action@v4
-#        with:
-#          context: .
-#          push: true
-#          tags: ${{steps.meta.outputs.tags}}
-#          labels: ${{steps.meta.outputs.labels}}
+  build-linux:
+    runs-on: ubuntu-22.04
+    needs:
+      - generate-antlr-sources
+      - generate-grpc-sources
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: antlr4
+          path: pkg/a2l/parser
+      - uses: actions/download-artifact@v3
+        with:
+          name: grpc
+          path: pkg/a2l
+      - run: |
+          go get github.com/antlr4-go/antlr/v4
+          go build --buildmode=c-shared -o a2l_grpc_$(uname -p).so ./cmd/a2l/a2l.go
+      - uses: actions/upload-artifact@v3
+        with:
+          name: a2l_grpc_linux
+          path: |
+            *.so
+            *.h
+            protobufs
