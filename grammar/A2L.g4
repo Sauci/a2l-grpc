@@ -50,7 +50,7 @@ annotation:
 
     (
         v_annotationLabel = annotationLabel |
-        v_annotationOrigin = annotationOrigin
+        v_annotationOrigin = annotationOrigin |
         v_annotationText = annotationText
     )*
     END 'ANNOTATION'
