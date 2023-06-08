@@ -133,16 +133,22 @@ message AxisPtsType {
 message AxisPtsXType {
   IntType Position = 1 [json_name="Position"];
   DataTypeType DataType = 2 [json_name="DataType"];
+  IndexOrderType IndexIncr = 3 [json_name="IndexIncr"];
+  AddrTypeType Addressing = 4 [json_name="Addressing"];
 }
 
 message AxisPtsYType {
   IntType Position = 1 [json_name="Position"];
   DataTypeType DataType = 2 [json_name="DataType"];
+  IndexOrderType IndexIncr = 3 [json_name="IndexIncr"];
+  AddrTypeType Addressing = 4 [json_name="Addressing"];
 }
 
 message AxisPtsZType {
   IntType Position = 1 [json_name="Position"];
   DataTypeType DataType = 2 [json_name="DataType"];
+  IndexOrderType IndexIncr = 3 [json_name="IndexIncr"];
+  AddrTypeType Addressing = 4 [json_name="Addressing"];
 }
 
 message AxisRescaleXType {

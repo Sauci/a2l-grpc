@@ -196,8 +196,10 @@ func (n *Listener) ExitAxisPts(_ *parser.AxisPtsContext) {
 
 func (n *Listener) EnterAxisPtsX(ctx *parser.AxisPtsXContext) {
 	n.Push(&AxisPtsXType{
-		Position: a2lIntToIntType(ctx.GetPosition()),
-		DataType: &DataTypeType{Value: ctx.GetDatatype().GetText()},
+		Position:   a2lIntToIntType(ctx.GetPosition()),
+		DataType:   &DataTypeType{Value: ctx.GetDatatype().GetText()},
+		IndexIncr:  &IndexOrderType{Value: ctx.GetIndexIncr().GetText()},
+		Addressing: &AddrTypeType{Value: ctx.GetAddressing().GetText()},
 	})
 }
 
@@ -209,8 +211,10 @@ func (n *Listener) ExitAxisPtsX(_ *parser.AxisPtsXContext) {
 
 func (n *Listener) EnterAxisPtsY(ctx *parser.AxisPtsYContext) {
 	n.Push(&AxisPtsYType{
-		Position: a2lIntToIntType(ctx.GetPosition()),
-		DataType: &DataTypeType{Value: ctx.GetDatatype().GetText()},
+		Position:   a2lIntToIntType(ctx.GetPosition()),
+		DataType:   &DataTypeType{Value: ctx.GetDatatype().GetText()},
+		IndexIncr:  &IndexOrderType{Value: ctx.GetIndexIncr().GetText()},
+		Addressing: &AddrTypeType{Value: ctx.GetAddressing().GetText()},
 	})
 }
 
@@ -222,8 +226,10 @@ func (n *Listener) ExitAxisPtsY(_ *parser.AxisPtsYContext) {
 
 func (n *Listener) EnterAxisPtsZ(ctx *parser.AxisPtsZContext) {
 	n.Push(&AxisPtsZType{
-		Position: a2lIntToIntType(ctx.GetPosition()),
-		DataType: &DataTypeType{Value: ctx.GetDatatype().GetText()},
+		Position:   a2lIntToIntType(ctx.GetPosition()),
+		DataType:   &DataTypeType{Value: ctx.GetDatatype().GetText()},
+		IndexIncr:  &IndexOrderType{Value: ctx.GetIndexIncr().GetText()},
+		Addressing: &AddrTypeType{Value: ctx.GetAddressing().GetText()},
 	})
 }
 
