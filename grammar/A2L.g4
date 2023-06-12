@@ -706,12 +706,11 @@ group:
 
     (
         v_annotation += annotation |
-        v_functionList += functionList |
-        v_ifData += ifData |
-        v_refCharacteristic += refCharacteristic |
-        v_refMeasurement += refMeasurement |
-        v_root += root |
-        v_subGroup += subGroup
+        v_functionList = functionList |
+        v_refCharacteristic = refCharacteristic |
+        v_refMeasurement = refMeasurement |
+        v_root = root |
+        v_subGroup = subGroup
     )*
     END 'GROUP'
     ;

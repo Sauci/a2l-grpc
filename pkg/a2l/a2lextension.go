@@ -1093,7 +1093,7 @@ func (t *GroupType) MapChildNodes(node any) {
 		}
 
 		t.ANNOTATION = append(t.ANNOTATION, node.(*AnnotationType))
-	case RootType:
+	case *RootType:
 		t.ROOT = node.(*RootType)
 	case *RefCharacteristicType:
 		t.REF_CHARACTERISTIC = node.(*RefCharacteristicType)
