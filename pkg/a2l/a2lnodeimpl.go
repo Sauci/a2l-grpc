@@ -537,7 +537,7 @@ func (n *Listener) ExitCustomer(_ *parser.CustomerContext) {
 }
 
 func (n *Listener) EnterDataSize(ctx *parser.DataSizeContext) {
-	n.Push(&DataSizeType{Value: ctx.GetText()})
+	n.Push(&DataSizeType{Size: a2lIntToIntType(ctx.GetSize())})
 }
 
 func (n *Listener) ExitDataSize(_ *parser.DataSizeContext) {
@@ -1444,7 +1444,7 @@ func (n *Listener) ExitRefUnit(_ *parser.RefUnitContext) {
 func (n *Listener) EnterReserved(ctx *parser.ReservedContext) {
 	n.Push(&ReservedType{
 		Position: a2lIntToIntType(ctx.GetPosition()),
-		DataSize: &DataSizeType{Value: ctx.GetDataSize_().GetText()},
+		DataSize: ctx.GetDataSize_().GetText(),
 	})
 }
 

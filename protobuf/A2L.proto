@@ -321,7 +321,7 @@ message CustomerType {
 }
 
 message DataSizeType {
-  string Value = 1 [json_name="Value"];
+  IntType Size = 1 [json_name="Value"];
 }
 
 message DefaultValueType {
@@ -775,7 +775,7 @@ message RefUnitType {
 
 message ReservedType {
   IntType Position = 1 [json_name="Position"];
-  DataSizeType DataSize = 2 [json_name="DataSize"];
+  string DataSize = 2 [json_name="DataSize"];
 }
 
 message RightShiftType {
