@@ -100,9 +100,9 @@ func (n *Listener) EnterEnumerator(ctx *parser.EnumeratorContext) {
 	enumerator := &Enumerator{}
 
 	if ctx.GetTag0() != nil {
-		enumerator.Keyword = ctx.GetTag0().GetText()
+		enumerator.Keyword = &StringType{Value: ctx.GetTag0().GetText()}
 	} else {
-		enumerator.Keyword = ctx.GetTag1().GetText()
+		enumerator.Keyword = a2lStringToStringType(ctx.GetTag1())
 	}
 
 	if ctx.GetConstant() != nil {

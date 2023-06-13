@@ -43,7 +43,7 @@ message enum_type_name {
 }
 
 message enumerator {
-  string keyword = 1 [json_name="keyword"];
+  StringType keyword = 1 [json_name="keyword"];
   LongType constant = 2 [json_name="constant"];
 }
 
