@@ -482,7 +482,9 @@ message GroupType {
   optional SubGroupType SUB_GROUP = 8 [json_name="SUB_GROUP"];
 }
 
-message GuardRailsType {}
+message GuardRailsType {
+  bool Present = 1;
+}
 
 message HeaderType {
   StringType Comment = 1 [json_name="Comment"];
@@ -706,9 +708,13 @@ message ProjectType {
   repeated ModuleType MODULE = 4 [json_name="MODULE"];
 }
 
-message ReadOnlyType {}
+message ReadOnlyType {
+  bool Present = 1;
+}
 
-message ReadWriteType {}
+message ReadWriteType {
+  bool Present = 1;
+}
 
 message RecordLayoutType {
   IdentType Name = 1 [json_name="Name"];
@@ -808,7 +814,9 @@ message RootNodeType {
   ProjectType PROJECT = 3 [json_name="PROJECT"];
 }
 
-message RootType {}
+message RootType {
+  bool Present = 1;
+}
 
 message ShiftOpXType {
   IntType Position = 1 [json_name="Position"];
@@ -835,7 +843,9 @@ message SiExponentsType {
   IntType LuminousIntensity = 7 [json_name="LuminousIntensity"];
 }
 
-message SignExtendType {}
+message SignExtendType {
+  bool Present = 1;
+}
 
 message SrcAddrXType {
   IntType Position = 1 [json_name="Position"];

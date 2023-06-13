@@ -923,7 +923,7 @@ func (n *Listener) ExitGroup(_ *parser.GroupContext) {
 }
 
 func (n *Listener) EnterGuardRails(_ *parser.GuardRailsContext) {
-	n.Push(&GuardRailsType{})
+	n.Push(&GuardRailsType{Present: true})
 }
 
 func (n *Listener) ExitGuardRails(_ *parser.GuardRailsContext) {
@@ -1344,7 +1344,7 @@ func (n *Listener) ExitProject(_ *parser.ProjectContext) {
 }
 
 func (n *Listener) EnterReadOnly(_ *parser.ReadOnlyContext) {
-	n.Push(&ReadOnlyType{})
+	n.Push(&ReadOnlyType{Present: true})
 }
 
 func (n *Listener) ExitReadOnly(_ *parser.ReadOnlyContext) {
@@ -1354,7 +1354,7 @@ func (n *Listener) ExitReadOnly(_ *parser.ReadOnlyContext) {
 }
 
 func (n *Listener) EnterReadWrite(_ *parser.ReadWriteContext) {
-	n.Push(&ReadWriteType{})
+	n.Push(&ReadWriteType{Present: true})
 }
 
 func (n *Listener) ExitReadWrite(_ *parser.ReadWriteContext) {
@@ -1517,7 +1517,7 @@ func (n *Listener) ExitRipAddrZ(_ *parser.RipAddrZContext) {
 }
 
 func (n *Listener) EnterRoot(_ *parser.RootContext) {
-	n.Push(&RootType{})
+	n.Push(&RootType{Present: true})
 }
 
 func (n *Listener) ExitRoot(_ *parser.RootContext) {
@@ -1584,7 +1584,7 @@ func (n *Listener) ExitSiExponents(_ *parser.SiExponentsContext) {
 }
 
 func (n *Listener) EnterSignExtend(_ *parser.SignExtendContext) {
-	n.Push(&SignExtendType{})
+	n.Push(&SignExtendType{Present: true})
 }
 
 func (n *Listener) ExitSignExtend(_ *parser.SignExtendContext) {
