@@ -8,17 +8,13 @@ import (
 	"github.com/sauci/a2l-grpc/pkg/a2l"
 	"github.com/sauci/a2l-grpc/pkg/a2l/parser"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/encoding/protojson"
 	"net"
 	"sync"
 )
 
-type grpcA2LImplType struct {
-	a2l.UnimplementedA2LServer
-}
-
-func (s *grpcA2LImplType) GetTree(_ context.Context, request *a2l.GetTreeRequest) (_ *a2l.RootNodeType, err error) {
-	input := antlr.NewInputStream(request.GetA2L())
-	lexer := parser.NewA2LLexer(input)
+func getTreeFromString(a2lString string) (result *a2l.RootNodeType, err error) {
+	lexer := parser.NewA2LLexer(antlr.NewInputStream(a2lString))
 	tokenStream := antlr.NewCommonTokenStream(lexer, 0)
 	p := parser.NewA2LParser(tokenStream)
 	p.AddErrorListener(antlr.NewDiagnosticErrorListener(true))
@@ -29,6 +25,42 @@ func (s *grpcA2LImplType) GetTree(_ context.Context, request *a2l.GetTreeRequest
 	antlr.ParseTreeWalkerDefault.Walk(listener, p.A2lFile())
 
 	return listener.Tree(), err
+}
+
+type grpcA2LImplType struct {
+	a2l.UnimplementedA2LServer
+}
+
+func (s *grpcA2LImplType) GetTree(_ context.Context, request *a2l.GetTreeRequest) (result *a2l.GetTreeResponse, err error) {
+	var tree *a2l.RootNodeType
+	var internalErr error
+
+	result = &a2l.GetTreeResponse{}
+
+	if tree, internalErr = getTreeFromString(request.GetA2L()); internalErr == nil {
+		result.Tree = tree
+	} else {
+		errString := internalErr.Error()
+		result.Error = &errString
+	}
+
+	return result, err
+}
+
+func (s *grpcA2LImplType) GetJSONTree(_ context.Context, request *a2l.RootNodeType) (result *a2l.GetJSONTreeResponse, err error) {
+	var rawData []byte
+	var internalErr error
+
+	result = &a2l.GetJSONTreeResponse{}
+
+	if rawData, internalErr = protojson.Marshal(request); internalErr == nil {
+		result.Json = string(rawData)
+	} else {
+		errString := internalErr.Error()
+		result.Error = &errString
+	}
+
+	return result, err
 }
 
 var serverMutex sync.Mutex
