@@ -5,21 +5,35 @@ import "protobuf/A2L.proto";
 option go_package = "./../pkg/a2l";
 
 service A2L {
-  rpc GetTree (GetTreeRequest) returns (GetTreeResponse) {}
-  rpc GetJSONTree (RootNodeType) returns (GetJSONTreeResponse) {}
+  rpc GetTreeFromA2L (A2LRequest) returns (TreeResponse) {}
+  rpc GetJSONFromTree (TreeRequest) returns (JSONResponse) {}
+  rpc GetTreeFromJSON (JSONRequest) returns (TreeResponse) {}
+  rpc GetA2LFromTree (TreeRequest) returns (A2LResponse) {}
 }
 
-// The request message containing the user's name.
-message GetTreeRequest {
+message A2LRequest {
   string a2l = 1;
 }
 
-message GetTreeResponse {
+message A2LResponse {
+  string a2l = 1;
+  optional string error = 2;
+}
+
+message TreeRequest {
+  RootNodeType tree = 1;
+}
+
+message TreeResponse {
   RootNodeType tree = 1;
   optional string error = 2;
 }
 
-message GetJSONTreeResponse {
+message JSONRequest {
+  string json = 1;
+}
+
+message JSONResponse {
   string json = 1;
   optional string error = 2;
 }
