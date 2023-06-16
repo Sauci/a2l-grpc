@@ -98,7 +98,7 @@ class A2lParser(object):
         client = A2LStub(channel)
         if self._dll.Create(3333):
             raise Exception(1)
-        self.ast = client.GetTree(GetTreeRequest(a2l=string))
+        self.ast = client.GetTreeFromA2L(A2LRequest(a2l=string)).tree
 
 
 if __name__ == '__main__':
