@@ -6,7 +6,7 @@ option go_package = "./../pkg/a2l";
 
 service A2L {
   rpc GetTreeFromA2L (A2LRequest) returns (TreeResponse) {}
-  rpc GetJSONFromTree (TreeRequest) returns (JSONResponse) {}
+  rpc GetJSONFromTree (JSONFromTreeRequest) returns (JSONResponse) {}
   rpc GetTreeFromJSON (JSONRequest) returns (TreeResponse) {}
   rpc GetA2LFromTree (TreeRequest) returns (A2LResponse) {}
 }
@@ -18,6 +18,12 @@ message A2LRequest {
 message A2LResponse {
   string a2l = 1;
   optional string error = 2;
+}
+
+message JSONFromTreeRequest {
+  RootNodeType tree = 1;
+  bool sort_keys = 2;
+  optional uint32 indent = 3;
 }
 
 message TreeRequest {

@@ -62,13 +62,25 @@ func (s *grpcA2LImplType) GetTreeFromA2L(_ context.Context, request *a2l.A2LRequ
 	return result, err
 }
 
-func (s *grpcA2LImplType) GetJSONFromTree(_ context.Context, request *a2l.TreeRequest) (result *a2l.JSONResponse, err error) {
+func (s *grpcA2LImplType) GetJSONFromTree(_ context.Context, request *a2l.JSONFromTreeRequest) (result *a2l.JSONResponse, err error) {
 	var rawData []byte
 	var parseError error
+	multiline := false
+	indent := ""
 
 	result = &a2l.JSONResponse{}
 
-	if rawData, parseError = protojson.Marshal(request.Tree); parseError == nil {
+	if request.Indent != nil {
+		multiline = true
+
+		for i := uint32(0); i < *request.Indent; i++ {
+			indent += " "
+		}
+	}
+
+	opt := protojson.MarshalOptions{Multiline: multiline, Indent: indent}
+
+	if rawData, parseError = opt.Marshal(request.Tree); parseError == nil {
 		result.Json = string(rawData)
 	} else {
 		errString := parseError.Error()
@@ -136,7 +148,7 @@ func Close() (result C.int) {
 	if server == nil {
 		result = 1
 	} else {
-		server.GracefulStop()
+		server.Stop()
 
 		server = nil
 
