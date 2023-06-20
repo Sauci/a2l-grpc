@@ -1,5 +1,6 @@
 syntax = "proto3";
 
+import "google/protobuf/any.proto";
 import "protobuf/A2L.proto";
 
 option go_package = "./../pkg/a2l";
@@ -21,7 +22,7 @@ message A2LResponse {
 }
 
 message JSONFromTreeRequest {
-  RootNodeType tree = 1;
+  google.protobuf.Any tree = 1;
   bool sort_keys = 2;
   optional uint32 indent = 3;
 }
