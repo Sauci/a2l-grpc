@@ -9,13 +9,14 @@ import (
 	"github.com/sauci/a2l-grpc/pkg/a2l/parser"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/anypb"
 	"io"
 	"net"
 	"os"
 	"sync"
 )
 
-func getTreeFromString(a2lString string) (result *a2l.RootNodeType, err error) {
+func getTreeFromString(a2lString string) (result *anypb.Any, err error) {
 	stdErr := os.Stderr
 	r, w, _ := os.Pipe()
 	os.Stderr = w
@@ -39,15 +40,18 @@ func getTreeFromString(a2lString string) (result *a2l.RootNodeType, err error) {
 		err = fmt.Errorf("%s", string(out))
 	}
 
-	return listener.Tree(), err
+	result = &anypb.Any{}
+	err = result.MarshalFrom(listener.Tree())
+
+	return result, err
 }
 
 type grpcA2LImplType struct {
 	a2l.UnimplementedA2LServer
 }
 
-func (s *grpcA2LImplType) GetTreeFromA2L(_ context.Context, request *a2l.A2LRequest) (result *a2l.TreeResponse, err error) {
-	var tree *a2l.RootNodeType
+func (s *grpcA2LImplType) GetTreeFromA2L(_ context.Context, request *a2l.TreeFromA2LRequest) (result *a2l.TreeResponse, err error) {
+	var tree *anypb.Any
 	var parseError error
 
 	result = &a2l.TreeResponse{}
@@ -67,6 +71,8 @@ func (s *grpcA2LImplType) GetJSONFromTree(_ context.Context, request *a2l.JSONFr
 	var parseError error
 	multiline := false
 	indent := ""
+	allowPartial := false
+	emitUnpopulated := false
 
 	result = &a2l.JSONResponse{}
 
@@ -78,7 +84,18 @@ func (s *grpcA2LImplType) GetJSONFromTree(_ context.Context, request *a2l.JSONFr
 		}
 	}
 
-	opt := protojson.MarshalOptions{Multiline: multiline, Indent: indent}
+	if request.AllowPartial != nil {
+		allowPartial = *request.AllowPartial
+	}
+
+	if request.EmitUnpopulated != nil {
+		emitUnpopulated = *request.EmitUnpopulated
+	}
+
+	opt := protojson.MarshalOptions{Multiline: multiline,
+		Indent:          indent,
+		AllowPartial:    allowPartial,
+		EmitUnpopulated: emitUnpopulated}
 
 	if rawData, parseError = opt.Marshal(request.Tree); parseError == nil {
 		result.Json = string(rawData)
@@ -90,12 +107,24 @@ func (s *grpcA2LImplType) GetJSONFromTree(_ context.Context, request *a2l.JSONFr
 	return result, err
 }
 
-func (s *grpcA2LImplType) GetTreeFromJSON(_ context.Context, request *a2l.JSONRequest) (result *a2l.TreeResponse, err error) {
+func (s *grpcA2LImplType) GetTreeFromJSON(_ context.Context, request *a2l.TreeFromJSONRequest) (result *a2l.TreeResponse, err error) {
+	tree := &anypb.Any{}
 	var parseError error
+	allowPartial := false
 
-	result = &a2l.TreeResponse{Tree: &a2l.RootNodeType{}}
+	result = &a2l.TreeResponse{}
 
-	if parseError = protojson.Unmarshal([]byte(request.Json), result.Tree); parseError != nil {
+	if request.AllowPartial != nil {
+		allowPartial = *request.AllowPartial
+	}
+
+	opt := protojson.UnmarshalOptions{
+		AllowPartial: allowPartial,
+	}
+
+	if parseError = opt.Unmarshal([]byte(request.Json), tree); parseError == nil {
+		result.Tree = tree
+	} else {
 		errString := parseError.Error()
 		result.Error = &errString
 	}
@@ -103,8 +132,8 @@ func (s *grpcA2LImplType) GetTreeFromJSON(_ context.Context, request *a2l.JSONRe
 	return result, err
 }
 
-func (s *grpcA2LImplType) GetA2LFromTree(_ context.Context, request *a2l.TreeRequest) (result *a2l.A2LResponse, err error) {
-	panic("not implemented yet...")
+func (s *grpcA2LImplType) GetA2LFromTree(_ context.Context, request *a2l.A2LFromTreeRequest) (result *a2l.A2LResponse, err error) {
+	panic(fmt.Sprintf("not implemented yet %v...", request))
 }
 
 var serverMutex sync.Mutex
