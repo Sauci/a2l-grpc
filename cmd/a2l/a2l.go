@@ -148,7 +148,7 @@ func (s *grpcA2LImplType) GetTreeFromJSON(_ context.Context, request *a2l.TreeFr
 }
 
 func (s *grpcA2LImplType) GetA2LFromTree(_ context.Context, request *a2l.A2LFromTreeRequest) (result *a2l.A2LResponse, err error) {
-	panic(fmt.Sprintf("not implemented yet %v...", request))
+	return &a2l.A2LResponse{A2L: request.Tree.MarshalA2L(2)}, nil
 }
 
 var serverMutex sync.Mutex

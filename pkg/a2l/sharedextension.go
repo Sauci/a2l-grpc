@@ -25,3 +25,19 @@ func (n *StringType) A2LString() string {
 func (n *IdentType) A2LString() string {
 	return fmt.Sprintf("%v", n.Value)
 }
+
+func (n *TagType) A2LString() string {
+	return fmt.Sprintf("\"%v\"", n.Value)
+}
+
+func (n *DataTypeType) A2LString() string {
+	return fmt.Sprintf("%v", n.Value)
+}
+
+func (n *IndexOrderType) A2LString() string {
+	return fmt.Sprintf("%v", n.Value)
+}
+
+func (n *AddrTypeType) A2LString() string {
+	return fmt.Sprintf("%v", n.Value)
+}
