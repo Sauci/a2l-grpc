@@ -878,9 +878,10 @@ func (t *CompuVTabType) MapChildNodes(node any) {
 }
 
 func (t *CompuVTabType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent(fmt.Sprintf("/begin COMPU_VTAB %s %s %s",
+	tmpResult := []string{indentContent(fmt.Sprintf("/begin COMPU_VTAB %s %s %s %s",
 		t.Name.A2LString(),
 		t.LongIdentifier.A2LString(),
+		t.ConversionType,
 		t.NumberValuePairs.A2LString()), indent)}
 
 	if t.InValOutVal != nil {

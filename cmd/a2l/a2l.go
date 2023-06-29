@@ -15,15 +15,37 @@ import (
 	"sync"
 )
 
+type CustomSyntaxError struct {
+	line, column int
+	msg          string
+}
+
+type CustomErrorListener struct {
+	*antlr.DefaultErrorListener // Embed default which ensures we fit the interface
+	Errors                      []CustomSyntaxError
+}
+
+func (c *CustomErrorListener) SyntaxError(recognizer antlr.Recognizer, offendingSymbol interface{}, line, column int, msg string, e antlr.RecognitionException) {
+	c.Errors = append(c.Errors, CustomSyntaxError{
+		line:   line,
+		column: column,
+		msg:    msg,
+	})
+}
+
 func getTreeFromString(a2lString string) (result *a2l.RootNodeType, err error) {
 	stdErr := os.Stderr
 	r, w, _ := os.Pipe()
 	os.Stderr = w
 
+	errorListener := CustomErrorListener{Errors: make([]CustomSyntaxError, 0)}
 	lexer := parser.NewA2LLexer(antlr.NewInputStream(a2lString))
+	lexer.RemoveErrorListeners()
+	lexer.AddErrorListener(&errorListener)
 	tokenStream := antlr.NewCommonTokenStream(lexer, 0)
 	p := parser.NewA2LParser(tokenStream)
-	p.AddErrorListener(antlr.NewDiagnosticErrorListener(true))
+	p.RemoveErrorListeners()
+	p.AddErrorListener(&errorListener)
 	p.BuildParseTrees = true
 
 	listener := a2l.NewListener()

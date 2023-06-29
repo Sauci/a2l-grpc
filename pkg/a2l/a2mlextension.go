@@ -2,7 +2,6 @@ package a2l
 
 import (
 	"fmt"
-	"log"
 	"strings"
 )
 
@@ -53,14 +52,14 @@ func (t *Declaration) MapChildNodes(node any) {
 func (t *Declaration) MarshalA2L(indent int) (result string) {
 	switch t.Oneof.(type) {
 	case *Declaration_TypeDefinition:
-		result = indentContent(t.Oneof.(*Declaration_TypeDefinition).TypeDefinition.MarshalA2L(indent), indent)
+		result = t.Oneof.(*Declaration_TypeDefinition).TypeDefinition.MarshalA2L(indent)
 	case *Declaration_BlockDefinition:
-		result = indentContent(t.Oneof.(*Declaration_BlockDefinition).BlockDefinition.MarshalA2L(indent), indent)
+		result = t.Oneof.(*Declaration_BlockDefinition).BlockDefinition.MarshalA2L(indent)
 	default:
 		panic("not implemented yet...")
 	}
 
-	return result
+	return result + ";"
 }
 
 func (t *TypeDefinition) MapChildNodes(node any) {
@@ -233,22 +232,22 @@ func (t *BlockDefinition) MapChildNodes(node any) {
 }
 
 func (t *BlockDefinition) MarshalA2L(indent int) (result string) {
-	result = fmt.Sprintf("block ")
+	tmpResult := []string{fmt.Sprintf(indentContent("block ", indent))}
 
 	if t.Tag != nil {
-		result += fmt.Sprintf("%s ", t.Tag.A2LString())
+		tmpResult[0] += fmt.Sprintf("%s ", t.Tag.A2LString())
 	}
 
 	switch t.Oneof.(type) {
 	case *BlockDefinition_TypeName:
-		result += t.Oneof.(*BlockDefinition_TypeName).TypeName.MarshalA2L(indent + 1)
+		tmpResult = append(tmpResult, t.Oneof.(*BlockDefinition_TypeName).TypeName.MarshalA2L(indent+1))
 	case *BlockDefinition_Member:
-		result += t.Oneof.(*BlockDefinition_Member).Member.MarshalA2L(indent + 1)
+		tmpResult = append(tmpResult, t.Oneof.(*BlockDefinition_Member).Member.MarshalA2L(indent+1))
 	default:
 		panic("not implemented yet...")
 	}
 
-	return result
+	return strings.Join(tmpResult, "\n")
 }
 
 func (t *EnumTypeName) MapChildNodes(node any) {
@@ -316,7 +315,7 @@ func (t *StructTypeName) MapChildNodes(node any) {
 }
 
 func (t *StructTypeName) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{"struct "}
+	tmpResult := []string{indentContent("struct ", indent)}
 
 	if t.Identifier != nil {
 		tmpResult[0] += fmt.Sprintf("%s ", t.Identifier.A2LString())
@@ -329,7 +328,7 @@ func (t *StructTypeName) MarshalA2L(indent int) (result string) {
 			tmpResult = append(tmpResult, structMember.MarshalA2L(indent+1))
 		}
 
-		tmpResult = append(tmpResult, "}")
+		tmpResult = append(tmpResult, indentContent("}", indent))
 	}
 
 	return strings.Join(tmpResult, "\n")
@@ -358,14 +357,7 @@ func (t *Member) MapChildNodes(node any) {
 }
 
 func (t *Member) MarshalA2L(indent int) (result string) {
-	if t == nil {
-		log.Print(t)
-	}
-	if t.TypeName != nil {
-		result = t.TypeName.MarshalA2L(indent)
-	} else {
-		log.Print(t)
-	}
+	result = t.TypeName.MarshalA2L(indent)
 
 	if t.ArraySpecifier != nil {
 		result += "["
@@ -382,8 +374,6 @@ func (t *Member) MarshalA2L(indent int) (result string) {
 
 func (t *TaggedstructTypeName) MapChildNodes(node any) {
 	switch node.(type) {
-	case *TaggedstructMember:
-		panic("should not happen...")
 	case *TaggedstructMember_TaggedstructDefinition:
 		if t.TaggedstructMemberList == nil {
 			t.TaggedstructMemberList = make([]*TaggedstructMember, 0)
@@ -436,26 +426,28 @@ func (t *TaggedstructMember) MapChildNodes(node any) {
 }
 
 func (t *TaggedstructMember) MarshalA2L(indent int) (result string) {
+	tmpResult := make([]string, 0)
+
 	if t.Star {
-		result += indentContent("(", indent)
+		tmpResult = append(tmpResult, indentContent("(", indent+1))
 	}
 
 	switch t.Oneof.(type) {
 	case *TaggedstructMember_TaggedstructDefinition:
-		result += t.Oneof.(*TaggedstructMember_TaggedstructDefinition).TaggedstructDefinition.MarshalA2L(indent + 1)
+		tmpResult = append(tmpResult, t.Oneof.(*TaggedstructMember_TaggedstructDefinition).TaggedstructDefinition.MarshalA2L(indent+1))
 	case *TaggedstructMember_BlockDefinition:
-		result += t.Oneof.(*TaggedstructMember_BlockDefinition).BlockDefinition.MarshalA2L(indent + 1)
+		tmpResult = append(tmpResult, t.Oneof.(*TaggedstructMember_BlockDefinition).BlockDefinition.MarshalA2L(indent+1))
 	default:
 		panic("not implemented yet...")
 	}
 
 	if t.Star {
-		result += ")*"
+		tmpResult = append(tmpResult, indentContent(")*;", indent+1))
+	} else {
+		tmpResult[len(tmpResult)-1] += ";"
 	}
 
-	result += ";"
-
-	return result
+	return strings.Join(tmpResult, "\n")
 }
 
 func (t *TaggedstructMember_TaggedstructDefinition) MapChildNodes(_ any) {
@@ -484,21 +476,21 @@ func (t *TaggedstructDefinition) MapChildNodes(node any) {
 }
 
 func (t *TaggedstructDefinition) MarshalA2L(indent int) (result string) {
-	result += fmt.Sprintf("%s ", t.Tag.A2LString())
+	tmpResult := []string{indentContent(fmt.Sprintf("%s", t.Tag.A2LString()), indent)}
 
 	if t.Star {
-		result += "("
+		tmpResult = append(tmpResult, indentContent("(", indent))
 	}
 
 	if t.Member != nil { // not part of the spec...
-		result += t.Member.MarshalA2L(indent + 1)
+		tmpResult = append(tmpResult, t.Member.MarshalA2L(indent))
 	}
 
 	if t.Star {
-		result += ")*"
+		tmpResult = append(tmpResult, indentContent(")*", indent))
 	}
 
-	return result
+	return strings.Join(tmpResult, "\n")
 }
 
 func (t *TaggedunionTypeName) MapChildNodes(node any) {
@@ -537,7 +529,7 @@ func (t *TaggedunionTypeName) MarshalA2L(indent int) (result string) {
 		tmpResult[0] += "{"
 
 		for _, taggedunionMember := range t.TaggedunionMemberList {
-			tmpResult = append(tmpResult, taggedunionMember.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, taggedunionMember.MarshalA2L(indent))
 		}
 
 		tmpResult = append(tmpResult, indentContent("}", indent))
@@ -565,7 +557,7 @@ func (t *TaggedunionMember) MarshalA2L(indent int) (result string) {
 		panic("not implemented yet...")
 	}
 
-	return result
+	return result + ";"
 }
 
 func (t *TagMember) MapChildNodes(node any) {
@@ -578,15 +570,14 @@ func (t *TagMember) MapChildNodes(node any) {
 }
 
 func (t *TagMember) MarshalA2L(indent int) (result string) {
+	tmpResult := make([]string, 0)
 	if t.Tag != nil {
-		result = fmt.Sprintf("%s ", t.Tag.A2LString())
+		tmpResult = append(tmpResult, indentContent(t.Tag.A2LString(), indent))
 	}
 
-	result += t.Member.MarshalA2L(indent + 1)
+	tmpResult = append(tmpResult, t.Member.MarshalA2L(indent+1))
 
-	result += ";"
-
-	return result
+	return strings.Join(tmpResult, "\n")
 }
 
 func (t *TaggedunionMember_TagMember) MapChildNodes(node any) {
