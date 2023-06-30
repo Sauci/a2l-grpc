@@ -9,36 +9,41 @@ import (
 	"github.com/sauci/a2l-grpc/pkg/a2l/parser"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/encoding/protojson"
-	"io"
 	"net"
-	"os"
+	"strings"
 	"sync"
 )
 
-type CustomSyntaxError struct {
+type A2LSyntaxError struct {
 	line, column int
 	msg          string
 }
 
-type CustomErrorListener struct {
-	*antlr.DefaultErrorListener // Embed default which ensures we fit the interface
-	Errors                      []CustomSyntaxError
+func (e A2LSyntaxError) String() string {
+	return fmt.Sprintf("%v:%v %v", e.line, e.column, e.msg)
 }
 
-func (c *CustomErrorListener) SyntaxError(recognizer antlr.Recognizer, offendingSymbol interface{}, line, column int, msg string, e antlr.RecognitionException) {
-	c.Errors = append(c.Errors, CustomSyntaxError{
-		line:   line,
-		column: column,
-		msg:    msg,
-	})
+type A2LErrorListener struct {
+	*antlr.DefaultErrorListener // Embed default which ensures we fit the interface
+	Errors                      []A2LSyntaxError
+}
+
+func (l *A2LErrorListener) GetErrors() (result []string) {
+	result = make([]string, 0)
+
+	for _, e := range l.Errors {
+		result = append(result, e.String())
+	}
+
+	return result
+}
+
+func (l *A2LErrorListener) SyntaxError(_ antlr.Recognizer, _ interface{}, line, column int, msg string, _ antlr.RecognitionException) {
+	l.Errors = append(l.Errors, A2LSyntaxError{line: line, column: column, msg: msg})
 }
 
 func getTreeFromString(a2lString string) (result *a2l.RootNodeType, err error) {
-	stdErr := os.Stderr
-	r, w, _ := os.Pipe()
-	os.Stderr = w
-
-	errorListener := CustomErrorListener{Errors: make([]CustomSyntaxError, 0)}
+	errorListener := A2LErrorListener{Errors: make([]A2LSyntaxError, 0)}
 	lexer := parser.NewA2LLexer(antlr.NewInputStream(a2lString))
 	lexer.RemoveErrorListeners()
 	lexer.AddErrorListener(&errorListener)
@@ -52,13 +57,8 @@ func getTreeFromString(a2lString string) (result *a2l.RootNodeType, err error) {
 
 	antlr.ParseTreeWalkerDefault.Walk(listener, p.A2lFile())
 
-	_ = w.Close()
-	out, _ := io.ReadAll(r)
-
-	os.Stderr = stdErr
-
-	if len(out) != 0 {
-		err = fmt.Errorf("%s", string(out))
+	if len(errorListener.Errors) != 0 {
+		err = fmt.Errorf(strings.Join(errorListener.GetErrors(), "\n"))
 	}
 
 	return listener.Tree(), err
