@@ -59,7 +59,7 @@ func a2lLongToLongType(integerValue parser.IIntegerValueContext) (result *LongTy
 
 		if tmpResult, err = strconv.ParseInt(rawString, int(base), 64); err == nil {
 			result = &LongType{
-				Value: int32(tmpResult),
+				Value: tmpResult,
 				Base:  base,
 				Size:  uint32(len(rawString)),
 			}
@@ -91,7 +91,7 @@ func numericToLongType(integerValue parser.INumericValueContext) (result *LongTy
 
 		if tmpResult, err = strconv.ParseInt(rawString, int(base), 64); err == nil {
 			result = &LongType{
-				Value: int32(tmpResult),
+				Value: tmpResult,
 				Base:  base,
 				Size:  uint32(len(rawString)),
 			}
@@ -155,7 +155,7 @@ func floatToFloatType(integerValue parser.INumericValueContext) (result *FloatTy
 		}
 
 		if tmpResult, err = strconv.ParseFloat(originalString, 64); err == nil {
-			result.Value = float32(tmpResult)
+			result.Value = tmpResult
 		} else {
 			panic(err)
 		}

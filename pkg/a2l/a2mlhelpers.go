@@ -35,7 +35,7 @@ func arraySpecifierToLongType(integerValue parser.IArraySpecifierContext) (resul
 
 	if tmpResult, err = strconv.ParseInt(rawString, int(base), 64); err == nil {
 		result = &LongType{
-			Value: int32(tmpResult),
+			Value: tmpResult,
 			Base:  base,
 			Size:  uint32(len(rawString)),
 		}
