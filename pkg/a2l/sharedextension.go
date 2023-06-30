@@ -7,7 +7,15 @@ type A2LStringer interface {
 }
 
 func (n *IntType) A2LString() string {
-	return fmt.Sprintf("%v", n.Value)
+	var format string
+
+	if n.Base == 10 {
+		format = fmt.Sprintf("%%0%vd", n.Size)
+	} else {
+		format = fmt.Sprintf("0x%%0%vX", n.Size)
+	}
+
+	return fmt.Sprintf(format, n.Value)
 }
 
 func (n *FloatType) A2LString() string {
@@ -15,7 +23,15 @@ func (n *FloatType) A2LString() string {
 }
 
 func (n *LongType) A2LString() string {
-	return fmt.Sprintf("%v", n.Value)
+	var format string
+
+	if n.Base == 10 {
+		format = fmt.Sprintf("%%0%vd", n.Size)
+	} else {
+		format = fmt.Sprintf("0x%%0%vX", n.Size)
+	}
+
+	return fmt.Sprintf(format, n.Value)
 }
 
 func (n *StringType) A2LString() string {
