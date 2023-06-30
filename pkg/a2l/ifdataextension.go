@@ -18,16 +18,16 @@ func (t *IfDataType) MapChildNodes(node any) {
 	}
 }
 
-func (t *IfDataType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent(fmt.Sprintf("/begin IF_DATA %s", t.Name.A2LString()), indent)}
+func (t *IfDataType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent(fmt.Sprintf("/begin IF_DATA %s", t.Name.A2LString()), indentLevel, indentString)}
 
 	if t.Blob != nil {
 		for _, blob := range t.Blob {
-			tmpResult = append(tmpResult, blob.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, blob.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end IF_DATA", indent))
+	tmpResult = append(tmpResult, indentContent("/end IF_DATA", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -41,20 +41,20 @@ func (t *GenericParameterType) MapChildNodes(node any) {
 	}
 }
 
-func (t *GenericParameterType) MarshalA2L(indent int) (result string) {
+func (t *GenericParameterType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	switch t.Oneof.(type) {
 	case *GenericParameterType_Tag:
-		result = indentContent(t.Oneof.(*GenericParameterType_Tag).Tag.A2LString(), indent)
+		result = indentContent(t.Oneof.(*GenericParameterType_Tag).Tag.A2LString(), indentLevel, indentString)
 	case *GenericParameterType_String_:
-		result = indentContent(t.Oneof.(*GenericParameterType_String_).String_.A2LString(), indent)
+		result = indentContent(t.Oneof.(*GenericParameterType_String_).String_.A2LString(), indentLevel, indentString)
 	case *GenericParameterType_Long:
-		result = indentContent(t.Oneof.(*GenericParameterType_Long).Long.A2LString(), indent)
+		result = indentContent(t.Oneof.(*GenericParameterType_Long).Long.A2LString(), indentLevel, indentString)
 	case *GenericParameterType_Float:
-		result = indentContent(t.Oneof.(*GenericParameterType_Float).Float.A2LString(), indent)
+		result = indentContent(t.Oneof.(*GenericParameterType_Float).Float.A2LString(), indentLevel, indentString)
 	case *GenericParameterType_Generic:
-		result = t.Oneof.(*GenericParameterType_Generic).Generic.MarshalA2L(indent)
+		result = t.Oneof.(*GenericParameterType_Generic).Generic.MarshalA2L(indentLevel, indentString)
 	case *GenericParameterType_Identifier:
-		result = indentContent(t.Oneof.(*GenericParameterType_Identifier).Identifier.A2LString(), indent)
+		result = indentContent(t.Oneof.(*GenericParameterType_Identifier).Identifier.A2LString(), indentLevel, indentString)
 	default:
 		panic("not implemented yet...")
 	}
@@ -75,16 +75,16 @@ func (t *GenericNodeType) MapChildNodes(node any) {
 	}
 }
 
-func (t *GenericNodeType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent(fmt.Sprintf("/begin %s", t.Name.A2LString()), indent)}
+func (t *GenericNodeType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent(fmt.Sprintf("/begin %s", t.Name.A2LString()), indentLevel, indentString)}
 
 	if t.Element != nil {
 		for _, element := range t.Element {
-			tmpResult = append(tmpResult, element.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, element.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
-	tmpResult = append(tmpResult, indentContent(fmt.Sprintf("/end %s", t.Name.A2LString()), indent))
+	tmpResult = append(tmpResult, indentContent(fmt.Sprintf("/end %s", t.Name.A2LString()), indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }

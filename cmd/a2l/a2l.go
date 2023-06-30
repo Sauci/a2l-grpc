@@ -170,7 +170,14 @@ func (s *grpcA2LImplType) GetTreeFromJSON(_ context.Context, request *a2l.TreeFr
 }
 
 func (s *grpcA2LImplType) GetA2LFromTree(_ context.Context, request *a2l.A2LFromTreeRequest) (result *a2l.A2LResponse, err error) {
-	return &a2l.A2LResponse{A2L: request.Tree.MarshalA2L(2)}, nil
+	indent := ""
+
+	if request.Indent != nil {
+		for i := uint32(0); i < *request.Indent; i++ {
+			indent += " "
+		}
+	}
+	return &a2l.A2LResponse{A2L: request.Tree.MarshalA2L(0, indent)}, nil
 }
 
 var serverMutex sync.Mutex

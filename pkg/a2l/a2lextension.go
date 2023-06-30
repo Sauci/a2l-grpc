@@ -21,86 +21,86 @@ func (t *A2MLVersionType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *A2MLVersionType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("A2ML_VERSION %s %s", t.VersionNo.A2LString(), t.UpgradeNo.A2LString()), indent)
+func (t *A2MLVersionType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("A2ML_VERSION %s %s", t.VersionNo.A2LString(), t.UpgradeNo.A2LString()), indentLevel, indentString)
 }
 
 func (t *AddrEpkType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *AddrEpkType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("ADDR_EPK %s", t.Address.A2LString()), indent)
+func (t *AddrEpkType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("ADDR_EPK %s", t.Address.A2LString()), indentLevel, indentString)
 }
 
 func (t *AlignmentByteType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *AlignmentByteType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("ALIGNMENT_BYTE %s", t.AlignmentBorder.A2LString()), indent)
+func (t *AlignmentByteType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("ALIGNMENT_BYTE %s", t.AlignmentBorder.A2LString()), indentLevel, indentString)
 }
 
 func (t *AlignmentFloat32IeeeType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *AlignmentFloat32IeeeType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("ALIGNMENT_FLOAT32_IEEE %s", t.AlignmentBorder.A2LString()), indent)
+func (t *AlignmentFloat32IeeeType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("ALIGNMENT_FLOAT32_IEEE %s", t.AlignmentBorder.A2LString()), indentLevel, indentString)
 }
 
 func (t *AlignmentFloat64IeeeType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *AlignmentFloat64IeeeType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("ALIGNMENT_FLOAT64_IEEE %s", t.AlignmentBorder.A2LString()), indent)
+func (t *AlignmentFloat64IeeeType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("ALIGNMENT_FLOAT64_IEEE %s", t.AlignmentBorder.A2LString()), indentLevel, indentString)
 }
 
 func (t *AlignmentLongType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *AlignmentLongType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("ALIGNMENT_LONG %s", t.AlignmentBorder.A2LString()), indent)
+func (t *AlignmentLongType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("ALIGNMENT_LONG %s", t.AlignmentBorder.A2LString()), indentLevel, indentString)
 }
 
 func (t *AlignmentWordType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *AlignmentWordType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("ALIGNMENT_WORD %s", t.AlignmentBorder.A2LString()), indent)
+func (t *AlignmentWordType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("ALIGNMENT_WORD %s", t.AlignmentBorder.A2LString()), indentLevel, indentString)
 }
 
 func (t *AnnotationLabelType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *AnnotationLabelType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("ANNOTATION_LABEL %s", t.Label.A2LString()), indent)
+func (t *AnnotationLabelType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("ANNOTATION_LABEL %s", t.Label.A2LString()), indentLevel, indentString)
 }
 
 func (t *AnnotationOriginType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *AnnotationOriginType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("ANNOTATION_ORIGIN %s", t.Origin.A2LString()), indent)
+func (t *AnnotationOriginType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("ANNOTATION_ORIGIN %s", t.Origin.A2LString()), indentLevel, indentString)
 }
 
 func (t *AnnotationTextType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *AnnotationTextType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent(fmt.Sprintf("/begin ANNOTATION_TEXT"), indent)}
+func (t *AnnotationTextType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent(fmt.Sprintf("/begin ANNOTATION_TEXT"), indentLevel, indentString)}
 
 	for _, annotationText := range t.AnnotationText {
-		tmpResult = append(tmpResult, indentContent(annotationText.A2LString(), indent+1))
+		tmpResult = append(tmpResult, indentContent(annotationText.A2LString(), indentLevel+1, indentString))
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end ANNOTATION_TEXT", indent))
+	tmpResult = append(tmpResult, indentContent("/end ANNOTATION_TEXT", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -118,22 +118,22 @@ func (t *AnnotationType) MapChildNodes(node any) {
 	}
 }
 
-func (t *AnnotationType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent(fmt.Sprintf("/begin ANNOTATION"), indent)}
+func (t *AnnotationType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent(fmt.Sprintf("/begin ANNOTATION"), indentLevel, indentString)}
 
 	if t.ANNOTATION_LABEL != nil {
-		tmpResult = append(tmpResult, t.ANNOTATION_LABEL.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.ANNOTATION_LABEL.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.ANNOTATION_ORIGIN != nil {
-		tmpResult = append(tmpResult, t.ANNOTATION_ORIGIN.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.ANNOTATION_ORIGIN.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.ANNOTATION_TEXT != nil {
-		tmpResult = append(tmpResult, t.ANNOTATION_TEXT.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.ANNOTATION_TEXT.MarshalA2L(indentLevel+1, indentString))
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end ANNOTATION", indent))
+	tmpResult = append(tmpResult, indentContent("/end ANNOTATION", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -142,16 +142,16 @@ func (t *ArraySizeType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *ArraySizeType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("ARRAY_SIZE %s", t.Number.A2LString()), indent)
+func (t *ArraySizeType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("ARRAY_SIZE %s", t.Number.A2LString()), indentLevel, indentString)
 }
 
 func (t *ASAP2VersionType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *ASAP2VersionType) MarshalA2L(indent int) string {
-	return indentContent(fmt.Sprintf("ASAP2_VERSION %s %s", t.VersionNo.A2LString(), t.UpgradeNo.A2LString()), indent)
+func (t *ASAP2VersionType) MarshalA2L(indentLevel int, indentString string) string {
+	return indentContent(fmt.Sprintf("ASAP2_VERSION %s %s", t.VersionNo.A2LString(), t.UpgradeNo.A2LString()), indentLevel, indentString)
 }
 
 func (t *AxisDescrType) MapChildNodes(node any) {
@@ -191,70 +191,70 @@ func (t *AxisDescrType) MapChildNodes(node any) {
 	}
 }
 
-func (t *AxisDescrType) MarshalA2L(indent int) (result string) {
+func (t *AxisDescrType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	tmpResult := []string{indentContent(fmt.Sprintf("/begin AXIS_DESCR %s %s %s %s %s %s",
 		t.Attribute,
 		t.InputQuantity.A2LString(),
 		t.Conversion.A2LString(),
 		t.MaxAxisPoints.A2LString(),
 		t.LowerLimit.A2LString(),
-		t.UpperLimit.A2LString()), indent)}
+		t.UpperLimit.A2LString()), indentLevel, indentString)}
 
 	if t.READ_ONLY != nil {
-		tmpResult = append(tmpResult, t.READ_ONLY.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.READ_ONLY.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.FORMAT != nil {
-		tmpResult = append(tmpResult, t.FORMAT.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.FORMAT.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.ANNOTATION != nil {
 		for _, annotation := range t.ANNOTATION {
-			tmpResult = append(tmpResult, annotation.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, annotation.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
 	if t.AXIS_PTS_REF != nil {
-		tmpResult = append(tmpResult, t.AXIS_PTS_REF.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.AXIS_PTS_REF.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.MAX_GRAD != nil {
-		tmpResult = append(tmpResult, t.MAX_GRAD.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.MAX_GRAD.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.MONOTONY != nil {
-		tmpResult = append(tmpResult, t.MONOTONY.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.MONOTONY.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.BYTE_ORDER != nil {
-		tmpResult = append(tmpResult, t.BYTE_ORDER.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.BYTE_ORDER.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.EXTENDED_LIMITS != nil {
-		tmpResult = append(tmpResult, t.EXTENDED_LIMITS.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.EXTENDED_LIMITS.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.FIX_AXIS_PAR != nil {
-		tmpResult = append(tmpResult, t.FIX_AXIS_PAR.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.FIX_AXIS_PAR.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.FIX_AXIS_PAR_DIST != nil {
-		tmpResult = append(tmpResult, t.FIX_AXIS_PAR_DIST.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.FIX_AXIS_PAR_DIST.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.FIX_AXIS_PAR_LIST != nil {
-		tmpResult = append(tmpResult, t.FIX_AXIS_PAR_LIST.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.FIX_AXIS_PAR_LIST.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.DEPOSIT != nil {
-		tmpResult = append(tmpResult, t.DEPOSIT.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.DEPOSIT.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.CURVE_AXIS_REF != nil {
-		tmpResult = append(tmpResult, t.CURVE_AXIS_REF.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.CURVE_AXIS_REF.MarshalA2L(indentLevel+1, indentString))
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end AXIS_DESCR", indent))
+	tmpResult = append(tmpResult, indentContent("/end AXIS_DESCR", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -263,8 +263,8 @@ func (t *AxisPtsRefType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *AxisPtsRefType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("AXIS_PTS_REF %s", t.AxisPoints.A2LString()), indent)
+func (t *AxisPtsRefType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("AXIS_PTS_REF %s", t.AxisPoints.A2LString()), indentLevel, indentString)
 }
 
 func (t *AxisPtsType) MapChildNodes(node any) {
@@ -308,7 +308,7 @@ func (t *AxisPtsType) MapChildNodes(node any) {
 	}
 }
 
-func (t *AxisPtsType) MarshalA2L(indent int) (result string) {
+func (t *AxisPtsType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	tmpResult := []string{indentContent(fmt.Sprintf("/begin AXIS_PTS %s %s %s %s %s %s %s %s %s %s",
 		t.Name.A2LString(),
 		t.LongIdentifier.A2LString(),
@@ -319,65 +319,65 @@ func (t *AxisPtsType) MarshalA2L(indent int) (result string) {
 		t.Conversion.A2LString(),
 		t.MaxAxisPoints.A2LString(),
 		t.LowerLimit.A2LString(),
-		t.UpperLimit.A2LString()), indent)}
+		t.UpperLimit.A2LString()), indentLevel, indentString)}
 
 	if t.DISPLAY_IDENTIFIER != nil {
-		tmpResult = append(tmpResult, t.DISPLAY_IDENTIFIER.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.DISPLAY_IDENTIFIER.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.READ_ONLY != nil {
-		tmpResult = append(tmpResult, t.READ_ONLY.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.READ_ONLY.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.FORMAT != nil {
-		tmpResult = append(tmpResult, t.FORMAT.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.FORMAT.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.DEPOSIT != nil {
-		tmpResult = append(tmpResult, t.DEPOSIT.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.DEPOSIT.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.BYTE_ORDER != nil {
-		tmpResult = append(tmpResult, t.BYTE_ORDER.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.BYTE_ORDER.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.FUNCTION_LIST != nil {
-		tmpResult = append(tmpResult, t.FUNCTION_LIST.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.FUNCTION_LIST.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.REF_MEMORY_SEGMENT != nil {
-		tmpResult = append(tmpResult, t.REF_MEMORY_SEGMENT.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.REF_MEMORY_SEGMENT.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.GUARD_RAILS != nil {
-		tmpResult = append(tmpResult, t.GUARD_RAILS.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.GUARD_RAILS.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.EXTENDED_LIMITS != nil {
-		tmpResult = append(tmpResult, t.EXTENDED_LIMITS.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.EXTENDED_LIMITS.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.ANNOTATION != nil {
 		for _, annotation := range t.ANNOTATION {
-			tmpResult = append(tmpResult, annotation.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, annotation.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
 	if t.IF_DATA != nil {
 		for _, ifData := range t.IF_DATA {
-			tmpResult = append(tmpResult, ifData.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, ifData.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
 	if t.CALIBRATION_ACCESS != nil {
-		tmpResult = append(tmpResult, t.CALIBRATION_ACCESS.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.CALIBRATION_ACCESS.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.ECU_ADDRESS_EXTENSION != nil {
-		tmpResult = append(tmpResult, t.ECU_ADDRESS_EXTENSION.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.ECU_ADDRESS_EXTENSION.MarshalA2L(indentLevel+1, indentString))
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end AXIS_PTS", indent))
+	tmpResult = append(tmpResult, indentContent("/end AXIS_PTS", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -386,83 +386,83 @@ func (t *AxisPtsXType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *AxisPtsXType) MarshalA2L(indent int) (result string) {
+func (t *AxisPtsXType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	return indentContent(fmt.Sprintf("AXIS_PTS_X %s %s %s %s",
 		t.Position.A2LString(),
 		t.DataType.A2LString(),
 		t.IndexIncr.A2LString(),
-		t.Addressing.A2LString()), indent)
+		t.Addressing.A2LString()), indentLevel, indentString)
 }
 
 func (t *AxisPtsYType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *AxisPtsYType) MarshalA2L(indent int) (result string) {
+func (t *AxisPtsYType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	return indentContent(fmt.Sprintf("AXIS_PTS_Y %s %s %s %s",
 		t.Position.A2LString(),
 		t.DataType.A2LString(),
 		t.IndexIncr.A2LString(),
-		t.Addressing.A2LString()), indent)
+		t.Addressing.A2LString()), indentLevel, indentString)
 }
 
 func (t *AxisPtsZType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *AxisPtsZType) MarshalA2L(indent int) (result string) {
+func (t *AxisPtsZType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	return indentContent(fmt.Sprintf("AXIS_PTS_Z %s %s %s %s",
 		t.Position.A2LString(),
 		t.DataType.A2LString(),
 		t.IndexIncr.A2LString(),
-		t.Addressing.A2LString()), indent)
+		t.Addressing.A2LString()), indentLevel, indentString)
 }
 
 func (t *AxisRescaleXType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *AxisRescaleXType) MarshalA2L(indent int) (result string) {
+func (t *AxisRescaleXType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	return indentContent(fmt.Sprintf("AXIS_RESCALE_X %s %s %s %s %s",
 		t.Position.A2LString(),
 		t.DataType.A2LString(),
 		t.MaxNumberOfRescalePairs.A2LString(),
 		t.IndexIncr.A2LString(),
-		t.Addressing.A2LString()), indent)
+		t.Addressing.A2LString()), indentLevel, indentString)
 }
 
 func (t *AxisRescaleYType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *AxisRescaleYType) MarshalA2L(indent int) (result string) {
+func (t *AxisRescaleYType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	return indentContent(fmt.Sprintf("AXIS_RESCALE_Y %s %s %s %s %s",
 		t.Position.A2LString(),
 		t.DataType.A2LString(),
 		t.MaxNumberOfRescalePairs.A2LString(),
 		t.IndexIncr.A2LString(),
-		t.Addressing.A2LString()), indent)
+		t.Addressing.A2LString()), indentLevel, indentString)
 }
 
 func (t *AxisRescaleZType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *AxisRescaleZType) MarshalA2L(indent int) (result string) {
+func (t *AxisRescaleZType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	return indentContent(fmt.Sprintf("AXIS_RESCALE_Z %s %s %s %s %s",
 		t.Position.A2LString(),
 		t.DataType.A2LString(),
 		t.MaxNumberOfRescalePairs.A2LString(),
 		t.IndexIncr.A2LString(),
-		t.Addressing.A2LString()), indent)
+		t.Addressing.A2LString()), indentLevel, indentString)
 }
 
 func (t *BitMaskType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *BitMaskType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("BIT_MASK %s", t.Mask.A2LString()), indent)
+func (t *BitMaskType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("BIT_MASK %s", t.Mask.A2LString()), indentLevel, indentString)
 }
 
 func (t *BitOperationType) MapChildNodes(node any) {
@@ -478,22 +478,22 @@ func (t *BitOperationType) MapChildNodes(node any) {
 	}
 }
 
-func (t *BitOperationType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent(fmt.Sprintf("/begin BIT_OPERATION"), indent)}
+func (t *BitOperationType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent(fmt.Sprintf("/begin BIT_OPERATION"), indentLevel, indentString)}
 
 	if t.LEFT_SHIFT != nil {
-		tmpResult = append(tmpResult, t.LEFT_SHIFT.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.LEFT_SHIFT.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.RIGHT_SHIFT != nil {
-		tmpResult = append(tmpResult, t.RIGHT_SHIFT.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.RIGHT_SHIFT.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.SIGN_EXTEND != nil {
-		tmpResult = append(tmpResult, t.SIGN_EXTEND.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.SIGN_EXTEND.MarshalA2L(indentLevel+1, indentString))
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end BIT_OPERATION", indent))
+	tmpResult = append(tmpResult, indentContent("/end BIT_OPERATION", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -502,32 +502,32 @@ func (t *ByteOrderType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *ByteOrderType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("BYTE_ORDER %s", t.ByteOrder), indent)
+func (t *ByteOrderType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("BYTE_ORDER %s", t.ByteOrder), indentLevel, indentString)
 }
 
 func (t *CalibrationAccessType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *CalibrationAccessType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("CALIBRATION_ACCESS %s", t.Type), indent)
+func (t *CalibrationAccessType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("CALIBRATION_ACCESS %s", t.Type), indentLevel, indentString)
 }
 
 func (t *CalibrationHandleType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *CalibrationHandleType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent(fmt.Sprintf("/begin CALIBRATION_HANDLE"), indent)}
+func (t *CalibrationHandleType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent(fmt.Sprintf("/begin CALIBRATION_HANDLE"), indentLevel, indentString)}
 
 	if t.Handle != nil {
 		for _, handle := range t.Handle {
-			tmpResult = append(tmpResult, indentContent(handle.A2LString(), indent+1))
+			tmpResult = append(tmpResult, indentContent(handle.A2LString(), indentLevel+1, indentString))
 		}
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end CALIBRATION_HANDLE", indent))
+	tmpResult = append(tmpResult, indentContent("/end CALIBRATION_HANDLE", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -545,18 +545,18 @@ func (t *CalibrationMethodType) MapChildNodes(node any) {
 	}
 }
 
-func (t *CalibrationMethodType) MarshalA2L(indent int) (result string) {
+func (t *CalibrationMethodType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	tmpResult := []string{indentContent(fmt.Sprintf("/begin CALIBRATION_METHOD %s %s",
 		t.Method.A2LString(),
-		t.Version.A2LString()), indent)}
+		t.Version.A2LString()), indentLevel, indentString)}
 
 	if t.CALIBRATION_HANDLE != nil {
 		for _, calibrationHandle := range t.CALIBRATION_HANDLE {
-			tmpResult = append(tmpResult, calibrationHandle.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, calibrationHandle.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end CALIBRATION_METHOD", indent))
+	tmpResult = append(tmpResult, indentContent("/end CALIBRATION_METHOD", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -622,7 +622,7 @@ func (t *CharacteristicType) MapChildNodes(node any) {
 	}
 }
 
-func (t *CharacteristicType) MarshalA2L(indent int) (result string) {
+func (t *CharacteristicType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	tmpResult := []string{indentContent(fmt.Sprintf("/begin CHARACTERISTIC %s %s %s %s %s %s %s %s %s",
 		t.Name.A2LString(),
 		t.LongIdentifier.A2LString(),
@@ -632,99 +632,99 @@ func (t *CharacteristicType) MarshalA2L(indent int) (result string) {
 		t.MaxDiff.A2LString(),
 		t.Conversion.A2LString(),
 		t.LowerLimit.A2LString(),
-		t.UpperLimit.A2LString()), indent)}
+		t.UpperLimit.A2LString()), indentLevel, indentString)}
 
 	if t.DISPLAY_IDENTIFIER != nil {
-		tmpResult = append(tmpResult, t.DISPLAY_IDENTIFIER.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.DISPLAY_IDENTIFIER.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.FORMAT != nil {
-		tmpResult = append(tmpResult, t.FORMAT.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.FORMAT.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.BYTE_ORDER != nil {
-		tmpResult = append(tmpResult, t.BYTE_ORDER.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.BYTE_ORDER.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.BIT_MASK != nil {
-		tmpResult = append(tmpResult, t.BIT_MASK.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.BIT_MASK.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.FUNCTION_LIST != nil {
-		tmpResult = append(tmpResult, t.FUNCTION_LIST.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.FUNCTION_LIST.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.NUMBER != nil {
-		tmpResult = append(tmpResult, t.NUMBER.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.NUMBER.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.EXTENDED_LIMITS != nil {
-		tmpResult = append(tmpResult, t.EXTENDED_LIMITS.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.EXTENDED_LIMITS.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.READ_ONLY != nil {
-		tmpResult = append(tmpResult, t.READ_ONLY.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.READ_ONLY.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.GUARD_RAILS != nil {
-		tmpResult = append(tmpResult, t.GUARD_RAILS.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.GUARD_RAILS.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.MAP_LIST != nil {
-		tmpResult = append(tmpResult, t.MAP_LIST.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.MAP_LIST.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.MAX_REFRESH != nil {
-		tmpResult = append(tmpResult, t.MAX_REFRESH.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.MAX_REFRESH.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.DEPENDENT_CHARACTERISTIC != nil {
-		tmpResult = append(tmpResult, t.DEPENDENT_CHARACTERISTIC.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.DEPENDENT_CHARACTERISTIC.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.VIRTUAL_CHARACTERISTIC != nil {
-		tmpResult = append(tmpResult, t.VIRTUAL_CHARACTERISTIC.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.VIRTUAL_CHARACTERISTIC.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.REF_MEMORY_SEGMENT != nil {
-		tmpResult = append(tmpResult, t.REF_MEMORY_SEGMENT.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.REF_MEMORY_SEGMENT.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.ANNOTATION != nil {
 		for _, annotation := range t.ANNOTATION {
-			tmpResult = append(tmpResult, annotation.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, annotation.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
 	if t.COMPARISON_QUANTITY != nil {
-		tmpResult = append(tmpResult, t.COMPARISON_QUANTITY.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.COMPARISON_QUANTITY.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.IF_DATA != nil {
 		for _, ifData := range t.IF_DATA {
-			tmpResult = append(tmpResult, ifData.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, ifData.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
 	if t.AXIS_DESCR != nil {
 		for _, axisDescr := range t.AXIS_DESCR {
-			tmpResult = append(tmpResult, axisDescr.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, axisDescr.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
 	if t.CALIBRATION_ACCESS != nil {
-		tmpResult = append(tmpResult, t.CALIBRATION_ACCESS.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.CALIBRATION_ACCESS.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.MATRIX_DIM != nil {
-		tmpResult = append(tmpResult, t.MATRIX_DIM.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.MATRIX_DIM.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.ECU_ADDRESS_EXTENSION != nil {
-		tmpResult = append(tmpResult, t.ECU_ADDRESS_EXTENSION.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.ECU_ADDRESS_EXTENSION.MarshalA2L(indentLevel+1, indentString))
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end CHARACTERISTIC", indent))
+	tmpResult = append(tmpResult, indentContent("/end CHARACTERISTIC", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -733,22 +733,22 @@ func (t *CoeffsType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *CoeffsType) MarshalA2L(indent int) (result string) {
+func (t *CoeffsType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	return indentContent(fmt.Sprintf("COEFFS %s %s %s %s %s %s",
 		t.A.A2LString(),
 		t.B.A2LString(),
 		t.C.A2LString(),
 		t.D.A2LString(),
 		t.E.A2LString(),
-		t.F.A2LString()), indent)
+		t.F.A2LString()), indentLevel, indentString)
 }
 
 func (t *ComparisonQuantityType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *ComparisonQuantityType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("COMPARISON_QUANTITY %s", t.Name.A2LString()), indent)
+func (t *ComparisonQuantityType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("COMPARISON_QUANTITY %s", t.Name.A2LString()), indentLevel, indentString)
 }
 
 func (t *CompuMethodType) MapChildNodes(node any) {
@@ -766,31 +766,31 @@ func (t *CompuMethodType) MapChildNodes(node any) {
 	}
 }
 
-func (t *CompuMethodType) MarshalA2L(indent int) (result string) {
+func (t *CompuMethodType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	tmpResult := []string{indentContent(fmt.Sprintf("/begin COMPU_METHOD %s %s %s %s %s",
 		t.Name.A2LString(),
 		t.LongIdentifier.A2LString(),
 		t.ConversionType,
 		t.Format.A2LString(),
-		t.Unit.A2LString()), indent)}
+		t.Unit.A2LString()), indentLevel, indentString)}
 
 	if t.FORMULA != nil {
-		tmpResult = append(tmpResult, t.FORMULA.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.FORMULA.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.COEFFS != nil {
-		tmpResult = append(tmpResult, t.COEFFS.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.COEFFS.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.COMPU_TAB_REF != nil {
-		tmpResult = append(tmpResult, t.COMPU_TAB_REF.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.COMPU_TAB_REF.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.REF_UNIT != nil {
-		tmpResult = append(tmpResult, t.REF_UNIT.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.REF_UNIT.MarshalA2L(indentLevel+1, indentString))
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end COMPU_METHOD", indent))
+	tmpResult = append(tmpResult, indentContent("/end COMPU_METHOD", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -799,8 +799,8 @@ func (t *CompuTabRefType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *CompuTabRefType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("COMPU_TAB_REF %s", t.ConversionTable.A2LString()), indent)
+func (t *CompuTabRefType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("COMPU_TAB_REF %s", t.ConversionTable.A2LString()), indentLevel, indentString)
 }
 
 func (t *CompuTabType) MapChildNodes(node any) {
@@ -812,25 +812,25 @@ func (t *CompuTabType) MapChildNodes(node any) {
 	}
 }
 
-func (t *CompuTabType) MarshalA2L(indent int) (result string) {
+func (t *CompuTabType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	tmpResult := []string{indentContent(fmt.Sprintf("/begin COMPU_TAB %s %s %s %s",
 		t.Name.A2LString(),
 		t.LongIdentifier.A2LString(),
 		t.ConversionType,
-		t.NumberValuePairs.A2LString()), indent)}
+		t.NumberValuePairs.A2LString()), indentLevel, indentString)}
 
 	if t.InValOutVal != nil {
 		for _, inValOutVal := range t.InValOutVal {
 			tmpResult = append(tmpResult, indentContent(fmt.Sprintf("%s %s",
-				inValOutVal.InVal.A2LString(), inValOutVal.OutVal.A2LString()), indent+1))
+				inValOutVal.InVal.A2LString(), inValOutVal.OutVal.A2LString()), indentLevel+1, indentString))
 		}
 	}
 
 	if t.DEFAULT_VALUE != nil {
-		tmpResult = append(tmpResult, t.DEFAULT_VALUE.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.DEFAULT_VALUE.MarshalA2L(indentLevel+1, indentString))
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end COMPU_TAB", indent))
+	tmpResult = append(tmpResult, indentContent("/end COMPU_TAB", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -844,26 +844,26 @@ func (t *CompuVTabRangeType) MapChildNodes(node any) {
 	}
 }
 
-func (t *CompuVTabRangeType) MarshalA2L(indent int) (result string) {
+func (t *CompuVTabRangeType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	tmpResult := []string{indentContent(fmt.Sprintf("/begin COMPU_VTAB_RANGE %s %s %s",
 		t.Name.A2LString(),
 		t.LongIdentifier.A2LString(),
-		t.NumberOfValuesTriples.A2LString()), indent)}
+		t.NumberOfValuesTriples.A2LString()), indentLevel, indentString)}
 
 	if t.InValMinInValMaxOutVal != nil {
 		for _, inValMinInValMaxOutVal := range t.InValMinInValMaxOutVal {
 			tmpResult = append(tmpResult, indentContent(fmt.Sprintf("%s %s %s",
 				inValMinInValMaxOutVal.InValMin.A2LString(),
 				inValMinInValMaxOutVal.InValMax.A2LString(),
-				inValMinInValMaxOutVal.OutVal.A2LString()), indent+1))
+				inValMinInValMaxOutVal.OutVal.A2LString()), indentLevel+1, indentString))
 		}
 	}
 
 	if t.DEFAULT_VALUE != nil {
-		tmpResult = append(tmpResult, t.DEFAULT_VALUE.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.DEFAULT_VALUE.MarshalA2L(indentLevel+1, indentString))
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end COMPU_VTAB_RANGE", indent))
+	tmpResult = append(tmpResult, indentContent("/end COMPU_VTAB_RANGE", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -877,26 +877,26 @@ func (t *CompuVTabType) MapChildNodes(node any) {
 	}
 }
 
-func (t *CompuVTabType) MarshalA2L(indent int) (result string) {
+func (t *CompuVTabType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	tmpResult := []string{indentContent(fmt.Sprintf("/begin COMPU_VTAB %s %s %s %s",
 		t.Name.A2LString(),
 		t.LongIdentifier.A2LString(),
 		t.ConversionType,
-		t.NumberValuePairs.A2LString()), indent)}
+		t.NumberValuePairs.A2LString()), indentLevel, indentString)}
 
 	if t.InValOutVal != nil {
 		for _, inValOutVal := range t.InValOutVal {
 			tmpResult = append(tmpResult, indentContent(fmt.Sprintf("%s %s",
 				inValOutVal.InVal.A2LString(),
-				inValOutVal.OutVal.A2LString()), indent+1))
+				inValOutVal.OutVal.A2LString()), indentLevel+1, indentString))
 		}
 	}
 
 	if t.DEFAULT_VALUE != nil {
-		tmpResult = append(tmpResult, t.DEFAULT_VALUE.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.DEFAULT_VALUE.MarshalA2L(indentLevel+1, indentString))
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end COMPU_VTAB", indent))
+	tmpResult = append(tmpResult, indentContent("/end COMPU_VTAB", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -905,64 +905,64 @@ func (t *CpuTypeType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *CpuTypeType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("CPU_TYPE %s", t.Cpu.A2LString()), indent)
+func (t *CpuTypeType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("CPU_TYPE %s", t.Cpu.A2LString()), indentLevel, indentString)
 }
 
 func (t *CurveAxisRefType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *CurveAxisRefType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("CURVE_AXIS_REF %s", t.CurveAxis.A2LString()), indent)
+func (t *CurveAxisRefType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("CURVE_AXIS_REF %s", t.CurveAxis.A2LString()), indentLevel, indentString)
 }
 
 func (t *CustomerNoType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *CustomerNoType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("CUSTOMER_NO %s", t.Number.A2LString()), indent)
+func (t *CustomerNoType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("CUSTOMER_NO %s", t.Number.A2LString()), indentLevel, indentString)
 }
 
 func (t *CustomerType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *CustomerType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("CUSTOMER %s", t.Customer.A2LString()), indent)
+func (t *CustomerType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("CUSTOMER %s", t.Customer.A2LString()), indentLevel, indentString)
 }
 
 func (t *DataSizeType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *DataSizeType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("DATA_SIZE %s", t.Size.A2LString()), indent)
+func (t *DataSizeType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("DATA_SIZE %s", t.Size.A2LString()), indentLevel, indentString)
 }
 
 func (t *DefaultValueType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *DefaultValueType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("DEFAULT_VALUE %s", t.DisplayString.A2LString()), indent)
+func (t *DefaultValueType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("DEFAULT_VALUE %s", t.DisplayString.A2LString()), indentLevel, indentString)
 }
 
 func (t *DefCharacteristicType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *DefCharacteristicType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent(fmt.Sprintf("/begin DEF_CHARACTERISTIC"), indent)}
+func (t *DefCharacteristicType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent(fmt.Sprintf("/begin DEF_CHARACTERISTIC"), indentLevel, indentString)}
 
 	if t.Identifier != nil {
 		for _, identifier := range t.Identifier {
-			tmpResult = append(tmpResult, indentContent(identifier.A2LString(), indent+1))
+			tmpResult = append(tmpResult, indentContent(identifier.A2LString(), indentLevel+1, indentString))
 		}
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end DEF_CHARACTERISTIC", indent))
+	tmpResult = append(tmpResult, indentContent("/end DEF_CHARACTERISTIC", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -971,17 +971,17 @@ func (t *DependentCharacteristicType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *DependentCharacteristicType) MarshalA2L(indent int) (result string) {
+func (t *DependentCharacteristicType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	tmpResult := []string{indentContent(fmt.Sprintf("/begin DEPENDENT_CHARACTERISTIC %s",
-		t.Formula.A2LString()), indent)}
+		t.Formula.A2LString()), indentLevel, indentString)}
 
 	if t.Characteristic != nil {
 		for _, characteristic := range t.Characteristic {
-			tmpResult = append(tmpResult, indentContent(characteristic.A2LString(), indent+1))
+			tmpResult = append(tmpResult, indentContent(characteristic.A2LString(), indentLevel+1, indentString))
 		}
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end DEPENDENT_CHARACTERISTIC", indent))
+	tmpResult = append(tmpResult, indentContent("/end DEPENDENT_CHARACTERISTIC", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -990,131 +990,131 @@ func (t *DepositType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *DepositType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("DEPOSIT %s", t.Mode), indent)
+func (t *DepositType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("DEPOSIT %s", t.Mode), indentLevel, indentString)
 }
 
 func (t *DisplayIdentifierType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *DisplayIdentifierType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("DISPLAY_IDENTIFIER %s", t.DisplayName.A2LString()), indent)
+func (t *DisplayIdentifierType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("DISPLAY_IDENTIFIER %s", t.DisplayName.A2LString()), indentLevel, indentString)
 }
 
 func (t *DistOpXType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *DistOpXType) MarshalA2L(indent int) (result string) {
+func (t *DistOpXType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	return indentContent(fmt.Sprintf("DIST_OP_X %s %s",
 		t.Position.A2LString(),
-		t.DataType.A2LString()), indent)
+		t.DataType.A2LString()), indentLevel, indentString)
 }
 
 func (t *DistOpYType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *DistOpYType) MarshalA2L(indent int) (result string) {
+func (t *DistOpYType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	return indentContent(fmt.Sprintf("DIST_OP_Y %s %s",
 		t.Position.A2LString(),
-		t.DataType.A2LString()), indent)
+		t.DataType.A2LString()), indentLevel, indentString)
 }
 
 func (t *DistOpZType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *DistOpZType) MarshalA2L(indent int) (result string) {
+func (t *DistOpZType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	return indentContent(fmt.Sprintf("DIST_OP_Z %s %s",
 		t.Position.A2LString(),
-		t.DataType.A2LString()), indent)
+		t.DataType.A2LString()), indentLevel, indentString)
 }
 
 func (t *EcuAddressExtensionType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *EcuAddressExtensionType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("ECU_ADDRESS_EXTENSION %s", t.Extension.A2LString()), indent)
+func (t *EcuAddressExtensionType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("ECU_ADDRESS_EXTENSION %s", t.Extension.A2LString()), indentLevel, indentString)
 }
 
 func (t *EcuAddressType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *EcuAddressType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("ECU_ADDRESS %s", t.Address.A2LString()), indent)
+func (t *EcuAddressType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("ECU_ADDRESS %s", t.Address.A2LString()), indentLevel, indentString)
 }
 
 func (t *EcuCalibrationOffsetType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *EcuCalibrationOffsetType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("ECU_CALIBRATION_OFFSET %s", t.Offset.A2LString()), indent)
+func (t *EcuCalibrationOffsetType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("ECU_CALIBRATION_OFFSET %s", t.Offset.A2LString()), indentLevel, indentString)
 }
 
 func (t *EcuType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *EcuType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("ECU %s", t.ControlUnit.A2LString()), indent)
+func (t *EcuType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("ECU %s", t.ControlUnit.A2LString()), indentLevel, indentString)
 }
 
 func (t *EpkType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *EpkType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("EPK %s", t.Identifier.A2LString()), indent)
+func (t *EpkType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("EPK %s", t.Identifier.A2LString()), indentLevel, indentString)
 }
 
 func (t *ErrorMaskType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *ErrorMaskType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("ERROR_MASK %s", t.Mask.A2LString()), indent)
+func (t *ErrorMaskType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("ERROR_MASK %s", t.Mask.A2LString()), indentLevel, indentString)
 }
 
 func (t *ExtendedLimitsType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *ExtendedLimitsType) MarshalA2L(indent int) (result string) {
+func (t *ExtendedLimitsType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	return indentContent(fmt.Sprintf("EXTENDED_LIMITS %s %s",
 		t.LowerLimit.A2LString(),
-		t.UpperLimit.A2LString()), indent)
+		t.UpperLimit.A2LString()), indentLevel, indentString)
 }
 
 func (t *FixAxisParDistType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *FixAxisParDistType) MarshalA2L(indent int) (result string) {
+func (t *FixAxisParDistType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	return indentContent(fmt.Sprintf("FIX_AXIS_PAR_DIST %s %s %s",
 		t.Offset.A2LString(),
 		t.Distance.A2LString(),
-		t.Numberapo.A2LString()), indent)
+		t.Numberapo.A2LString()), indentLevel, indentString)
 }
 
 func (t *FixAxisParListType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *FixAxisParListType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent("/begin FIX_AXIS_PAR_LIST", indent)}
+func (t *FixAxisParListType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent("/begin FIX_AXIS_PAR_LIST", indentLevel, indentString)}
 
 	if t.AxisPtsValue != nil {
 		for _, axisPtsValue := range t.AxisPtsValue {
-			tmpResult = append(tmpResult, indentContent(axisPtsValue.A2LString(), indent+1))
+			tmpResult = append(tmpResult, indentContent(axisPtsValue.A2LString(), indentLevel+1, indentString))
 		}
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end FIX_AXIS_PAR_LIST", indent))
+	tmpResult = append(tmpResult, indentContent("/end FIX_AXIS_PAR_LIST", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -1123,63 +1123,63 @@ func (t *FixAxisParType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *FixAxisParType) MarshalA2L(indent int) (result string) {
+func (t *FixAxisParType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	return indentContent(fmt.Sprintf("FIX_AXIS_PAR %s %s %s",
 		t.Offset.A2LString(),
 		t.Shift.A2LString(),
-		t.Numberapo.A2LString()), indent)
+		t.Numberapo.A2LString()), indentLevel, indentString)
 }
 
 func (t *FixNoAxisPtsXType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *FixNoAxisPtsXType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("FIX_NO_AXIS_PTS_X %s", t.NumberOfAxisPoints.A2LString()), indent)
+func (t *FixNoAxisPtsXType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("FIX_NO_AXIS_PTS_X %s", t.NumberOfAxisPoints.A2LString()), indentLevel, indentString)
 }
 
 func (t *FixNoAxisPtsYType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *FixNoAxisPtsYType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("FIX_NO_AXIS_PTS_Y %s", t.NumberOfAxisPoints.A2LString()), indent)
+func (t *FixNoAxisPtsYType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("FIX_NO_AXIS_PTS_Y %s", t.NumberOfAxisPoints.A2LString()), indentLevel, indentString)
 }
 
 func (t *FixNoAxisPtsZType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *FixNoAxisPtsZType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("FIX_NO_AXIS_PTS_Z %s", t.NumberOfAxisPoints.A2LString()), indent)
+func (t *FixNoAxisPtsZType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("FIX_NO_AXIS_PTS_Z %s", t.NumberOfAxisPoints.A2LString()), indentLevel, indentString)
 }
 
 func (t *FncValuesType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *FncValuesType) MarshalA2L(indent int) (result string) {
+func (t *FncValuesType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	return indentContent(fmt.Sprintf("FNC_VALUES %s %s %s %s",
 		t.Position.A2LString(),
 		t.DataType.A2LString(),
 		t.IndexMode,
-		t.AddressType.A2LString()), indent)
+		t.AddressType.A2LString()), indentLevel, indentString)
 }
 
 func (t *FormatType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *FormatType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("FORMAT %s", t.FormatString.A2LString()), indent)
+func (t *FormatType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("FORMAT %s", t.FormatString.A2LString()), indentLevel, indentString)
 }
 
 func (t *FormulaInvType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *FormulaInvType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("FORMULA_INV %s", t.GX.A2LString()), indent)
+func (t *FormulaInvType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("FORMULA_INV %s", t.GX.A2LString()), indentLevel, indentString)
 }
 
 func (t *FormulaType) MapChildNodes(node any) {
@@ -1191,14 +1191,14 @@ func (t *FormulaType) MapChildNodes(node any) {
 	}
 }
 
-func (t *FormulaType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent(fmt.Sprintf("/begin FORMULA %s", t.FX.A2LString()), indent)}
+func (t *FormulaType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent(fmt.Sprintf("/begin FORMULA %s", t.FX.A2LString()), indentLevel, indentString)}
 
 	if t.FORMULA_INV != nil {
-		tmpResult = append(tmpResult, t.FORMULA_INV.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.FORMULA_INV.MarshalA2L(indentLevel+1, indentString))
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end FORMULA", indent))
+	tmpResult = append(tmpResult, indentContent("/end FORMULA", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -1207,8 +1207,8 @@ func (t *FrameMeasurementType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *FrameMeasurementType) MarshalA2L(indent int) (result string) {
-	result = indentContent("FRAME_MEASUREMENT", indent)
+func (t *FrameMeasurementType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	result = indentContent("FRAME_MEASUREMENT", indentLevel, indentString)
 
 	if t.Identifier != nil {
 		for _, identifier := range t.Identifier {
@@ -1234,24 +1234,24 @@ func (t *FrameType) MapChildNodes(node any) {
 	}
 }
 
-func (t *FrameType) MarshalA2L(indent int) (result string) {
+func (t *FrameType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	tmpResult := []string{indentContent(fmt.Sprintf("/begin FRAME %s %s %s %s",
 		t.Name.A2LString(),
 		t.LongIdentifier.A2LString(),
 		t.ScalingUnit.A2LString(),
-		t.Rate.A2LString()), indent)}
+		t.Rate.A2LString()), indentLevel, indentString)}
 
 	if t.FRAME_MEASUREMENT != nil {
-		tmpResult = append(tmpResult, t.FRAME_MEASUREMENT.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.FRAME_MEASUREMENT.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.IF_DATA != nil {
 		for _, ifData := range t.IF_DATA {
-			tmpResult = append(tmpResult, ifData.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, ifData.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end FRAME", indent))
+	tmpResult = append(tmpResult, indentContent("/end FRAME", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -1260,16 +1260,16 @@ func (t *FunctionListType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *FunctionListType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent("/begin FUNCTION_LIST", indent)}
+func (t *FunctionListType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent("/begin FUNCTION_LIST", indentLevel, indentString)}
 
 	if t.Name != nil {
 		for _, name := range t.Name {
-			tmpResult = append(tmpResult, indentContent(name.A2LString(), indent+1))
+			tmpResult = append(tmpResult, indentContent(name.A2LString(), indentLevel+1, indentString))
 		}
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end FUNCTION_LIST", indent))
+	tmpResult = append(tmpResult, indentContent("/end FUNCTION_LIST", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -1301,46 +1301,46 @@ func (t *FunctionType) MapChildNodes(node any) {
 	}
 }
 
-func (t *FunctionType) MarshalA2L(indent int) (result string) {
+func (t *FunctionType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	tmpResult := []string{indentContent(fmt.Sprintf("/begin FUNCTION %s %s",
 		t.Name.A2LString(),
-		t.LongIdentifier.A2LString()), indent)}
+		t.LongIdentifier.A2LString()), indentLevel, indentString)}
 
 	if t.ANNOTATION != nil {
 		for _, annotation := range t.ANNOTATION {
-			tmpResult = append(tmpResult, annotation.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, annotation.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
 	if t.DEF_CHARACTERISTIC != nil {
-		tmpResult = append(tmpResult, t.DEF_CHARACTERISTIC.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.DEF_CHARACTERISTIC.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.REF_CHARACTERISTIC != nil {
-		tmpResult = append(tmpResult, t.REF_CHARACTERISTIC.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.REF_CHARACTERISTIC.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.IN_MEASUREMENT != nil {
-		tmpResult = append(tmpResult, t.IN_MEASUREMENT.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.IN_MEASUREMENT.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.OUT_MEASUREMENT != nil {
-		tmpResult = append(tmpResult, t.OUT_MEASUREMENT.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.OUT_MEASUREMENT.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.LOC_MEASUREMENT != nil {
-		tmpResult = append(tmpResult, t.LOC_MEASUREMENT.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.LOC_MEASUREMENT.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.SUB_FUNCTION != nil {
-		tmpResult = append(tmpResult, t.SUB_FUNCTION.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.SUB_FUNCTION.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.FUNCTION_VERSION != nil {
-		tmpResult = append(tmpResult, t.FUNCTION_VERSION.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.FUNCTION_VERSION.MarshalA2L(indentLevel+1, indentString))
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end FUNCTION", indent))
+	tmpResult = append(tmpResult, indentContent("/end FUNCTION", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -1349,8 +1349,8 @@ func (t *FunctionVersionType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *FunctionVersionType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("FUNCTION_VERSION %s", t.VersionIdentifier.A2LString()), indent)
+func (t *FunctionVersionType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("FUNCTION_VERSION %s", t.VersionIdentifier.A2LString()), indentLevel, indentString)
 }
 
 func (t *GroupType) MapChildNodes(node any) {
@@ -1376,38 +1376,38 @@ func (t *GroupType) MapChildNodes(node any) {
 	}
 }
 
-func (t *GroupType) MarshalA2L(indent int) (result string) {
+func (t *GroupType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	tmpResult := []string{indentContent(fmt.Sprintf("/begin GROUP %s %s",
 		t.GroupName.A2LString(),
-		t.GroupLongIdentifier.A2LString()), indent)}
+		t.GroupLongIdentifier.A2LString()), indentLevel, indentString)}
 
 	if t.ANNOTATION != nil {
 		for _, annotation := range t.ANNOTATION {
-			tmpResult = append(tmpResult, annotation.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, annotation.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
 	if t.ROOT != nil {
-		tmpResult = append(tmpResult, t.ROOT.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.ROOT.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.REF_CHARACTERISTIC != nil {
-		tmpResult = append(tmpResult, t.REF_CHARACTERISTIC.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.REF_CHARACTERISTIC.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.REF_MEASUREMENT != nil {
-		tmpResult = append(tmpResult, t.REF_MEASUREMENT.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.REF_MEASUREMENT.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.FUNCTION_LIST != nil {
-		tmpResult = append(tmpResult, t.FUNCTION_LIST.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.FUNCTION_LIST.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.SUB_GROUP != nil {
-		tmpResult = append(tmpResult, t.SUB_GROUP.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.SUB_GROUP.MarshalA2L(indentLevel+1, indentString))
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end GROUP", indent))
+	tmpResult = append(tmpResult, indentContent("/end GROUP", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -1416,8 +1416,8 @@ func (t *GuardRailsType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *GuardRailsType) MarshalA2L(indent int) (result string) {
-	return indentContent("GUARD_RAILS", indent)
+func (t *GuardRailsType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent("GUARD_RAILS", indentLevel, indentString)
 }
 
 func (t *HeaderType) MapChildNodes(node any) {
@@ -1431,18 +1431,18 @@ func (t *HeaderType) MapChildNodes(node any) {
 	}
 }
 
-func (t *HeaderType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent(fmt.Sprintf("/begin HEADER %s", t.Comment.A2LString()), indent)}
+func (t *HeaderType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent(fmt.Sprintf("/begin HEADER %s", t.Comment.A2LString()), indentLevel, indentString)}
 
 	if t.VERSION != nil {
-		tmpResult = append(tmpResult, t.VERSION.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.VERSION.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.PROJECT_NO != nil {
-		tmpResult = append(tmpResult, t.PROJECT_NO.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.PROJECT_NO.MarshalA2L(indentLevel+1, indentString))
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end HEADER", indent))
+	tmpResult = append(tmpResult, indentContent("/end HEADER", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -1451,24 +1451,24 @@ func (t *IdentificationType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *IdentificationType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("IDENTIFICATION %s %s", t.Position.A2LString(), t.DataType.A2LString()), indent)
+func (t *IdentificationType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("IDENTIFICATION %s %s", t.Position.A2LString(), t.DataType.A2LString()), indentLevel, indentString)
 }
 
 func (t *InMeasurementType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *InMeasurementType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent("/begin IN_MEASUREMENT", indent)}
+func (t *InMeasurementType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent("/begin IN_MEASUREMENT", indentLevel, indentString)}
 
 	if t.Identifier != nil {
 		for _, identifier := range t.Identifier {
-			tmpResult = append(tmpResult, indentContent(identifier.A2LString(), indent+1))
+			tmpResult = append(tmpResult, indentContent(identifier.A2LString(), indentLevel+1, indentString))
 		}
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end IN_MEASUREMENT", indent))
+	tmpResult = append(tmpResult, indentContent("/end IN_MEASUREMENT", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -1477,24 +1477,24 @@ func (t *LeftShiftType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *LeftShiftType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("LEFT_SHIFT %s", t.BitCount.A2LString()), indent)
+func (t *LeftShiftType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("LEFT_SHIFT %s", t.BitCount.A2LString()), indentLevel, indentString)
 }
 
 func (t *LocMeasurementType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *LocMeasurementType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent("/begin LOC_MEASUREMENT", indent)}
+func (t *LocMeasurementType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent("/begin LOC_MEASUREMENT", indentLevel, indentString)}
 
 	if t.Identifier != nil {
 		for _, identifier := range t.Identifier {
-			tmpResult = append(tmpResult, indentContent(identifier.A2LString(), indent+1))
+			tmpResult = append(tmpResult, indentContent(identifier.A2LString(), indentLevel+1, indentString))
 		}
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end LOC_MEASUREMENT", indent))
+	tmpResult = append(tmpResult, indentContent("/end LOC_MEASUREMENT", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -1503,16 +1503,16 @@ func (t *MapListType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *MapListType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent("/begin MAP_LIST", indent)}
+func (t *MapListType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent("/begin MAP_LIST", indentLevel, indentString)}
 
 	if t.Name != nil {
 		for _, name := range t.Name {
-			tmpResult = append(tmpResult, indentContent(name.A2LString(), indent+1))
+			tmpResult = append(tmpResult, indentContent(name.A2LString(), indentLevel+1, indentString))
 		}
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end MAP_LIST", indent))
+	tmpResult = append(tmpResult, indentContent("/end MAP_LIST", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -1521,24 +1521,24 @@ func (t *MatrixDimType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *MatrixDimType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("MATRIX_DIM %s %s %s", t.XDim.A2LString(), t.YDim.A2LString(), t.ZDim.A2LString()), indent)
+func (t *MatrixDimType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("MATRIX_DIM %s %s %s", t.XDim.A2LString(), t.YDim.A2LString(), t.ZDim.A2LString()), indentLevel, indentString)
 }
 
 func (t *MaxGradType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *MaxGradType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("MAX_GRAD %s", t.MaxGradient.A2LString()), indent)
+func (t *MaxGradType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("MAX_GRAD %s", t.MaxGradient.A2LString()), indentLevel, indentString)
 }
 
 func (t *MaxRefreshType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *MaxRefreshType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("MAX_REFRESH %s %s", t.ScalingUnit.A2LString(), t.Rate.A2LString()), indent)
+func (t *MaxRefreshType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("MAX_REFRESH %s %s", t.ScalingUnit.A2LString(), t.Rate.A2LString()), indentLevel, indentString)
 }
 
 func (t *MeasurementType) MapChildNodes(node any) {
@@ -1592,7 +1592,7 @@ func (t *MeasurementType) MapChildNodes(node any) {
 	}
 }
 
-func (t *MeasurementType) MarshalA2L(indent int) (result string) {
+func (t *MeasurementType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	tmpResult := []string{indentContent(fmt.Sprintf("/begin MEASUREMENT %s %s %s %s %s %s %s %s",
 		t.Name.A2LString(),
 		t.LongIdentifier.A2LString(),
@@ -1601,81 +1601,81 @@ func (t *MeasurementType) MarshalA2L(indent int) (result string) {
 		t.Resolution.A2LString(),
 		t.Accuracy.A2LString(),
 		t.LowerLimit.A2LString(),
-		t.UpperLimit.A2LString()), indent)}
+		t.UpperLimit.A2LString()), indentLevel, indentString)}
 
 	if t.DISPLAY_IDENTIFIER != nil {
-		tmpResult = append(tmpResult, t.DISPLAY_IDENTIFIER.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.DISPLAY_IDENTIFIER.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.READ_WRITE != nil {
-		tmpResult = append(tmpResult, t.READ_WRITE.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.READ_WRITE.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.FORMAT != nil {
-		tmpResult = append(tmpResult, t.FORMAT.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.FORMAT.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.ARRAY_SIZE != nil {
-		tmpResult = append(tmpResult, t.ARRAY_SIZE.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.ARRAY_SIZE.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.BIT_MASK != nil {
-		tmpResult = append(tmpResult, t.BIT_MASK.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.BIT_MASK.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.BIT_OPERATION != nil {
-		tmpResult = append(tmpResult, t.BIT_OPERATION.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.BIT_OPERATION.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.BYTE_ORDER != nil {
-		tmpResult = append(tmpResult, t.BYTE_ORDER.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.BYTE_ORDER.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.MAX_REFRESH != nil {
-		tmpResult = append(tmpResult, t.MAX_REFRESH.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.MAX_REFRESH.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.VIRTUAL != nil {
-		tmpResult = append(tmpResult, t.VIRTUAL.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.VIRTUAL.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.FUNCTION_LIST != nil {
-		tmpResult = append(tmpResult, t.FUNCTION_LIST.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.FUNCTION_LIST.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.ECU_ADDRESS != nil {
-		tmpResult = append(tmpResult, t.ECU_ADDRESS.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.ECU_ADDRESS.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.ERROR_MASK != nil {
-		tmpResult = append(tmpResult, t.ERROR_MASK.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.ERROR_MASK.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.REF_MEMORY_SEGMENT != nil {
-		tmpResult = append(tmpResult, t.REF_MEMORY_SEGMENT.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.REF_MEMORY_SEGMENT.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.ANNOTATION != nil {
 		for _, annotation := range t.ANNOTATION {
-			tmpResult = append(tmpResult, annotation.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, annotation.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
 	if t.IF_DATA != nil {
 		for _, ifData := range t.IF_DATA {
-			tmpResult = append(tmpResult, ifData.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, ifData.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
 	if t.MATRIX_DIM != nil {
-		tmpResult = append(tmpResult, t.MATRIX_DIM.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.MATRIX_DIM.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.ECU_ADDRESS_EXTENSION != nil {
-		tmpResult = append(tmpResult, t.ECU_ADDRESS_EXTENSION.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.ECU_ADDRESS_EXTENSION.MarshalA2L(indentLevel+1, indentString))
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end MEASUREMENT", indent))
+	tmpResult = append(tmpResult, indentContent("/end MEASUREMENT", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -1693,7 +1693,7 @@ func (t *MemoryLayoutType) MapChildNodes(node any) {
 	}
 }
 
-func (t *MemoryLayoutType) MarshalA2L(indent int) (result string) {
+func (t *MemoryLayoutType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	tmpResult := []string{indentContent(fmt.Sprintf("/begin MEMORY_LAYOUT %s %s %s %s %s %s %s %s",
 		t.PrgType,
 		t.Address.A2LString(),
@@ -1702,15 +1702,15 @@ func (t *MemoryLayoutType) MarshalA2L(indent int) (result string) {
 		t.Offset[1].A2LString(),
 		t.Offset[2].A2LString(),
 		t.Offset[3].A2LString(),
-		t.Offset[4].A2LString()), indent)}
+		t.Offset[4].A2LString()), indentLevel, indentString)}
 
 	if t.IF_DATA != nil {
 		for _, ifData := range t.IF_DATA {
-			tmpResult = append(tmpResult, ifData.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, ifData.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end MEMORY_LAYOUT", indent))
+	tmpResult = append(tmpResult, indentContent("/end MEMORY_LAYOUT", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -1728,7 +1728,7 @@ func (t *MemorySegmentType) MapChildNodes(node any) {
 	}
 }
 
-func (t *MemorySegmentType) MarshalA2L(indent int) (result string) {
+func (t *MemorySegmentType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	tmpResult := []string{indentContent(fmt.Sprintf("/begin MEMORY_SEGMENT %s %s %s %s %s %s %s %s %s %s %s %s",
 		t.Name.A2LString(),
 		t.LongIdentifier.A2LString(),
@@ -1741,15 +1741,15 @@ func (t *MemorySegmentType) MarshalA2L(indent int) (result string) {
 		t.Offset[1].A2LString(),
 		t.Offset[2].A2LString(),
 		t.Offset[3].A2LString(),
-		t.Offset[4].A2LString()), indent)}
+		t.Offset[4].A2LString()), indentLevel, indentString)}
 
 	if t.IF_DATA != nil {
 		for _, ifData := range t.IF_DATA {
-			tmpResult = append(tmpResult, ifData.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, ifData.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end MEMORY_SEGMENT", indent))
+	tmpResult = append(tmpResult, indentContent("/end MEMORY_SEGMENT", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -1779,46 +1779,46 @@ func (t *ModCommonType) MapChildNodes(node any) {
 	}
 }
 
-func (t *ModCommonType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent(fmt.Sprintf("/begin MOD_COMMON %s", t.Comment.A2LString()), indent)}
+func (t *ModCommonType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent(fmt.Sprintf("/begin MOD_COMMON %s", t.Comment.A2LString()), indentLevel, indentString)}
 
 	if t.S_REC_LAYOUT != nil {
-		tmpResult = append(tmpResult, t.S_REC_LAYOUT.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.S_REC_LAYOUT.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.DEPOSIT != nil {
-		tmpResult = append(tmpResult, t.DEPOSIT.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.DEPOSIT.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.BYTE_ORDER != nil {
-		tmpResult = append(tmpResult, t.BYTE_ORDER.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.BYTE_ORDER.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.DATA_SIZE != nil {
-		tmpResult = append(tmpResult, t.DATA_SIZE.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.DATA_SIZE.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.ALIGNMENT_BYTE != nil {
-		tmpResult = append(tmpResult, t.ALIGNMENT_BYTE.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.ALIGNMENT_BYTE.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.ALIGNMENT_WORD != nil {
-		tmpResult = append(tmpResult, t.ALIGNMENT_WORD.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.ALIGNMENT_WORD.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.ALIGNMENT_LONG != nil {
-		tmpResult = append(tmpResult, t.ALIGNMENT_LONG.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.ALIGNMENT_LONG.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.ALIGNMENT_FLOAT32_IEEE != nil {
-		tmpResult = append(tmpResult, t.ALIGNMENT_FLOAT32_IEEE.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.ALIGNMENT_FLOAT32_IEEE.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.ALIGNMENT_FLOAT64_IEEE != nil {
-		tmpResult = append(tmpResult, t.ALIGNMENT_FLOAT64_IEEE.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.ALIGNMENT_FLOAT64_IEEE.MarshalA2L(indentLevel+1, indentString))
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end MOD_COMMON", indent))
+	tmpResult = append(tmpResult, indentContent("/end MOD_COMMON", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -1882,84 +1882,84 @@ func (t *ModParType) MapChildNodes(node any) {
 	}
 }
 
-func (t *ModParType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent(fmt.Sprintf("/begin MOD_PAR %s", t.Comment.A2LString()), indent)}
+func (t *ModParType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent(fmt.Sprintf("/begin MOD_PAR %s", t.Comment.A2LString()), indentLevel, indentString)}
 
 	if t.VERSION != nil {
-		tmpResult = append(tmpResult, t.VERSION.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.VERSION.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.ADDR_EPK != nil {
 		for _, addrEpk := range t.ADDR_EPK {
-			tmpResult = append(tmpResult, addrEpk.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, addrEpk.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
 	if t.EPK != nil {
-		tmpResult = append(tmpResult, t.EPK.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.EPK.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.SUPPLIER != nil {
-		tmpResult = append(tmpResult, t.SUPPLIER.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.SUPPLIER.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.CUSTOMER != nil {
-		tmpResult = append(tmpResult, t.CUSTOMER.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.CUSTOMER.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.CUSTOMER_NO != nil {
-		tmpResult = append(tmpResult, t.CUSTOMER_NO.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.CUSTOMER_NO.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.USER != nil {
-		tmpResult = append(tmpResult, t.USER.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.USER.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.PHONE_NO != nil {
-		tmpResult = append(tmpResult, t.PHONE_NO.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.PHONE_NO.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.ECU != nil {
-		tmpResult = append(tmpResult, t.ECU.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.ECU.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.CPU_TYPE != nil {
-		tmpResult = append(tmpResult, t.CPU_TYPE.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.CPU_TYPE.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.NO_OF_INTERFACES != nil {
-		tmpResult = append(tmpResult, t.NO_OF_INTERFACES.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.NO_OF_INTERFACES.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.ECU_CALIBRATION_OFFSET != nil {
-		tmpResult = append(tmpResult, t.ECU_CALIBRATION_OFFSET.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.ECU_CALIBRATION_OFFSET.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.CALIBRATION_METHOD != nil {
 		for _, calibrationMethod := range t.CALIBRATION_METHOD {
-			tmpResult = append(tmpResult, calibrationMethod.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, calibrationMethod.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
 	if t.MEMORY_LAYOUT != nil {
 		for _, memoryLayout := range t.MEMORY_LAYOUT {
-			tmpResult = append(tmpResult, memoryLayout.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, memoryLayout.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
 	if t.MEMORY_SEGMENT != nil {
 		for _, memorySegment := range t.MEMORY_SEGMENT {
-			tmpResult = append(tmpResult, memorySegment.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, memorySegment.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
 	if t.SYSTEM_CONSTANT != nil {
 		for _, systemConstant := range t.SYSTEM_CONSTANT {
-			tmpResult = append(tmpResult, systemConstant.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, systemConstant.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end MOD_PAR", indent))
+	tmpResult = append(tmpResult, indentContent("/end MOD_PAR", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -2059,110 +2059,110 @@ func (t *ModuleType) MapChildNodes(node any) {
 	}
 }
 
-func (t *ModuleType) MarshalA2L(indent int) (result string) {
+func (t *ModuleType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	tmpResult := []string{indentContent(fmt.Sprintf("/begin MODULE %s %s",
 		t.Name.A2LString(),
-		t.LongIdentifier.A2LString()), indent)}
+		t.LongIdentifier.A2LString()), indentLevel, indentString)}
 
 	if t.A2ML != nil {
-		tmpResult = append(tmpResult, t.A2ML.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.A2ML.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.MOD_PAR != nil {
-		tmpResult = append(tmpResult, t.MOD_PAR.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.MOD_PAR.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.MOD_COMMON != nil {
-		tmpResult = append(tmpResult, t.MOD_COMMON.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.MOD_COMMON.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.IF_DATA != nil {
 		for _, ifData := range t.IF_DATA {
-			tmpResult = append(tmpResult, ifData.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, ifData.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
 	if t.CHARACTERISTIC != nil {
 		for _, characteristic := range t.CHARACTERISTIC {
-			tmpResult = append(tmpResult, characteristic.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, characteristic.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
 	if t.AXIS_PTS != nil {
 		for _, axisPts := range t.AXIS_PTS {
-			tmpResult = append(tmpResult, axisPts.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, axisPts.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
 	if t.MEASUREMENT != nil {
 		for _, measurement := range t.MEASUREMENT {
-			tmpResult = append(tmpResult, measurement.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, measurement.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
 	if t.COMPU_METHOD != nil {
 		for _, compuMethod := range t.COMPU_METHOD {
-			tmpResult = append(tmpResult, compuMethod.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, compuMethod.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
 	if t.COMPU_TAB != nil {
 		for _, compuTab := range t.COMPU_TAB {
-			tmpResult = append(tmpResult, compuTab.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, compuTab.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
 	if t.COMPU_VTAB != nil {
 		for _, compuVTab := range t.COMPU_VTAB {
-			tmpResult = append(tmpResult, compuVTab.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, compuVTab.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
 	if t.COMPU_VTAB_RANGE != nil {
 		for _, compuVTabRange := range t.COMPU_VTAB_RANGE {
-			tmpResult = append(tmpResult, compuVTabRange.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, compuVTabRange.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
 	if t.FUNCTION != nil {
 		for _, function := range t.FUNCTION {
-			tmpResult = append(tmpResult, function.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, function.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
 	if t.GROUP != nil {
 		for _, group := range t.GROUP {
-			tmpResult = append(tmpResult, group.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, group.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
 	if t.RECORD_LAYOUT != nil {
 		for _, recordLayout := range t.RECORD_LAYOUT {
-			tmpResult = append(tmpResult, recordLayout.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, recordLayout.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
 	if t.VARIANT_CODING != nil {
-		tmpResult = append(tmpResult, t.VARIANT_CODING.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.VARIANT_CODING.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.FRAME != nil {
-		tmpResult = append(tmpResult, t.FRAME.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.FRAME.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.USER_RIGHTS != nil {
 		for _, userRights := range t.USER_RIGHTS {
-			tmpResult = append(tmpResult, userRights.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, userRights.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
 	if t.UNIT != nil {
 		for _, unit := range t.UNIT {
-			tmpResult = append(tmpResult, unit.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, unit.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end MODULE", indent))
+	tmpResult = append(tmpResult, indentContent("/end MODULE", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -2171,112 +2171,112 @@ func (t *MonotonyType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *MonotonyType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("MONOTONY %s", t.Monotony), indent)
+func (t *MonotonyType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("MONOTONY %s", t.Monotony), indentLevel, indentString)
 }
 
 func (t *NoAxisPtsXType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *NoAxisPtsXType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("NO_AXIS_PTS_X %s %s", t.Position.A2LString(), t.DataType.A2LString()), indent)
+func (t *NoAxisPtsXType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("NO_AXIS_PTS_X %s %s", t.Position.A2LString(), t.DataType.A2LString()), indentLevel, indentString)
 }
 
 func (t *NoAxisPtsYType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *NoAxisPtsYType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("NO_AXIS_PTS_Y %s %s", t.Position.A2LString(), t.DataType.A2LString()), indent)
+func (t *NoAxisPtsYType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("NO_AXIS_PTS_Y %s %s", t.Position.A2LString(), t.DataType.A2LString()), indentLevel, indentString)
 }
 
 func (t *NoAxisPtsZType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *NoAxisPtsZType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("NO_AXIS_PTS_Z %s %s", t.Position.A2LString(), t.DataType.A2LString()), indent)
+func (t *NoAxisPtsZType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("NO_AXIS_PTS_Z %s %s", t.Position.A2LString(), t.DataType.A2LString()), indentLevel, indentString)
 }
 
 func (t *NoOfInterfacesType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *NoOfInterfacesType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("NO_OF_INTERFACES %s", t.Num.A2LString()), indent)
+func (t *NoOfInterfacesType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("NO_OF_INTERFACES %s", t.Num.A2LString()), indentLevel, indentString)
 }
 
 func (t *NoRescaleXType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *NoRescaleXType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("NO_RESCALE_X %s %s", t.Position.A2LString(), t.DataType.A2LString()), indent)
+func (t *NoRescaleXType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("NO_RESCALE_X %s %s", t.Position.A2LString(), t.DataType.A2LString()), indentLevel, indentString)
 }
 
 func (t *NoRescaleYType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *NoRescaleYType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("NO_RESCALE_Y %s %s", t.Position.A2LString(), t.DataType.A2LString()), indent)
+func (t *NoRescaleYType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("NO_RESCALE_Y %s %s", t.Position.A2LString(), t.DataType.A2LString()), indentLevel, indentString)
 }
 
 func (t *NoRescaleZType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *NoRescaleZType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("NO_RESCALE_Z %s %s", t.Position.A2LString(), t.DataType.A2LString()), indent)
+func (t *NoRescaleZType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("NO_RESCALE_Z %s %s", t.Position.A2LString(), t.DataType.A2LString()), indentLevel, indentString)
 }
 
 func (t *NumberType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *NumberType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("NUMBER %s", t.Number.A2LString()), indent)
+func (t *NumberType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("NUMBER %s", t.Number.A2LString()), indentLevel, indentString)
 }
 
 func (t *OffsetXType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *OffsetXType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("OFFSET_X %s %s", t.Position.A2LString(), t.DataType.A2LString()), indent)
+func (t *OffsetXType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("OFFSET_X %s %s", t.Position.A2LString(), t.DataType.A2LString()), indentLevel, indentString)
 }
 
 func (t *OffsetYType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *OffsetYType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("OFFSET_Y %s %s", t.Position.A2LString(), t.DataType.A2LString()), indent)
+func (t *OffsetYType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("OFFSET_Y %s %s", t.Position.A2LString(), t.DataType.A2LString()), indentLevel, indentString)
 }
 
 func (t *OffsetZType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *OffsetZType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("OFFSET_Z %s %s", t.Position.A2LString(), t.DataType.A2LString()), indent)
+func (t *OffsetZType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("OFFSET_Z %s %s", t.Position.A2LString(), t.DataType.A2LString()), indentLevel, indentString)
 }
 
 func (t *OutMeasurementType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *OutMeasurementType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent("/begin OUT_MEASUREMENT", indent)}
+func (t *OutMeasurementType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent("/begin OUT_MEASUREMENT", indentLevel, indentString)}
 
 	if t.Identifier != nil {
 		for _, identifier := range t.Identifier {
-			tmpResult = append(tmpResult, indentContent(identifier.A2LString(), indent+1))
+			tmpResult = append(tmpResult, indentContent(identifier.A2LString(), indentLevel+1, indentString))
 		}
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end OUT_MEASUREMENT", indent))
+	tmpResult = append(tmpResult, indentContent("/end OUT_MEASUREMENT", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -2285,16 +2285,16 @@ func (t *PhoneNoType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *PhoneNoType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("PHONE_NO %s", t.TelNum.A2LString()), indent)
+func (t *PhoneNoType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("PHONE_NO %s", t.TelNum.A2LString()), indentLevel, indentString)
 }
 
 func (t *ProjectNoType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *ProjectNoType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("PROJECT_NO %s", t.ProjectNumber.A2LString()), indent)
+func (t *ProjectNoType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("PROJECT_NO %s", t.ProjectNumber.A2LString()), indentLevel, indentString)
 }
 
 func (t *ProjectType) MapChildNodes(node any) {
@@ -2310,22 +2310,22 @@ func (t *ProjectType) MapChildNodes(node any) {
 	}
 }
 
-func (t *ProjectType) MarshalA2L(indent int) (result string) {
+func (t *ProjectType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	tmpResult := []string{indentContent(fmt.Sprintf("/begin PROJECT %s %s",
 		t.Name.A2LString(),
-		t.LongIdentifier.A2LString()), indent)}
+		t.LongIdentifier.A2LString()), indentLevel, indentString)}
 
 	if t.HEADER != nil {
-		tmpResult = append(tmpResult, t.HEADER.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.HEADER.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.MODULE != nil {
 		for _, module := range t.MODULE {
-			tmpResult = append(tmpResult, module.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, module.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end PROJECT", indent))
+	tmpResult = append(tmpResult, indentContent("/end PROJECT", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -2334,16 +2334,16 @@ func (t *ReadOnlyType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *ReadOnlyType) MarshalA2L(indent int) (result string) {
-	return indentContent("READ_ONLY", indent)
+func (t *ReadOnlyType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent("READ_ONLY", indentLevel, indentString)
 }
 
 func (t *ReadWriteType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *ReadWriteType) MarshalA2L(indent int) (result string) {
-	return indentContent("READ_WRITE", indent)
+func (t *ReadWriteType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent("READ_WRITE", indentLevel, indentString)
 }
 
 func (t *RecordLayoutType) MapChildNodes(node any) {
@@ -2435,168 +2435,168 @@ func (t *RecordLayoutType) MapChildNodes(node any) {
 	}
 }
 
-func (t *RecordLayoutType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent(fmt.Sprintf("/begin RECORD_LAYOUT %s", t.Name.A2LString()), indent)}
+func (t *RecordLayoutType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent(fmt.Sprintf("/begin RECORD_LAYOUT %s", t.Name.A2LString()), indentLevel, indentString)}
 
 	if t.FNC_VALUES != nil {
-		tmpResult = append(tmpResult, t.FNC_VALUES.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.FNC_VALUES.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.IDENTIFICATION != nil {
-		tmpResult = append(tmpResult, t.IDENTIFICATION.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.IDENTIFICATION.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.AXIS_PTS_X != nil {
-		tmpResult = append(tmpResult, t.AXIS_PTS_X.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.AXIS_PTS_X.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.AXIS_PTS_Y != nil {
-		tmpResult = append(tmpResult, t.AXIS_PTS_Y.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.AXIS_PTS_Y.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.AXIS_PTS_Z != nil {
-		tmpResult = append(tmpResult, t.AXIS_PTS_Z.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.AXIS_PTS_Z.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.AXIS_RESCALE_X != nil {
-		tmpResult = append(tmpResult, t.AXIS_RESCALE_X.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.AXIS_RESCALE_X.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.AXIS_RESCALE_Y != nil {
-		tmpResult = append(tmpResult, t.AXIS_RESCALE_Y.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.AXIS_RESCALE_Y.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.AXIS_RESCALE_Z != nil {
-		tmpResult = append(tmpResult, t.AXIS_RESCALE_Z.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.AXIS_RESCALE_Z.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.NO_AXIS_PTS_X != nil {
-		tmpResult = append(tmpResult, t.NO_AXIS_PTS_X.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.NO_AXIS_PTS_X.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.NO_AXIS_PTS_Y != nil {
-		tmpResult = append(tmpResult, t.NO_AXIS_PTS_Y.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.NO_AXIS_PTS_Y.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.NO_AXIS_PTS_Z != nil {
-		tmpResult = append(tmpResult, t.NO_AXIS_PTS_Z.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.NO_AXIS_PTS_Z.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.NO_RESCALE_X != nil {
-		tmpResult = append(tmpResult, t.NO_RESCALE_X.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.NO_RESCALE_X.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.NO_RESCALE_Y != nil {
-		tmpResult = append(tmpResult, t.NO_RESCALE_Y.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.NO_RESCALE_Y.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.NO_RESCALE_Z != nil {
-		tmpResult = append(tmpResult, t.NO_RESCALE_Z.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.NO_RESCALE_Z.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.FIX_NO_AXIS_PTS_X != nil {
-		tmpResult = append(tmpResult, t.FIX_NO_AXIS_PTS_X.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.FIX_NO_AXIS_PTS_X.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.FIX_NO_AXIS_PTS_Y != nil {
-		tmpResult = append(tmpResult, t.FIX_NO_AXIS_PTS_Y.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.FIX_NO_AXIS_PTS_Y.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.FIX_NO_AXIS_PTS_Z != nil {
-		tmpResult = append(tmpResult, t.FIX_NO_AXIS_PTS_Z.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.FIX_NO_AXIS_PTS_Z.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.SRC_ADDR_X != nil {
-		tmpResult = append(tmpResult, t.SRC_ADDR_X.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.SRC_ADDR_X.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.SRC_ADDR_Y != nil {
-		tmpResult = append(tmpResult, t.SRC_ADDR_Y.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.SRC_ADDR_Y.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.SRC_ADDR_Z != nil {
-		tmpResult = append(tmpResult, t.SRC_ADDR_Z.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.SRC_ADDR_Z.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.RIP_ADDR_X != nil {
-		tmpResult = append(tmpResult, t.RIP_ADDR_X.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.RIP_ADDR_X.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.RIP_ADDR_Y != nil {
-		tmpResult = append(tmpResult, t.RIP_ADDR_Y.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.RIP_ADDR_Y.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.RIP_ADDR_Z != nil {
-		tmpResult = append(tmpResult, t.RIP_ADDR_Z.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.RIP_ADDR_Z.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.RIP_ADDR_W != nil {
-		tmpResult = append(tmpResult, t.RIP_ADDR_W.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.RIP_ADDR_W.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.SHIFT_OP_X != nil {
-		tmpResult = append(tmpResult, t.SHIFT_OP_X.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.SHIFT_OP_X.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.SHIFT_OP_Y != nil {
-		tmpResult = append(tmpResult, t.SHIFT_OP_Y.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.SHIFT_OP_Y.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.SHIFT_OP_Z != nil {
-		tmpResult = append(tmpResult, t.SHIFT_OP_Z.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.SHIFT_OP_Z.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.OFFSET_X != nil {
-		tmpResult = append(tmpResult, t.OFFSET_X.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.OFFSET_X.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.OFFSET_Y != nil {
-		tmpResult = append(tmpResult, t.OFFSET_Y.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.OFFSET_Y.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.OFFSET_Z != nil {
-		tmpResult = append(tmpResult, t.OFFSET_Z.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.OFFSET_Z.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.DIST_OP_X != nil {
-		tmpResult = append(tmpResult, t.DIST_OP_X.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.DIST_OP_X.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.DIST_OP_Y != nil {
-		tmpResult = append(tmpResult, t.DIST_OP_Y.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.DIST_OP_Y.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.DIST_OP_Z != nil {
-		tmpResult = append(tmpResult, t.DIST_OP_Z.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.DIST_OP_Z.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.ALIGNMENT_BYTE != nil {
-		tmpResult = append(tmpResult, t.ALIGNMENT_BYTE.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.ALIGNMENT_BYTE.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.ALIGNMENT_WORD != nil {
-		tmpResult = append(tmpResult, t.ALIGNMENT_WORD.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.ALIGNMENT_WORD.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.ALIGNMENT_LONG != nil {
-		tmpResult = append(tmpResult, t.ALIGNMENT_LONG.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.ALIGNMENT_LONG.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.ALIGNMENT_FLOAT32_IEEE != nil {
-		tmpResult = append(tmpResult, t.ALIGNMENT_FLOAT32_IEEE.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.ALIGNMENT_FLOAT32_IEEE.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.ALIGNMENT_FLOAT64_IEEE != nil {
-		tmpResult = append(tmpResult, t.ALIGNMENT_FLOAT64_IEEE.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.ALIGNMENT_FLOAT64_IEEE.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.RESERVED != nil {
 		for _, reserved := range t.RESERVED {
-			tmpResult = append(tmpResult, reserved.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, reserved.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end RECORD_LAYOUT", indent))
+	tmpResult = append(tmpResult, indentContent("/end RECORD_LAYOUT", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -2605,16 +2605,16 @@ func (t *RefCharacteristicType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *RefCharacteristicType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent("/begin REF_CHARACTERISTIC", indent)}
+func (t *RefCharacteristicType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent("/begin REF_CHARACTERISTIC", indentLevel, indentString)}
 
 	if t.Identifier != nil {
 		for _, identifier := range t.Identifier {
-			tmpResult = append(tmpResult, indentContent(identifier.A2LString(), indent+1))
+			tmpResult = append(tmpResult, indentContent(identifier.A2LString(), indentLevel+1, indentString))
 		}
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end REF_CHARACTERISTIC", indent))
+	tmpResult = append(tmpResult, indentContent("/end REF_CHARACTERISTIC", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -2623,16 +2623,16 @@ func (t *RefGroupType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *RefGroupType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent("/begin REF_GROUP", indent)}
+func (t *RefGroupType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent("/begin REF_GROUP", indentLevel, indentString)}
 
 	if t.Identifier != nil {
 		for _, identifier := range t.Identifier {
-			tmpResult = append(tmpResult, indentContent(identifier.A2LString(), indent+1))
+			tmpResult = append(tmpResult, indentContent(identifier.A2LString(), indentLevel+1, indentString))
 		}
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end REF_GROUP", indent))
+	tmpResult = append(tmpResult, indentContent("/end REF_GROUP", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -2641,16 +2641,16 @@ func (t *RefMeasurementType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *RefMeasurementType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent("/begin REF_MEASUREMENT", indent)}
+func (t *RefMeasurementType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent("/begin REF_MEASUREMENT", indentLevel, indentString)}
 
 	if t.Identifier != nil {
 		for _, identifier := range t.Identifier {
-			tmpResult = append(tmpResult, indentContent(identifier.A2LString(), indent+1))
+			tmpResult = append(tmpResult, indentContent(identifier.A2LString(), indentLevel+1, indentString))
 		}
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end REF_MEASUREMENT", indent))
+	tmpResult = append(tmpResult, indentContent("/end REF_MEASUREMENT", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -2659,64 +2659,64 @@ func (t *RefMemorySegmentType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *RefMemorySegmentType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("REF_MEMORY_SEGMENT %s", t.Name.A2LString()), indent)
+func (t *RefMemorySegmentType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("REF_MEMORY_SEGMENT %s", t.Name.A2LString()), indentLevel, indentString)
 }
 
 func (t *RefUnitType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *RefUnitType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("REF_UNIT %s", t.Unit.A2LString()), indent)
+func (t *RefUnitType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("REF_UNIT %s", t.Unit.A2LString()), indentLevel, indentString)
 }
 
 func (t *ReservedType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *ReservedType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("RESERVED %s %s", t.Position.A2LString(), t.DataSize), indent)
+func (t *ReservedType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("RESERVED %s %s", t.Position.A2LString(), t.DataSize), indentLevel, indentString)
 }
 
 func (t *RightShiftType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *RightShiftType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("RIGHT_SHIFT %s", t.BitCount.A2LString()), indent)
+func (t *RightShiftType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("RIGHT_SHIFT %s", t.BitCount.A2LString()), indentLevel, indentString)
 }
 
 func (t *RipAddrWType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *RipAddrWType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("RIP_ADDR_W %s %s", t.Position.A2LString(), t.DataType.A2LString()), indent)
+func (t *RipAddrWType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("RIP_ADDR_W %s %s", t.Position.A2LString(), t.DataType.A2LString()), indentLevel, indentString)
 }
 
 func (t *RipAddrXType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *RipAddrXType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("RIP_ADDR_X %s %s", t.Position.A2LString(), t.DataType.A2LString()), indent)
+func (t *RipAddrXType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("RIP_ADDR_X %s %s", t.Position.A2LString(), t.DataType.A2LString()), indentLevel, indentString)
 }
 
 func (t *RipAddrYType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *RipAddrYType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("RIP_ADDR_Y %s %s", t.Position.A2LString(), t.DataType.A2LString()), indent)
+func (t *RipAddrYType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("RIP_ADDR_Y %s %s", t.Position.A2LString(), t.DataType.A2LString()), indentLevel, indentString)
 }
 
 func (t *RipAddrZType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *RipAddrZType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("RIP_ADDR_Z %s %s", t.Position.A2LString(), t.DataType.A2LString()), indent)
+func (t *RipAddrZType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("RIP_ADDR_Z %s %s", t.Position.A2LString(), t.DataType.A2LString()), indentLevel, indentString)
 }
 
 func (t *RootNodeType) MapChildNodes(node any) {
@@ -2732,19 +2732,19 @@ func (t *RootNodeType) MapChildNodes(node any) {
 	}
 }
 
-func (t *RootNodeType) MarshalA2L(indent int) (result string) {
+func (t *RootNodeType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	tmpResult := make([]string, 0)
 
 	if t.ASAP2_VERSION != nil {
-		tmpResult = append(tmpResult, t.ASAP2_VERSION.MarshalA2L(indent))
+		tmpResult = append(tmpResult, t.ASAP2_VERSION.MarshalA2L(indentLevel, indentString))
 	}
 
 	if t.A2ML_VERSION != nil {
-		tmpResult = append(tmpResult, t.A2ML_VERSION.MarshalA2L(indent))
+		tmpResult = append(tmpResult, t.A2ML_VERSION.MarshalA2L(indentLevel, indentString))
 	}
 
 	if t.PROJECT != nil {
-		tmpResult = append(tmpResult, t.PROJECT.MarshalA2L(indent))
+		tmpResult = append(tmpResult, t.PROJECT.MarshalA2L(indentLevel, indentString))
 	}
 
 	return strings.Join(tmpResult, "\n")
@@ -2754,39 +2754,39 @@ func (t *RootType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *RootType) MarshalA2L(indent int) (result string) {
-	return indentContent("ROOT", indent)
+func (t *RootType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent("ROOT", indentLevel, indentString)
 }
 
 func (t *ShiftOpXType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *ShiftOpXType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("SHIFT_OP_X %s %s", t.Position.A2LString(), t.DataType.A2LString()), indent)
+func (t *ShiftOpXType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("SHIFT_OP_X %s %s", t.Position.A2LString(), t.DataType.A2LString()), indentLevel, indentString)
 }
 
 func (t *ShiftOpYType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *ShiftOpYType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("SHIFT_OP_Y %s %s", t.Position.A2LString(), t.DataType.A2LString()), indent)
+func (t *ShiftOpYType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("SHIFT_OP_Y %s %s", t.Position.A2LString(), t.DataType.A2LString()), indentLevel, indentString)
 }
 
 func (t *ShiftOpZType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *ShiftOpZType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("SHIFT_OP_Z %s %s", t.Position.A2LString(), t.DataType.A2LString()), indent)
+func (t *ShiftOpZType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("SHIFT_OP_Z %s %s", t.Position.A2LString(), t.DataType.A2LString()), indentLevel, indentString)
 }
 
 func (t *SiExponentsType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *SiExponentsType) MarshalA2L(indent int) (result string) {
+func (t *SiExponentsType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	return indentContent(fmt.Sprintf("SI_EXPONENTS %s %s %s %s %s %s %s",
 		t.Length.A2LString(),
 		t.Mass.A2LString(),
@@ -2794,63 +2794,63 @@ func (t *SiExponentsType) MarshalA2L(indent int) (result string) {
 		t.ElectricCurrent.A2LString(),
 		t.Temperature.A2LString(),
 		t.AmountOfSubstance.A2LString(),
-		t.LuminousIntensity.A2LString()), indent)
+		t.LuminousIntensity.A2LString()), indentLevel, indentString)
 }
 
 func (t *SignExtendType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *SignExtendType) MarshalA2L(indent int) (result string) {
-	return indentContent("SIGN_EXTEND", indent)
+func (t *SignExtendType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent("SIGN_EXTEND", indentLevel, indentString)
 }
 
 func (t *SrcAddrXType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *SrcAddrXType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("SRC_ADDR_X %s %s", t.Position.A2LString(), t.DataType.A2LString()), indent)
+func (t *SrcAddrXType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("SRC_ADDR_X %s %s", t.Position.A2LString(), t.DataType.A2LString()), indentLevel, indentString)
 }
 
 func (t *SrcAddrYType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *SrcAddrYType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("SRC_ADDR_Y %s %s", t.Position.A2LString(), t.DataType.A2LString()), indent)
+func (t *SrcAddrYType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("SRC_ADDR_Y %s %s", t.Position.A2LString(), t.DataType.A2LString()), indentLevel, indentString)
 }
 
 func (t *SrcAddrZType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *SrcAddrZType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("SRC_ADDR_Z %s %s", t.Position.A2LString(), t.DataType.A2LString()), indent)
+func (t *SrcAddrZType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("SRC_ADDR_Z %s %s", t.Position.A2LString(), t.DataType.A2LString()), indentLevel, indentString)
 }
 
 func (t *SRecLayoutType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *SRecLayoutType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("S_REC_LAYOUT %s", t.Name.A2LString()), indent)
+func (t *SRecLayoutType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("S_REC_LAYOUT %s", t.Name.A2LString()), indentLevel, indentString)
 }
 
 func (t *SubFunctionType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *SubFunctionType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent("/begin SUB_FUNCTION", indent)}
+func (t *SubFunctionType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent("/begin SUB_FUNCTION", indentLevel, indentString)}
 
 	if t.Identifier != nil {
 		for _, identifier := range t.Identifier {
-			tmpResult = append(tmpResult, indentContent(identifier.A2LString(), indent+1))
+			tmpResult = append(tmpResult, indentContent(identifier.A2LString(), indentLevel+1, indentString))
 		}
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end SUB_FUNCTION", indent))
+	tmpResult = append(tmpResult, indentContent("/end SUB_FUNCTION", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -2859,16 +2859,16 @@ func (t *SubGroupType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *SubGroupType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent("/begin SUB_GROUP", indent)}
+func (t *SubGroupType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent("/begin SUB_GROUP", indentLevel, indentString)}
 
 	if t.Identifier != nil {
 		for _, identifier := range t.Identifier {
-			tmpResult = append(tmpResult, indentContent(identifier.A2LString(), indent+1))
+			tmpResult = append(tmpResult, indentContent(identifier.A2LString(), indentLevel+1, indentString))
 		}
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end SUB_GROUP", indent))
+	tmpResult = append(tmpResult, indentContent("/end SUB_GROUP", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -2877,24 +2877,24 @@ func (t *SupplierType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *SupplierType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("SUPPLIER %s", t.Manufacturer.A2LString()), indent)
+func (t *SupplierType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("SUPPLIER %s", t.Manufacturer.A2LString()), indentLevel, indentString)
 }
 
 func (t *SystemConstantType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *SystemConstantType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("SYSTEM_CONSTANT %s %s", t.Name.A2LString(), t.Value.A2LString()), indent)
+func (t *SystemConstantType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("SYSTEM_CONSTANT %s %s", t.Name.A2LString(), t.Value.A2LString()), indentLevel, indentString)
 }
 
 func (t *UnitConversionType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *UnitConversionType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("UNIT_CONVERSION %s %s", t.Gradient.A2LString(), t.Offset.A2LString()), indent)
+func (t *UnitConversionType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("UNIT_CONVERSION %s %s", t.Gradient.A2LString(), t.Offset.A2LString()), indentLevel, indentString)
 }
 
 func (t *UnitType) MapChildNodes(node any) {
@@ -2910,26 +2910,26 @@ func (t *UnitType) MapChildNodes(node any) {
 	}
 }
 
-func (t *UnitType) MarshalA2L(indent int) (result string) {
+func (t *UnitType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	tmpResult := []string{indentContent(fmt.Sprintf("/begin UNIT %s %s %s %s",
 		t.Name.A2LString(),
 		t.LongIdentifier.A2LString(),
 		t.Display.A2LString(),
-		t.Type), indent)}
+		t.Type), indentLevel, indentString)}
 
 	if t.SI_EXPONENTS != nil {
-		tmpResult = append(tmpResult, t.SI_EXPONENTS.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.SI_EXPONENTS.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.REF_UNIT != nil {
-		tmpResult = append(tmpResult, t.REF_UNIT.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.REF_UNIT.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.UNIT_CONVERSION != nil {
-		tmpResult = append(tmpResult, t.UNIT_CONVERSION.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.UNIT_CONVERSION.MarshalA2L(indentLevel+1, indentString))
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end UNIT", indent))
+	tmpResult = append(tmpResult, indentContent("/end UNIT", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -2949,20 +2949,20 @@ func (t *UserRightsType) MapChildNodes(node any) {
 	}
 }
 
-func (t *UserRightsType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent(fmt.Sprintf("/begin USER_RIGHTS %s", t.UserLevelId.A2LString()), indent)}
+func (t *UserRightsType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent(fmt.Sprintf("/begin USER_RIGHTS %s", t.UserLevelId.A2LString()), indentLevel, indentString)}
 
 	if t.REF_GROUP != nil {
 		for _, refGroup := range t.REF_GROUP {
-			tmpResult = append(tmpResult, refGroup.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, refGroup.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
 	if t.READ_ONLY != nil {
-		tmpResult = append(tmpResult, t.READ_ONLY.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.READ_ONLY.MarshalA2L(indentLevel+1, indentString))
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end USER_RIGHTS", indent))
+	tmpResult = append(tmpResult, indentContent("/end USER_RIGHTS", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -2971,24 +2971,24 @@ func (t *UserType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *UserType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("USER %s", t.UserName.A2LString()), indent)
+func (t *UserType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("USER %s", t.UserName.A2LString()), indentLevel, indentString)
 }
 
 func (t *VarAddressType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *VarAddressType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent("/begin VAR_ADDRESS", indent)}
+func (t *VarAddressType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent("/begin VAR_ADDRESS", indentLevel, indentString)}
 
 	if t.Address != nil {
 		for _, address := range t.Address {
-			tmpResult = append(tmpResult, indentContent(address.A2LString(), indent+1))
+			tmpResult = append(tmpResult, indentContent(address.A2LString(), indentLevel+1, indentString))
 		}
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end VAR_ADDRESS", indent))
+	tmpResult = append(tmpResult, indentContent("/end VAR_ADDRESS", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -3002,8 +3002,8 @@ func (t *VarCharacteristicType) MapChildNodes(node any) {
 	}
 }
 
-func (t *VarCharacteristicType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent(fmt.Sprintf("/begin VAR_CHARACTERISTIC %s", t.Name.A2LString()), indent)}
+func (t *VarCharacteristicType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent(fmt.Sprintf("/begin VAR_CHARACTERISTIC %s", t.Name.A2LString()), indentLevel, indentString)}
 
 	if t.CriterionName != nil {
 		for _, criterionName := range t.CriterionName {
@@ -3012,10 +3012,10 @@ func (t *VarCharacteristicType) MarshalA2L(indent int) (result string) {
 	}
 
 	if t.VAR_ADDRESS != nil {
-		tmpResult = append(tmpResult, t.VAR_ADDRESS.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.VAR_ADDRESS.MarshalA2L(indentLevel+1, indentString))
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end VAR_CHARACTERISTIC", indent))
+	tmpResult = append(tmpResult, indentContent("/end VAR_CHARACTERISTIC", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -3031,10 +3031,10 @@ func (t *VarCriterionType) MapChildNodes(node any) {
 	}
 }
 
-func (t *VarCriterionType) MarshalA2L(indent int) (result string) {
+func (t *VarCriterionType) MarshalA2L(indentLevel int, indentString string) (result string) {
 	tmpResult := []string{indentContent(fmt.Sprintf("/begin VAR_CRITERION %s %s",
 		t.Name.A2LString(),
-		t.LongIdentifier.A2LString()), indent)}
+		t.LongIdentifier.A2LString()), indentLevel, indentString)}
 
 	if t.Value != nil {
 		for _, value := range t.Value {
@@ -3043,14 +3043,14 @@ func (t *VarCriterionType) MarshalA2L(indent int) (result string) {
 	}
 
 	if t.VAR_MEASUREMENT != nil {
-		tmpResult = append(tmpResult, t.VAR_MEASUREMENT.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.VAR_MEASUREMENT.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.VAR_SELECTION_CHARACTERISTIC != nil {
-		tmpResult = append(tmpResult, t.VAR_SELECTION_CHARACTERISTIC.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.VAR_SELECTION_CHARACTERISTIC.MarshalA2L(indentLevel+1, indentString))
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end VAR_CRITERION", indent))
+	tmpResult = append(tmpResult, indentContent("/end VAR_CRITERION", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -3059,8 +3059,8 @@ func (t *VarForbiddenCombType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *VarForbiddenCombType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent("/begin VAR_FORBIDDEN_COMB", indent)}
+func (t *VarForbiddenCombType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent("/begin VAR_FORBIDDEN_COMB", indentLevel, indentString)}
 
 	if t.CriterionNameCriterionValue != nil {
 		for _, criterionNameCriterionValue := range t.CriterionNameCriterionValue {
@@ -3070,7 +3070,7 @@ func (t *VarForbiddenCombType) MarshalA2L(indent int) (result string) {
 		}
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end VAR_FORBIDDEN_COMB", indent))
+	tmpResult = append(tmpResult, indentContent("/end VAR_FORBIDDEN_COMB", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -3104,36 +3104,36 @@ func (t *VariantCodingType) MapChildNodes(node any) {
 	}
 }
 
-func (t *VariantCodingType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent("/begin VARIANT_CODING", indent)}
+func (t *VariantCodingType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent("/begin VARIANT_CODING", indentLevel, indentString)}
 
 	if t.VAR_SEPARATOR != nil {
-		tmpResult = append(tmpResult, t.VAR_SEPARATOR.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.VAR_SEPARATOR.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.VAR_NAMING != nil {
-		tmpResult = append(tmpResult, t.VAR_NAMING.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.VAR_NAMING.MarshalA2L(indentLevel+1, indentString))
 	}
 
 	if t.VAR_CRITERION != nil {
 		for _, varCriterion := range t.VAR_CRITERION {
-			tmpResult = append(tmpResult, varCriterion.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, varCriterion.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
 	if t.VAR_FORBIDDEN_COMB != nil {
 		for _, varForbiddenComb := range t.VAR_FORBIDDEN_COMB {
-			tmpResult = append(tmpResult, varForbiddenComb.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, varForbiddenComb.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
 	if t.VAR_CHARACTERISTIC != nil {
 		for _, varCharacteristic := range t.VAR_CHARACTERISTIC {
-			tmpResult = append(tmpResult, varCharacteristic.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, varCharacteristic.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end VARIANT_CODING", indent))
+	tmpResult = append(tmpResult, indentContent("/end VARIANT_CODING", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -3142,56 +3142,56 @@ func (t *VarMeasurementType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *VarMeasurementType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("VAR_MEASUREMENT %s", t.Name.A2LString()), indent)
+func (t *VarMeasurementType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("VAR_MEASUREMENT %s", t.Name.A2LString()), indentLevel, indentString)
 }
 
 func (t *VarNamingType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *VarNamingType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("VAR_NAMING %s", t.Tag), indent)
+func (t *VarNamingType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("VAR_NAMING %s", t.Tag), indentLevel, indentString)
 }
 
 func (t *VarSelectionCharacteristicType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *VarSelectionCharacteristicType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("VAR_SELECTION_CHARACTERISTIC %s", t.Name.A2LString()), indent)
+func (t *VarSelectionCharacteristicType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("VAR_SELECTION_CHARACTERISTIC %s", t.Name.A2LString()), indentLevel, indentString)
 }
 
 func (t *VarSeparatorType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *VarSeparatorType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("VAR_SEPARATOR %s", t.Separator.A2LString()), indent)
+func (t *VarSeparatorType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("VAR_SEPARATOR %s", t.Separator.A2LString()), indentLevel, indentString)
 }
 
 func (t *VersionType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *VersionType) MarshalA2L(indent int) (result string) {
-	return indentContent(fmt.Sprintf("VERSION %s", t.VersionIdentifier.A2LString()), indent)
+func (t *VersionType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(fmt.Sprintf("VERSION %s", t.VersionIdentifier.A2LString()), indentLevel, indentString)
 }
 
 func (t *VirtualCharacteristicType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *VirtualCharacteristicType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent(fmt.Sprintf("/begin VIRTUAL_CHARACTERISTIC %s", t.Formula.A2LString()), indent)}
+func (t *VirtualCharacteristicType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent(fmt.Sprintf("/begin VIRTUAL_CHARACTERISTIC %s", t.Formula.A2LString()), indentLevel, indentString)}
 
 	if t.Characteristic != nil {
 		for _, characteristic := range t.Characteristic {
-			tmpResult = append(tmpResult, indentContent(characteristic.A2LString(), indent+1))
+			tmpResult = append(tmpResult, indentContent(characteristic.A2LString(), indentLevel+1, indentString))
 		}
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end VIRTUAL_CHARACTERISTIC", indent))
+	tmpResult = append(tmpResult, indentContent("/end VIRTUAL_CHARACTERISTIC", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -3200,8 +3200,8 @@ func (t *VirtualType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
 
-func (t *VirtualType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent("/begin VIRTUAL", indent)}
+func (t *VirtualType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent("/begin VIRTUAL", indentLevel, indentString)}
 
 	if t.MeasuringChannel != nil {
 		for _, measuringChannel := range t.MeasuringChannel {
@@ -3209,7 +3209,7 @@ func (t *VirtualType) MarshalA2L(indent int) (result string) {
 		}
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end VIRTUAL", indent))
+	tmpResult = append(tmpResult, indentContent("/end VIRTUAL", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }

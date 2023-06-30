@@ -24,16 +24,16 @@ func (t *A2MLType) MapChildNodes(node any) {
 	}
 }
 
-func (t *A2MLType) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent("/begin A2ML", indent)}
+func (t *A2MLType) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent("/begin A2ML", indentLevel, indentString)}
 
 	if t.Declaration != nil {
 		for _, declaration := range t.Declaration {
-			tmpResult = append(tmpResult, declaration.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, declaration.MarshalA2L(indentLevel+1, indentString))
 		}
 	}
 
-	tmpResult = append(tmpResult, indentContent("/end A2ML", indent))
+	tmpResult = append(tmpResult, indentContent("/end A2ML", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -49,12 +49,12 @@ func (t *Declaration) MapChildNodes(node any) {
 	}
 }
 
-func (t *Declaration) MarshalA2L(indent int) (result string) {
+func (t *Declaration) MarshalA2L(indentLevel int, indentString string) (result string) {
 	switch t.Oneof.(type) {
 	case *Declaration_TypeDefinition:
-		result = t.Oneof.(*Declaration_TypeDefinition).TypeDefinition.MarshalA2L(indent)
+		result = t.Oneof.(*Declaration_TypeDefinition).TypeDefinition.MarshalA2L(indentLevel, indentString)
 	case *Declaration_BlockDefinition:
-		result = t.Oneof.(*Declaration_BlockDefinition).BlockDefinition.MarshalA2L(indent)
+		result = t.Oneof.(*Declaration_BlockDefinition).BlockDefinition.MarshalA2L(indentLevel, indentString)
 	default:
 		panic("not implemented yet...")
 	}
@@ -71,8 +71,8 @@ func (t *TypeDefinition) MapChildNodes(node any) {
 	}
 }
 
-func (t *TypeDefinition) MarshalA2L(indent int) (result string) {
-	return t.TypeName.MarshalA2L(indent)
+func (t *TypeDefinition) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return t.TypeName.MarshalA2L(indentLevel, indentString)
 }
 
 func (t *TypeName) MapChildNodes(node any) {
@@ -100,18 +100,18 @@ func (t *TypeName) MapChildNodes(node any) {
 	}
 }
 
-func (t *TypeName) MarshalA2L(indent int) (result string) {
+func (t *TypeName) MarshalA2L(indentLevel int, indentString string) (result string) {
 	switch t.Oneof.(type) {
 	case *TypeName_PredefinedTypeName:
-		result = t.Oneof.(*TypeName_PredefinedTypeName).PredefinedTypeName.MarshalA2L(indent)
+		result = t.Oneof.(*TypeName_PredefinedTypeName).PredefinedTypeName.MarshalA2L(indentLevel, indentString)
 	case *TypeName_StructTypeName:
-		result = t.Oneof.(*TypeName_StructTypeName).StructTypeName.MarshalA2L(indent)
+		result = t.Oneof.(*TypeName_StructTypeName).StructTypeName.MarshalA2L(indentLevel, indentString)
 	case *TypeName_TaggedstructTypeName:
-		result = t.Oneof.(*TypeName_TaggedstructTypeName).TaggedstructTypeName.MarshalA2L(indent)
+		result = t.Oneof.(*TypeName_TaggedstructTypeName).TaggedstructTypeName.MarshalA2L(indentLevel, indentString)
 	case *TypeName_TaggedunionTypeName:
-		result = t.Oneof.(*TypeName_TaggedunionTypeName).TaggedunionTypeName.MarshalA2L(indent)
+		result = t.Oneof.(*TypeName_TaggedunionTypeName).TaggedunionTypeName.MarshalA2L(indentLevel, indentString)
 	case *TypeName_EnumTypeName:
-		result = t.Oneof.(*TypeName_EnumTypeName).EnumTypeName.MarshalA2L(indent)
+		result = t.Oneof.(*TypeName_EnumTypeName).EnumTypeName.MarshalA2L(indentLevel, indentString)
 	default:
 		panic("not implemented yet...")
 	}
@@ -123,15 +123,15 @@ func (t *PredefinedTypeName) MapChildNodes(_ any) {
 	panic("not implemented yet...")
 }
 
-func (t *PredefinedTypeName) MarshalA2L(indent int) (result string) {
-	return indentContent(t.Name, indent)
+func (t *PredefinedTypeName) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return indentContent(t.Name, indentLevel, indentString)
 }
 
 func (t *TypeName_PredefinedTypeName) MapChildNodes(_ any) {
 	panic("not implemented yet...")
 }
 
-func (t *TypeName_PredefinedTypeName) MarshalA2L(indent int) (result string) {
+func (t *TypeName_PredefinedTypeName) MarshalA2L(_ int, _ string) (result string) {
 	return result
 }
 
@@ -148,7 +148,7 @@ func (t *TypeName_EnumTypeName) MapChildNodes(node any) {
 	}
 }
 
-func (t *TypeName_EnumTypeName) MarshalA2L(indent int) (result string) {
+func (t *TypeName_EnumTypeName) MarshalA2L(_ int, _ string) (result string) {
 	return result
 }
 
@@ -165,7 +165,7 @@ func (t *TypeName_StructTypeName) MapChildNodes(node any) {
 	}
 }
 
-func (t *TypeName_StructTypeName) MarshalA2L(indent int) (result string) {
+func (t *TypeName_StructTypeName) MarshalA2L(_ int, _ string) (result string) {
 	return result
 }
 
@@ -191,7 +191,7 @@ func (t *TypeName_TaggedstructTypeName) MapChildNodes(node any) {
 	}
 }
 
-func (t *TypeName_TaggedstructTypeName) MarshalA2L(indent int) (result string) {
+func (t *TypeName_TaggedstructTypeName) MarshalA2L(_ int, _ string) (result string) {
 	return result
 }
 
@@ -216,7 +216,7 @@ func (t *TypeName_TaggedunionTypeName) MapChildNodes(node any) {
 	}
 }
 
-func (t *TypeName_TaggedunionTypeName) MarshalA2L(indent int) (result string) {
+func (t *TypeName_TaggedunionTypeName) MarshalA2L(_ int, _ string) (result string) {
 	return result
 }
 
@@ -231,8 +231,8 @@ func (t *BlockDefinition) MapChildNodes(node any) {
 	}
 }
 
-func (t *BlockDefinition) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{fmt.Sprintf(indentContent("block ", indent))}
+func (t *BlockDefinition) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{fmt.Sprintf(indentContent("block ", indentLevel, indentString))}
 
 	if t.Tag != nil {
 		tmpResult[0] += fmt.Sprintf("%s ", t.Tag.A2LString())
@@ -240,9 +240,9 @@ func (t *BlockDefinition) MarshalA2L(indent int) (result string) {
 
 	switch t.Oneof.(type) {
 	case *BlockDefinition_TypeName:
-		tmpResult = append(tmpResult, t.Oneof.(*BlockDefinition_TypeName).TypeName.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.Oneof.(*BlockDefinition_TypeName).TypeName.MarshalA2L(indentLevel+1, indentString))
 	case *BlockDefinition_Member:
-		tmpResult = append(tmpResult, t.Oneof.(*BlockDefinition_Member).Member.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.Oneof.(*BlockDefinition_Member).Member.MarshalA2L(indentLevel+1, indentString))
 	default:
 		panic("not implemented yet...")
 	}
@@ -263,8 +263,8 @@ func (t *EnumTypeName) MapChildNodes(node any) {
 	}
 }
 
-func (t *EnumTypeName) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent("enum ", indent)}
+func (t *EnumTypeName) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent("enum ", indentLevel, indentString)}
 
 	if t.Identifier != nil {
 		tmpResult[0] += fmt.Sprintf("%s ", t.Identifier.A2LString())
@@ -274,14 +274,14 @@ func (t *EnumTypeName) MarshalA2L(indent int) (result string) {
 		tmpResult[0] += "{"
 
 		for i, enumerator := range t.EnumeratorList {
-			tmpResult = append(tmpResult, indentContent(enumerator.MarshalA2L(indent), indent+1))
+			tmpResult = append(tmpResult, indentContent(enumerator.MarshalA2L(indentLevel, indentString), indentLevel+1, indentString))
 
 			if i < len(t.EnumeratorList)-1 {
 				tmpResult[len(tmpResult)-1] += ","
 			}
 		}
 
-		tmpResult = append(tmpResult, indentContent("}", indent))
+		tmpResult = append(tmpResult, indentContent("}", indentLevel, indentString))
 	}
 
 	return strings.Join(tmpResult, "\n")
@@ -291,7 +291,7 @@ func (t *Enumerator) MapChildNodes(_ any) {
 	panic("not implemented yet...")
 }
 
-func (t *Enumerator) MarshalA2L(indent int) (result string) {
+func (t *Enumerator) MarshalA2L(_ int, _ string) (result string) {
 	result = t.Keyword.A2LString()
 
 	if t.Constant != nil {
@@ -314,8 +314,8 @@ func (t *StructTypeName) MapChildNodes(node any) {
 	}
 }
 
-func (t *StructTypeName) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent("struct ", indent)}
+func (t *StructTypeName) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent("struct ", indentLevel, indentString)}
 
 	if t.Identifier != nil {
 		tmpResult[0] += fmt.Sprintf("%s ", t.Identifier.A2LString())
@@ -325,10 +325,10 @@ func (t *StructTypeName) MarshalA2L(indent int) (result string) {
 		tmpResult[0] += "{"
 
 		for _, structMember := range t.StructMemberList {
-			tmpResult = append(tmpResult, structMember.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, structMember.MarshalA2L(indentLevel+1, indentString))
 		}
 
-		tmpResult = append(tmpResult, indentContent("}", indent))
+		tmpResult = append(tmpResult, indentContent("}", indentLevel, indentString))
 	}
 
 	return strings.Join(tmpResult, "\n")
@@ -343,8 +343,8 @@ func (t *StructMember) MapChildNodes(node any) {
 	}
 }
 
-func (t *StructMember) MarshalA2L(indent int) (result string) {
-	return fmt.Sprintf("%s;", t.Member.MarshalA2L(indent))
+func (t *StructMember) MarshalA2L(indentLevel int, indentString string) (result string) {
+	return fmt.Sprintf("%s;", t.Member.MarshalA2L(indentLevel, indentString))
 }
 
 func (t *Member) MapChildNodes(node any) {
@@ -356,8 +356,8 @@ func (t *Member) MapChildNodes(node any) {
 	}
 }
 
-func (t *Member) MarshalA2L(indent int) (result string) {
-	result = t.TypeName.MarshalA2L(indent)
+func (t *Member) MarshalA2L(indentLevel int, indentString string) (result string) {
+	result = t.TypeName.MarshalA2L(indentLevel, indentString)
 
 	if t.ArraySpecifier != nil {
 		result += "["
@@ -387,8 +387,8 @@ func (t *TaggedstructTypeName) MapChildNodes(node any) {
 	}
 }
 
-func (t *TaggedstructTypeName) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent("taggedstruct ", indent)}
+func (t *TaggedstructTypeName) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent("taggedstruct ", indentLevel, indentString)}
 
 	if t.Identifier != nil {
 		tmpResult[0] += fmt.Sprintf("%s ", t.Identifier.A2LString())
@@ -398,10 +398,10 @@ func (t *TaggedstructTypeName) MarshalA2L(indent int) (result string) {
 		tmpResult[0] += "{"
 
 		for _, taggedStructMember := range t.TaggedstructMemberList {
-			tmpResult = append(tmpResult, taggedStructMember.MarshalA2L(indent+1))
+			tmpResult = append(tmpResult, taggedStructMember.MarshalA2L(indentLevel+1, indentString))
 		}
 
-		tmpResult = append(tmpResult, indentContent("}", indent))
+		tmpResult = append(tmpResult, indentContent("}", indentLevel, indentString))
 	}
 
 	return strings.Join(tmpResult, "\n")
@@ -425,24 +425,24 @@ func (t *TaggedstructMember) MapChildNodes(node any) {
 	}
 }
 
-func (t *TaggedstructMember) MarshalA2L(indent int) (result string) {
+func (t *TaggedstructMember) MarshalA2L(indentLevel int, indentString string) (result string) {
 	tmpResult := make([]string, 0)
 
 	if t.Star {
-		tmpResult = append(tmpResult, indentContent("(", indent+1))
+		tmpResult = append(tmpResult, indentContent("(", indentLevel+1, indentString))
 	}
 
 	switch t.Oneof.(type) {
 	case *TaggedstructMember_TaggedstructDefinition:
-		tmpResult = append(tmpResult, t.Oneof.(*TaggedstructMember_TaggedstructDefinition).TaggedstructDefinition.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.Oneof.(*TaggedstructMember_TaggedstructDefinition).TaggedstructDefinition.MarshalA2L(indentLevel+1, indentString))
 	case *TaggedstructMember_BlockDefinition:
-		tmpResult = append(tmpResult, t.Oneof.(*TaggedstructMember_BlockDefinition).BlockDefinition.MarshalA2L(indent+1))
+		tmpResult = append(tmpResult, t.Oneof.(*TaggedstructMember_BlockDefinition).BlockDefinition.MarshalA2L(indentLevel+1, indentString))
 	default:
 		panic("not implemented yet...")
 	}
 
 	if t.Star {
-		tmpResult = append(tmpResult, indentContent(")*;", indent+1))
+		tmpResult = append(tmpResult, indentContent(")*;", indentLevel+1, indentString))
 	} else {
 		tmpResult[len(tmpResult)-1] += ";"
 	}
@@ -454,7 +454,7 @@ func (t *TaggedstructMember_TaggedstructDefinition) MapChildNodes(_ any) {
 	panic("not implemented yet...")
 }
 
-func (t *TaggedstructMember_TaggedstructDefinition) MarshalA2L(indent int) (result string) {
+func (t *TaggedstructMember_TaggedstructDefinition) MarshalA2L(_ int, _ string) (result string) {
 	return result
 }
 
@@ -462,7 +462,7 @@ func (t *TaggedstructMember_BlockDefinition) MapChildNodes(_ any) {
 	panic("not implemented yet...")
 }
 
-func (t *TaggedstructMember_BlockDefinition) MarshalA2L(indent int) (result string) {
+func (t *TaggedstructMember_BlockDefinition) MarshalA2L(_ int, _ string) (result string) {
 	return result
 }
 
@@ -475,19 +475,19 @@ func (t *TaggedstructDefinition) MapChildNodes(node any) {
 	}
 }
 
-func (t *TaggedstructDefinition) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent(fmt.Sprintf("%s", t.Tag.A2LString()), indent)}
+func (t *TaggedstructDefinition) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent(fmt.Sprintf("%s", t.Tag.A2LString()), indentLevel, indentString)}
 
 	if t.Star {
-		tmpResult = append(tmpResult, indentContent("(", indent))
+		tmpResult = append(tmpResult, indentContent("(", indentLevel, indentString))
 	}
 
 	if t.Member != nil { // not part of the spec...
-		tmpResult = append(tmpResult, t.Member.MarshalA2L(indent))
+		tmpResult = append(tmpResult, t.Member.MarshalA2L(indentLevel, indentString))
 	}
 
 	if t.Star {
-		tmpResult = append(tmpResult, indentContent(")*", indent))
+		tmpResult = append(tmpResult, indentContent(")*", indentLevel, indentString))
 	}
 
 	return strings.Join(tmpResult, "\n")
@@ -518,8 +518,8 @@ func (t *TaggedunionTypeName) MapChildNodes(node any) {
 	}
 }
 
-func (t *TaggedunionTypeName) MarshalA2L(indent int) (result string) {
-	tmpResult := []string{indentContent("taggedunion ", indent)}
+func (t *TaggedunionTypeName) MarshalA2L(indentLevel int, indentString string) (result string) {
+	tmpResult := []string{indentContent("taggedunion ", indentLevel, indentString)}
 
 	if t.Identifier != nil {
 		tmpResult[0] += fmt.Sprintf("%s ", t.Identifier.A2LString())
@@ -529,10 +529,10 @@ func (t *TaggedunionTypeName) MarshalA2L(indent int) (result string) {
 		tmpResult[0] += "{"
 
 		for _, taggedunionMember := range t.TaggedunionMemberList {
-			tmpResult = append(tmpResult, taggedunionMember.MarshalA2L(indent))
+			tmpResult = append(tmpResult, taggedunionMember.MarshalA2L(indentLevel, indentString))
 		}
 
-		tmpResult = append(tmpResult, indentContent("}", indent))
+		tmpResult = append(tmpResult, indentContent("}", indentLevel, indentString))
 	}
 
 	return strings.Join(tmpResult, "\n")
@@ -547,12 +547,12 @@ func (t *TaggedunionMember) MapChildNodes(node any) {
 	}
 }
 
-func (t *TaggedunionMember) MarshalA2L(indent int) (result string) {
+func (t *TaggedunionMember) MarshalA2L(indentLevel int, indentString string) (result string) {
 	switch t.Oneof.(type) {
 	case *TaggedunionMember_TagMember:
-		result = t.Oneof.(*TaggedunionMember_TagMember).TagMember.MarshalA2L(indent + 1)
+		result = t.Oneof.(*TaggedunionMember_TagMember).TagMember.MarshalA2L(indentLevel+1, indentString)
 	case *TaggedunionMember_BlockDefinition:
-		result = t.Oneof.(*TaggedunionMember_BlockDefinition).BlockDefinition.MarshalA2L(indent + 1)
+		result = t.Oneof.(*TaggedunionMember_BlockDefinition).BlockDefinition.MarshalA2L(indentLevel+1, indentString)
 	default:
 		panic("not implemented yet...")
 	}
@@ -569,13 +569,13 @@ func (t *TagMember) MapChildNodes(node any) {
 	}
 }
 
-func (t *TagMember) MarshalA2L(indent int) (result string) {
+func (t *TagMember) MarshalA2L(indentLevel int, indentString string) (result string) {
 	tmpResult := make([]string, 0)
 	if t.Tag != nil {
-		tmpResult = append(tmpResult, indentContent(t.Tag.A2LString(), indent))
+		tmpResult = append(tmpResult, indentContent(t.Tag.A2LString(), indentLevel, indentString))
 	}
 
-	tmpResult = append(tmpResult, t.Member.MarshalA2L(indent+1))
+	tmpResult = append(tmpResult, t.Member.MarshalA2L(indentLevel+1, indentString))
 
 	return strings.Join(tmpResult, "\n")
 }
@@ -589,6 +589,6 @@ func (t *TaggedunionMember_TagMember) MapChildNodes(node any) {
 	}
 }
 
-func (t *TaggedunionMember_TagMember) MarshalA2L(indent int) (result string) {
+func (t *TaggedunionMember_TagMember) MarshalA2L(_ int, _ string) (result string) {
 	return result
 }
