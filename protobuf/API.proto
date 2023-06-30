@@ -16,7 +16,7 @@ message TreeFromA2LRequest {
 }
 
 message A2LResponse {
-  string a2l = 1;
+  bytes a2l = 1;
   optional string error = 2;
 }
 
@@ -39,11 +39,11 @@ message TreeResponse {
 }
 
 message TreeFromJSONRequest {
-  string json = 1;
+  bytes json = 1;
   optional bool allow_partial = 2;
 }
 
 message JSONResponse {
-  string json = 1;
+  bytes json = 1;
   optional string error = 2;
 }

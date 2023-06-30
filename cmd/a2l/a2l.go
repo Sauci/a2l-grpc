@@ -117,7 +117,7 @@ func (s *grpcA2LImplType) GetJSONFromTree(_ context.Context, request *a2l.JSONFr
 		EmitUnpopulated: emitUnpopulated}
 
 	if rawData, parseError = opt.Marshal(request.Tree); parseError == nil {
-		result.Json = string(rawData)
+		result.Json = rawData
 		// fix https://github.com/golang/protobuf/issues/1121
 		//tmpResult := new(interface{})
 		//var stringResult []byte
@@ -177,7 +177,7 @@ func (s *grpcA2LImplType) GetA2LFromTree(_ context.Context, request *a2l.A2LFrom
 			indent += " "
 		}
 	}
-	return &a2l.A2LResponse{A2L: request.Tree.MarshalA2L(0, indent)}, nil
+	return &a2l.A2LResponse{A2L: []byte(request.Tree.MarshalA2L(0, indent))}, nil
 }
 
 var serverMutex sync.Mutex
