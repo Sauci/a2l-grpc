@@ -76,7 +76,7 @@ func (s *grpcA2LImplType) GetTreeFromA2L(_ context.Context, request *a2l.TreeFro
 
 	result = &a2l.TreeResponse{}
 
-	if tree, parseError = getTreeFromString(request.GetA2L()); parseError == nil {
+	if tree, parseError = getTreeFromString(string(request.A2L)); parseError == nil {
 		result.Tree = tree
 	} else {
 		errString := parseError.Error()

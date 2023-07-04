@@ -12,7 +12,7 @@ service A2L {
 }
 
 message TreeFromA2LRequest {
-  string a2l = 1;
+  bytes a2l = 1;
 }
 
 message A2LResponse {
