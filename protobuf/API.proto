@@ -22,7 +22,6 @@ message A2LResponse {
 
 message JSONFromTreeRequest {
   RootNodeType tree = 1;
-  bool sort_keys = 2;
   optional uint32 indent = 3;
   optional bool allow_partial = 4;
   optional bool emit_unpopulated = 5;

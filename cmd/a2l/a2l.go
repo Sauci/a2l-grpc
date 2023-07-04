@@ -2,7 +2,9 @@ package main
 
 import (
 	"C"
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/antlr4-go/antlr/v4"
 	"github.com/sauci/a2l-grpc/pkg/a2l"
@@ -86,8 +88,8 @@ func (s *grpcA2LImplType) GetTreeFromA2L(_ context.Context, request *a2l.TreeFro
 
 func (s *grpcA2LImplType) GetJSONFromTree(_ context.Context, request *a2l.JSONFromTreeRequest) (result *a2l.JSONResponse, err error) {
 	var rawData []byte
+	var indentedData []byte
 	var parseError error
-	multiline := false
 	indent := ""
 	allowPartial := false
 	emitUnpopulated := false
@@ -95,8 +97,6 @@ func (s *grpcA2LImplType) GetJSONFromTree(_ context.Context, request *a2l.JSONFr
 	result = &a2l.JSONResponse{}
 
 	if request.Indent != nil {
-		multiline = true
-
 		for i := uint32(0); i < *request.Indent; i++ {
 			indent += " "
 		}
@@ -111,34 +111,18 @@ func (s *grpcA2LImplType) GetJSONFromTree(_ context.Context, request *a2l.JSONFr
 	}
 
 	opt := protojson.MarshalOptions{
-		Multiline:       multiline,
-		Indent:          indent,
 		AllowPartial:    allowPartial,
 		EmitUnpopulated: emitUnpopulated}
 
 	if rawData, parseError = opt.Marshal(request.Tree); parseError == nil {
-		result.Json = rawData
-		// fix https://github.com/golang/protobuf/issues/1121
-		//tmpResult := new(interface{})
-		//var stringResult []byte
-		//
-		//_ = json.Unmarshal(rawData, &tmpResult)
-		//
-		//if multiline {
-		//	if stringResult, parseError = json.MarshalIndent(tmpResult, "", indent); parseError == nil {
-		//		result.Json = string(stringResult)
-		//	} else {
-		//		errString := parseError.Error()
-		//		result.Error = &errString
-		//	}
-		//} else {
-		//	if stringResult, parseError = json.Marshal(tmpResult); parseError == nil {
-		//		result.Json = string(stringResult)
-		//	} else {
-		//		errString := parseError.Error()
-		//		result.Error = &errString
-		//	}
-		//}
+		// Note: see https://github.com/golang/protobuf/issues/1121
+		buffer := bytes.NewBuffer(indentedData)
+		if err = json.Indent(buffer, rawData, "", indent); err == nil {
+			result.Json = buffer.Bytes()
+		} else {
+			errString := err.Error()
+			result.Error = &errString
+		}
 	} else {
 		errString := parseError.Error()
 		result.Error = &errString
