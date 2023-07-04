@@ -5,29 +5,31 @@ import "protobuf/A2L.proto";
 option go_package = "./../pkg/a2l";
 
 service A2L {
-  rpc GetTreeFromA2L (A2LRequest) returns (TreeResponse) {}
+  rpc GetTreeFromA2L (TreeFromA2LRequest) returns (TreeResponse) {}
   rpc GetJSONFromTree (JSONFromTreeRequest) returns (JSONResponse) {}
-  rpc GetTreeFromJSON (JSONRequest) returns (TreeResponse) {}
-  rpc GetA2LFromTree (TreeRequest) returns (A2LResponse) {}
+  rpc GetTreeFromJSON (TreeFromJSONRequest) returns (TreeResponse) {}
+  rpc GetA2LFromTree (A2LFromTreeRequest) returns (A2LResponse) {}
 }
 
-message A2LRequest {
-  string a2l = 1;
+message TreeFromA2LRequest {
+  bytes a2l = 1;
 }
 
 message A2LResponse {
-  string a2l = 1;
+  bytes a2l = 1;
   optional string error = 2;
 }
 
 message JSONFromTreeRequest {
   RootNodeType tree = 1;
-  bool sort_keys = 2;
   optional uint32 indent = 3;
+  optional bool allow_partial = 4;
+  optional bool emit_unpopulated = 5;
 }
 
-message TreeRequest {
+message A2LFromTreeRequest {
   RootNodeType tree = 1;
+  optional uint32 indent = 2;
 }
 
 message TreeResponse {
@@ -35,11 +37,12 @@ message TreeResponse {
   optional string error = 2;
 }
 
-message JSONRequest {
-  string json = 1;
+message TreeFromJSONRequest {
+  bytes json = 1;
+  optional bool allow_partial = 2;
 }
 
 message JSONResponse {
-  string json = 1;
+  bytes json = 1;
   optional string error = 2;
 }

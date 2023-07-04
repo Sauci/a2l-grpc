@@ -9,13 +9,13 @@ message IntType {
 }
 
 message LongType {
-  int32 Value = 1;
+  int64 Value = 1;
   uint32 Base = 2;
   uint32 Size = 3;
 }
 
 message FloatType {
-  float Value = 1;
+  double Value = 1;
   optional string IntegralSign = 2;
   uint32 IntegralSize = 3;
   uint32 DecimalSize = 4;
