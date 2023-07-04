@@ -77,8 +77,8 @@ Now that all sources are available, we can start writing the *gRPC* client in *P
 import ctypes
 import os
 
-from protobuf.API_pb2 import *
-from protobuf.API_pb2_grpc import *
+from pya2l.protobuf.API_pb2 import *
+from pya2l.protobuf.API_pb2_grpc import *
 
 
 def get_shared_object_name() -> str:
@@ -98,7 +98,7 @@ class A2lParser(object):
         client = A2LStub(channel)
         if self._dll.Create(3333):
             raise Exception(1)
-        self.ast = client.GetTreeFromA2L(A2LRequest(a2l=string)).tree
+        self.ast = client.GetTreeFromA2L(TreeFromA2LRequest(a2l=string.encode())).tree
 
 
 if __name__ == '__main__':
