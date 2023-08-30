@@ -272,6 +272,10 @@ func (t *AxisPtsRefType) MarshalA2L(indentLevel int, indentString string, _ bool
 	return indentContent(fmt.Sprintf("AXIS_PTS_REF %s", t.AxisPoints.A2LString()), indentLevel, indentString)
 }
 
+func (t *AxisPtsType) UniqueKey() string {
+	return t.Name.Value
+}
+
 func (t *AxisPtsType) MapChildNodes(node any) {
 	switch node.(type) {
 	case *DisplayIdentifierType:
@@ -760,6 +764,10 @@ func (t *ComparisonQuantityType) MarshalA2L(indentLevel int, indentString string
 	return indentContent(fmt.Sprintf("COMPARISON_QUANTITY %s", t.Name.A2LString()), indentLevel, indentString)
 }
 
+func (t *CompuMethodType) UniqueKey() string {
+	return t.Name.Value
+}
+
 func (t *CompuMethodType) MapChildNodes(node any) {
 	switch node.(type) {
 	case *FormulaType:
@@ -812,6 +820,10 @@ func (t *CompuTabRefType) MarshalA2L(indentLevel int, indentString string, _ boo
 	return indentContent(fmt.Sprintf("COMPU_TAB_REF %s", t.ConversionTable.A2LString()), indentLevel, indentString)
 }
 
+func (t *CompuTabType) UniqueKey() string {
+	return t.Name.Value
+}
+
 func (t *CompuTabType) MapChildNodes(node any) {
 	switch node.(type) {
 	case *DefaultValueType:
@@ -842,6 +854,10 @@ func (t *CompuTabType) MarshalA2L(indentLevel int, indentString string, sort boo
 	tmpResult = append(tmpResult, indentContent("/end COMPU_TAB", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
+}
+
+func (t *CompuVTabRangeType) UniqueKey() string {
+	return t.Name.Value
 }
 
 func (t *CompuVTabRangeType) MapChildNodes(node any) {
@@ -875,6 +891,10 @@ func (t *CompuVTabRangeType) MarshalA2L(indentLevel int, indentString string, so
 	tmpResult = append(tmpResult, indentContent("/end COMPU_VTAB_RANGE", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
+}
+
+func (t *CompuVTabType) UniqueKey() string {
+	return t.Name.Value
 }
 
 func (t *CompuVTabType) MapChildNodes(node any) {
@@ -1283,6 +1303,10 @@ func (t *FunctionListType) MarshalA2L(indentLevel int, indentString string, _ bo
 	return strings.Join(tmpResult, "\n")
 }
 
+func (t *FunctionType) UniqueKey() string {
+	return t.Name.Value
+}
+
 func (t *FunctionType) MapChildNodes(node any) {
 	switch node.(type) {
 	case *AnnotationType:
@@ -1360,6 +1384,10 @@ func (t *FunctionVersionType) MapChildNodes(_ any) {
 
 func (t *FunctionVersionType) MarshalA2L(indentLevel int, indentString string, _ bool) (result string) {
 	return indentContent(fmt.Sprintf("FUNCTION_VERSION %s", t.VersionIdentifier.A2LString()), indentLevel, indentString)
+}
+
+func (t *GroupType) UniqueKey() string {
+	return t.GroupName.Value
 }
 
 func (t *GroupType) MapChildNodes(node any) {
@@ -1548,6 +1576,10 @@ func (t *MaxRefreshType) MapChildNodes(_ any) {
 
 func (t *MaxRefreshType) MarshalA2L(indentLevel int, indentString string, _ bool) (result string) {
 	return indentContent(fmt.Sprintf("MAX_REFRESH %s %s", t.ScalingUnit.A2LString(), t.Rate.A2LString()), indentLevel, indentString)
+}
+
+func (t *MeasurementType) UniqueKey() string {
+	return t.Name.Value
 }
 
 func (t *MeasurementType) MapChildNodes(node any) {
@@ -2092,67 +2124,121 @@ func (t *ModuleType) MarshalA2L(indentLevel int, indentString string, sort bool)
 	}
 
 	if t.CHARACTERISTIC != nil {
-		characteristics := t.CHARACTERISTIC
+		items := t.CHARACTERISTIC
 
 		if sort {
-			sortSortableList[*CharacteristicType](characteristics)
+			sortSortableList[*CharacteristicType](items)
 		}
 
-		for _, characteristic := range characteristics {
+		for _, characteristic := range items {
 			tmpResult = append(tmpResult, characteristic.MarshalA2L(indentLevel+1, indentString, sort))
 		}
 	}
 
 	if t.AXIS_PTS != nil {
-		for _, axisPts := range t.AXIS_PTS {
+		items := t.AXIS_PTS
+
+		if sort {
+			sortSortableList[*AxisPtsType](items)
+		}
+
+		for _, axisPts := range items {
 			tmpResult = append(tmpResult, axisPts.MarshalA2L(indentLevel+1, indentString, sort))
 		}
 	}
 
 	if t.MEASUREMENT != nil {
-		for _, measurement := range t.MEASUREMENT {
+		items := t.MEASUREMENT
+
+		if sort {
+			sortSortableList[*MeasurementType](items)
+		}
+
+		for _, measurement := range items {
 			tmpResult = append(tmpResult, measurement.MarshalA2L(indentLevel+1, indentString, sort))
 		}
 	}
 
 	if t.COMPU_METHOD != nil {
-		for _, compuMethod := range t.COMPU_METHOD {
+		items := t.COMPU_METHOD
+
+		if sort {
+			sortSortableList[*CompuMethodType](items)
+		}
+
+		for _, compuMethod := range items {
 			tmpResult = append(tmpResult, compuMethod.MarshalA2L(indentLevel+1, indentString, sort))
 		}
 	}
 
 	if t.COMPU_TAB != nil {
-		for _, compuTab := range t.COMPU_TAB {
+		items := t.COMPU_TAB
+
+		if sort {
+			sortSortableList[*CompuTabType](items)
+		}
+
+		for _, compuTab := range items {
 			tmpResult = append(tmpResult, compuTab.MarshalA2L(indentLevel+1, indentString, sort))
 		}
 	}
 
 	if t.COMPU_VTAB != nil {
-		for _, compuVTab := range t.COMPU_VTAB {
+		items := t.COMPU_VTAB
+
+		if sort {
+			sortSortableList[*CompuVTabType](items)
+		}
+
+		for _, compuVTab := range items {
 			tmpResult = append(tmpResult, compuVTab.MarshalA2L(indentLevel+1, indentString, sort))
 		}
 	}
 
 	if t.COMPU_VTAB_RANGE != nil {
-		for _, compuVTabRange := range t.COMPU_VTAB_RANGE {
+		items := t.COMPU_VTAB_RANGE
+
+		if sort {
+			sortSortableList[*CompuVTabRangeType](items)
+		}
+
+		for _, compuVTabRange := range items {
 			tmpResult = append(tmpResult, compuVTabRange.MarshalA2L(indentLevel+1, indentString, sort))
 		}
 	}
 
 	if t.FUNCTION != nil {
-		for _, function := range t.FUNCTION {
+		items := t.FUNCTION
+
+		if sort {
+			sortSortableList[*FunctionType](items)
+		}
+
+		for _, function := range items {
 			tmpResult = append(tmpResult, function.MarshalA2L(indentLevel+1, indentString, sort))
 		}
 	}
 
 	if t.GROUP != nil {
-		for _, group := range t.GROUP {
+		items := t.GROUP
+
+		if sort {
+			sortSortableList[*GroupType](items)
+		}
+
+		for _, group := range items {
 			tmpResult = append(tmpResult, group.MarshalA2L(indentLevel+1, indentString, sort))
 		}
 	}
 
 	if t.RECORD_LAYOUT != nil {
-		for _, recordLayout := range t.RECORD_LAYOUT {
+		items := t.RECORD_LAYOUT
+
+		if sort {
+			sortSortableList[*RecordLayoutType](items)
+		}
+
+		for _, recordLayout := range items {
 			tmpResult = append(tmpResult, recordLayout.MarshalA2L(indentLevel+1, indentString, sort))
 		}
 	}
@@ -2166,13 +2252,25 @@ func (t *ModuleType) MarshalA2L(indentLevel int, indentString string, sort bool)
 	}
 
 	if t.USER_RIGHTS != nil {
-		for _, userRights := range t.USER_RIGHTS {
+		items := t.USER_RIGHTS
+
+		if sort {
+			sortSortableList[*UserRightsType](items)
+		}
+
+		for _, userRights := range items {
 			tmpResult = append(tmpResult, userRights.MarshalA2L(indentLevel+1, indentString, sort))
 		}
 	}
 
 	if t.UNIT != nil {
-		for _, unit := range t.UNIT {
+		items := t.UNIT
+
+		if sort {
+			sortSortableList[*UnitType](items)
+		}
+
+		for _, unit := range items {
 			tmpResult = append(tmpResult, unit.MarshalA2L(indentLevel+1, indentString, sort))
 		}
 	}
@@ -2359,6 +2457,10 @@ func (t *ReadWriteType) MapChildNodes(_ any) {
 
 func (t *ReadWriteType) MarshalA2L(indentLevel int, indentString string, _ bool) (result string) {
 	return indentContent("READ_WRITE", indentLevel, indentString)
+}
+
+func (t *RecordLayoutType) UniqueKey() string {
+	return t.Name.Value
 }
 
 func (t *RecordLayoutType) MapChildNodes(node any) {
@@ -2912,6 +3014,10 @@ func (t *UnitConversionType) MarshalA2L(indentLevel int, indentString string, _ 
 	return indentContent(fmt.Sprintf("UNIT_CONVERSION %s %s", t.Gradient.A2LString(), t.Offset.A2LString()), indentLevel, indentString)
 }
 
+func (t *UnitType) UniqueKey() string {
+	return t.Name.Value
+}
+
 func (t *UnitType) MapChildNodes(node any) {
 	switch node.(type) {
 	case *SiExponentsType:
@@ -2947,6 +3053,10 @@ func (t *UnitType) MarshalA2L(indentLevel int, indentString string, sort bool) (
 	tmpResult = append(tmpResult, indentContent("/end UNIT", indentLevel, indentString))
 
 	return strings.Join(tmpResult, "\n")
+}
+
+func (t *UserRightsType) UniqueKey() string {
+	return t.UserLevelId.Value
 }
 
 func (t *UserRightsType) MapChildNodes(node any) {
