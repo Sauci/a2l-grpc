@@ -145,7 +145,7 @@ func (s *grpcA2LImplType) GetTreeFromJSON(_ context.Context, request *a2l.TreeFr
 		AllowPartial: allowPartial,
 	}
 
-	if parseError = opt.Unmarshal([]byte(request.Json), result.Tree); parseError != nil {
+	if parseError = opt.Unmarshal(request.Json, result.Tree); parseError != nil {
 		errString := parseError.Error()
 		result.Error = &errString
 	}
@@ -155,13 +155,19 @@ func (s *grpcA2LImplType) GetTreeFromJSON(_ context.Context, request *a2l.TreeFr
 
 func (s *grpcA2LImplType) GetA2LFromTree(_ context.Context, request *a2l.A2LFromTreeRequest) (result *a2l.A2LResponse, err error) {
 	indent := ""
+	sorted := false
 
 	if request.Indent != nil {
 		for i := uint32(0); i < *request.Indent; i++ {
 			indent += " "
 		}
 	}
-	return &a2l.A2LResponse{A2L: []byte(request.Tree.MarshalA2L(0, indent))}, nil
+
+	if request.Sorted != nil {
+		sorted = *request.Sorted
+	}
+
+	return &a2l.A2LResponse{A2L: []byte(request.Tree.MarshalA2L(0, indent, sorted))}, nil
 }
 
 var serverMutex sync.Mutex

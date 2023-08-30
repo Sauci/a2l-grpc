@@ -18,12 +18,12 @@ func (t *IfDataType) MapChildNodes(node any) {
 	}
 }
 
-func (t *IfDataType) MarshalA2L(indentLevel int, indentString string) (result string) {
+func (t *IfDataType) MarshalA2L(indentLevel int, indentString string, sort bool) (result string) {
 	tmpResult := []string{indentContent(fmt.Sprintf("/begin IF_DATA %s", t.Name.A2LString()), indentLevel, indentString)}
 
 	if t.Blob != nil {
 		for _, blob := range t.Blob {
-			tmpResult = append(tmpResult, blob.MarshalA2L(indentLevel+1, indentString))
+			tmpResult = append(tmpResult, blob.MarshalA2L(indentLevel+1, indentString, sort))
 		}
 	}
 
@@ -41,7 +41,7 @@ func (t *GenericParameterType) MapChildNodes(node any) {
 	}
 }
 
-func (t *GenericParameterType) MarshalA2L(indentLevel int, indentString string) (result string) {
+func (t *GenericParameterType) MarshalA2L(indentLevel int, indentString string, sort bool) (result string) {
 	switch t.Oneof.(type) {
 	case *GenericParameterType_Tag:
 		result = indentContent(t.Oneof.(*GenericParameterType_Tag).Tag.A2LString(), indentLevel, indentString)
@@ -52,7 +52,7 @@ func (t *GenericParameterType) MarshalA2L(indentLevel int, indentString string) 
 	case *GenericParameterType_Float:
 		result = indentContent(t.Oneof.(*GenericParameterType_Float).Float.A2LString(), indentLevel, indentString)
 	case *GenericParameterType_Generic:
-		result = t.Oneof.(*GenericParameterType_Generic).Generic.MarshalA2L(indentLevel, indentString)
+		result = t.Oneof.(*GenericParameterType_Generic).Generic.MarshalA2L(indentLevel, indentString, sort)
 	case *GenericParameterType_Identifier:
 		result = indentContent(t.Oneof.(*GenericParameterType_Identifier).Identifier.A2LString(), indentLevel, indentString)
 	default:
@@ -75,12 +75,12 @@ func (t *GenericNodeType) MapChildNodes(node any) {
 	}
 }
 
-func (t *GenericNodeType) MarshalA2L(indentLevel int, indentString string) (result string) {
+func (t *GenericNodeType) MarshalA2L(indentLevel int, indentString string, sort bool) (result string) {
 	tmpResult := []string{indentContent(fmt.Sprintf("/begin %s", t.Name.A2LString()), indentLevel, indentString)}
 
 	if t.Element != nil {
 		for _, element := range t.Element {
-			tmpResult = append(tmpResult, element.MarshalA2L(indentLevel+1, indentString))
+			tmpResult = append(tmpResult, element.MarshalA2L(indentLevel+1, indentString, sort))
 		}
 	}
 
