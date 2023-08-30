@@ -30,6 +30,7 @@ message JSONFromTreeRequest {
 message A2LFromTreeRequest {
   RootNodeType tree = 1;
   optional uint32 indent = 2;
+  optional bool sorted = 3;
 }
 
 message TreeResponse {
