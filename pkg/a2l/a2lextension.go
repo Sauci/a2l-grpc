@@ -1,6 +1,7 @@
 package a2l
 
 import (
+	"facette.io/natsort"
 	"fmt"
 	sort2 "sort"
 	"strings"
@@ -19,7 +20,9 @@ import (
 //}
 
 func sortSortableList[T SortableNode](list []T) {
-	sort2.Slice(list, func(i, j int) bool { return list[i].UniqueKey() < list[j].UniqueKey() })
+	sort2.Slice(list, func(i, j int) bool {
+		return natsort.Compare(list[i].UniqueKey(), list[j].UniqueKey())
+	})
 }
 
 func (t *A2MLVersionType) MapChildNodes(_ any) {

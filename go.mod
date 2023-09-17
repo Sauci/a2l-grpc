@@ -3,6 +3,7 @@ module github.com/sauci/a2l-grpc
 go 1.20
 
 require (
+	facette.io/natsort v0.0.0-20181210072756-2cd4dd1e2dcb
 	github.com/antlr4-go/antlr/v4 v4.13.0
 	github.com/stretchr/testify v1.8.4
 	google.golang.org/grpc v1.55.0
