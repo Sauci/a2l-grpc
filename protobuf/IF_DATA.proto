@@ -5,22 +5,22 @@ option go_package = "./../pkg/a2l";
 import "protobuf/shared.proto";
 
 message IfDataType {
-  IdentType Name = 1 [json_name="Name"];
-  repeated GenericParameterType Blob = 2 [json_name="Blob"];
+  IdentType Name = 1 [json_name = "Name"];
+  repeated GenericParameterType Blob = 2 [json_name = "Blob"];
 }
 
 message GenericParameterType {
   oneof oneof {
-    TagType Tag = 1 [json_name="Tag"];
-    StringType String = 2 [json_name="String"];
-    LongType Long = 3 [json_name="Long"];
-    FloatType Float = 4 [json_name="Float"];
-    GenericNodeType Generic = 5 [json_name="Generic"];
-    IdentType Identifier = 6 [json_name="Identifier"];
+    TagType Tag = 1 [json_name = "Tag"];
+    StringType String = 2 [json_name = "String"];
+    LongType Long = 3 [json_name = "Long"];
+    FloatType Float = 4 [json_name = "Float"];
+    GenericNodeType Generic = 5 [json_name = "Generic"];
+    IdentType Identifier = 6 [json_name = "Identifier"];
   }
 }
 
 message GenericNodeType {
-  IdentType Name = 1 [json_name="Name"];
-  repeated GenericParameterType Element = 2 [json_name="Element"];
+  IdentType Name = 1 [json_name = "Name"];
+  repeated GenericParameterType Element = 2 [json_name = "Element"];
 }
