@@ -194,6 +194,10 @@ func (t *AxisDescrType) MapChildNodes(node any) {
 		t.DEPOSIT = node.(*DepositType)
 	case *CurveAxisRefType:
 		t.CURVE_AXIS_REF = node.(*CurveAxisRefType)
+	case *StepSizeType:
+		t.STEP_SIZE = node.(*StepSizeType)
+	case *PhysUnitType:
+		t.PHYS_UNIT = node.(*PhysUnitType)
 	default:
 		panic("not implemented yet...")
 	}
@@ -315,6 +319,12 @@ func (t *AxisPtsType) MapChildNodes(node any) {
 		t.CALIBRATION_ACCESS = node.(*CalibrationAccessType)
 	case *EcuAddressExtensionType:
 		t.ECU_ADDRESS_EXTENSION = node.(*EcuAddressExtensionType)
+	case *PhysUnitType:
+		t.PHYS_UNIT = node.(*PhysUnitType)
+	case *StepSizeType:
+		t.STEP_SIZE = node.(*StepSizeType)
+	case *SymbolLinkType:
+		t.SYMBOL_LINK = node.(*SymbolLinkType)
 	default:
 		panic("not implemented yet...")
 	}
@@ -633,6 +643,14 @@ func (t *CharacteristicType) MapChildNodes(node any) {
 		t.MATRIX_DIM = node.(*MatrixDimType)
 	case *EcuAddressExtensionType:
 		t.ECU_ADDRESS_EXTENSION = node.(*EcuAddressExtensionType)
+	case *DiscreteType:
+		t.DISCRETE = node.(*DiscreteType)
+	case *SymbolLinkType:
+		t.SYMBOL_LINK = node.(*SymbolLinkType)
+	case *StepSizeType:
+		t.STEP_SIZE = node.(*StepSizeType)
+	case *PhysUnitType:
+		t.PHYS_UNIT = node.(*PhysUnitType)
 	default:
 		panic("not implemented yet...")
 	}
@@ -1024,6 +1042,14 @@ func (t *DepositType) MapChildNodes(_ any) {
 
 func (t *DepositType) MarshalA2L(indentLevel int, indentString string, _ bool) (result string) {
 	return indentContent(fmt.Sprintf("DEPOSIT %s", t.Mode), indentLevel, indentString)
+}
+
+func (t *DiscreteType) MapChildNodes(_ any) {
+	panic("leaf node")
+}
+
+func (t *DiscreteType) MarshalA2L(indentLevel int, indentString string, _ bool) (result string) {
+	return indentContent("DISCRETE", indentLevel, indentString)
 }
 
 func (t *DisplayIdentifierType) MapChildNodes(_ any) {
@@ -1513,6 +1539,14 @@ func (t *InMeasurementType) MarshalA2L(indentLevel int, indentString string, _ b
 	return strings.Join(tmpResult, "\n")
 }
 
+func (t *LayoutType) MapChildNodes(_ any) {
+	panic("leaf node")
+}
+
+func (t *LayoutType) MarshalA2L(indentLevel int, indentString string, _ bool) (result string) {
+	return indentContent(fmt.Sprintf("LAYOUT %s", t.IndexMode), indentLevel, indentString)
+}
+
 func (t *LeftShiftType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
@@ -1631,6 +1665,14 @@ func (t *MeasurementType) MapChildNodes(node any) {
 		t.MATRIX_DIM = node.(*MatrixDimType)
 	case *EcuAddressExtensionType:
 		t.ECU_ADDRESS_EXTENSION = node.(*EcuAddressExtensionType)
+	case *DiscreteType:
+		t.DISCRETE = node.(*DiscreteType)
+	case *SymbolLinkType:
+		t.SYMBOL_LINK = node.(*SymbolLinkType)
+	case *LayoutType:
+		t.LAYOUT = node.(*LayoutType)
+	case *PhysUnitType:
+		t.PHYS_UNIT = node.(*PhysUnitType)
 	default:
 		panic("not implemented yet...")
 	}
@@ -2446,6 +2488,14 @@ func (t *ProjectType) MarshalA2L(indentLevel int, indentString string, sort bool
 	return strings.Join(tmpResult, "\n")
 }
 
+func (t *PhysUnitType) MapChildNodes(_ any) {
+	panic("leaf node")
+}
+
+func (t *PhysUnitType) MarshalA2L(indentLevel int, indentString string, _ bool) (result string) {
+	return indentContent(fmt.Sprintf("PHYS_UNIT %s", t.Unit.A2LString()), indentLevel, indentString)
+}
+
 func (t *ReadOnlyType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
@@ -2957,6 +3007,14 @@ func (t *SRecLayoutType) MarshalA2L(indentLevel int, indentString string, _ bool
 	return indentContent(fmt.Sprintf("S_REC_LAYOUT %s", t.Name.A2LString()), indentLevel, indentString)
 }
 
+func (t *StepSizeType) MapChildNodes(_ any) {
+	panic("leaf node")
+}
+
+func (t *StepSizeType) MarshalA2L(indentLevel int, indentString string, _ bool) (result string) {
+	return indentContent(fmt.Sprintf("STEP_SIZE %s", t.StepSize.A2LString()), indentLevel, indentString)
+}
+
 func (t *SubFunctionType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
@@ -2999,6 +3057,14 @@ func (t *SupplierType) MapChildNodes(_ any) {
 
 func (t *SupplierType) MarshalA2L(indentLevel int, indentString string, _ bool) (result string) {
 	return indentContent(fmt.Sprintf("SUPPLIER %s", t.Manufacturer.A2LString()), indentLevel, indentString)
+}
+
+func (t *SymbolLinkType) MapChildNodes(_ any) {
+	panic("leaf node")
+}
+
+func (t *SymbolLinkType) MarshalA2L(indentLevel int, indentString string, _ bool) (result string) {
+	return indentContent(fmt.Sprintf("SYMBOL_LINK %s %s", t.SymbolName.A2LString(), t.Offset.A2LString()), indentLevel, indentString)
 }
 
 func (t *SystemConstantType) MapChildNodes(_ any) {

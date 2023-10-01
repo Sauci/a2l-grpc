@@ -598,6 +598,16 @@ func (n *Listener) ExitDeposit(_ *parser.DepositContext) {
 	n.Last().MapChildNodes(node)
 }
 
+func (n *Listener) EnterDiscrete(_ *parser.DiscreteContext) {
+	n.Push(&DiscreteType{Present: true})
+}
+
+func (n *Listener) ExitDiscrete(_ *parser.DiscreteContext) {
+	node := n.Pop()
+
+	n.Last().MapChildNodes(node)
+}
+
 func (n *Listener) EnterDisplayIdentifier(ctx *parser.DisplayIdentifierContext) {
 	n.Push(&DisplayIdentifierType{DisplayName: identifierToIdentType(ctx.GetDisplay_name())})
 }
@@ -966,6 +976,16 @@ func (n *Listener) EnterInMeasurement(ctx *parser.InMeasurementContext) {
 }
 
 func (n *Listener) ExitInMeasurement(_ *parser.InMeasurementContext) {
+	node := n.Pop()
+
+	n.Last().MapChildNodes(node)
+}
+
+func (n *Listener) EnterLayout(ctx *parser.LayoutContext) {
+	n.Push(&LayoutType{IndexMode: ctx.GetIndexMode().GetText()})
+}
+
+func (n *Listener) ExitLayout(_ *parser.LayoutContext) {
 	node := n.Pop()
 
 	n.Last().MapChildNodes(node)
@@ -1343,6 +1363,16 @@ func (n *Listener) ExitProject(_ *parser.ProjectContext) {
 	n.Last().MapChildNodes(node)
 }
 
+func (n *Listener) EnterPhysUnit(ctx *parser.PhysUnitContext) {
+	n.Push(&PhysUnitType{Unit: a2lStringToStringType(ctx.GetUnit_())})
+}
+
+func (n *Listener) ExitPhysUnit(_ *parser.PhysUnitContext) {
+	node := n.Pop()
+
+	n.Last().MapChildNodes(node)
+}
+
 func (n *Listener) EnterReadOnly(_ *parser.ReadOnlyContext) {
 	n.Push(&ReadOnlyType{Present: true})
 }
@@ -1642,6 +1672,16 @@ func (n *Listener) ExitSRecLayout(_ *parser.SRecLayoutContext) {
 	n.Last().MapChildNodes(node)
 }
 
+func (n *Listener) EnterStepSize(ctx *parser.StepSizeContext) {
+	n.Push(&StepSizeType{StepSize: floatToFloatType(ctx.GetStepSize_())})
+}
+
+func (n *Listener) ExitStepSize(_ *parser.StepSizeContext) {
+	node := n.Pop()
+
+	n.Last().MapChildNodes(node)
+}
+
 func (n *Listener) EnterSubFunction(ctx *parser.SubFunctionContext) {
 	e := &SubFunctionType{Identifier: make([]*IdentType, 0)}
 
@@ -1679,6 +1719,17 @@ func (n *Listener) EnterSupplier(ctx *parser.SupplierContext) {
 }
 
 func (n *Listener) ExitSupplier(_ *parser.SupplierContext) {
+	node := n.Pop()
+
+	n.Last().MapChildNodes(node)
+}
+
+func (n *Listener) EnterSymbolLink(ctx *parser.SymbolLinkContext) {
+	n.Push(&SymbolLinkType{SymbolName: a2lStringToStringType(ctx.GetSymbolName()),
+		Offset: a2lLongToLongType(ctx.GetOffset())})
+}
+
+func (n *Listener) ExitSymbolLink(_ *parser.SymbolLinkContext) {
 	node := n.Pop()
 
 	n.Last().MapChildNodes(node)
