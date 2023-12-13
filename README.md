@@ -34,6 +34,7 @@ a2l_grpc.tar.gz
 |   ├── shared.proto
 ├── a2l_grpc_(os)_(arch).h
 ├── a2l_grpc_(os)_(arch).dll
+├── a2l_grpc_(os)_(arch).dylib
 └── a2l_grpc_(os)_(arch).so
 ```
 The *a2l_grpc.tar.gz/protobuf* folder contains all the *gRPC* data structure definitions. It will be used to generate
@@ -58,6 +59,7 @@ src
 |   |   ├── shared.proto
 |   ├── a2l_grpc_(os)_(arch).h
 |   ├── a2l_grpc_(os)_(arch).dll
+|   ├── a2l_grpc_(os)_(arch).dylib
 |   └── a2l_grpc_(os)_(arch).so
 ├── main.py
 ```
@@ -76,6 +78,7 @@ Now that all sources are available, we can start writing the *gRPC* client in *P
 ```python
 import ctypes
 import os
+import sys
 
 from pya2l.protobuf.API_pb2 import *
 from pya2l.protobuf.API_pb2_grpc import *
@@ -85,7 +88,10 @@ def get_shared_object_name() -> str:
     if os.name == 'nt':
         shared_object = 'a2l_grpc_windows_amd64.dll'
     elif os.name == 'posix':
-        shared_object = 'a2l_grpc_linux_amd64.so'
+        if sys.platform == 'darwin':
+            shared_object = 'a2l_grpc_darwin_arm64.dylib'
+        else:
+            shared_object = 'a2l_grpc_linux_amd64.so'
     else:
         raise Exception(f'unsupported operating system {os.name}')
     return shared_object
