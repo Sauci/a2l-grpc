@@ -107,7 +107,34 @@ jobs:
           path: |
             *.so
             *.h
-  build-windows:
+  build-windows-32:
+    runs-on: windows-2019
+    needs:
+      - test-linux
+      - test-windows
+      - test-mac
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: antlr4
+          path: pkg/a2l/parser
+      - uses: actions/download-artifact@v3
+        with:
+          name: grpc
+          path: pkg/a2l
+      - run: |
+          go get github.com/antlr4-go/antlr/v4
+          $env:GOARCH=386
+          $env:CGO_ENABLED=1
+          go build --buildmode=c-shared -o a2l_grpc_$(go env GOOS)_$(go env GOARCH).dll ./cmd/a2l/a2l.go
+      - uses: actions/upload-artifact@v3
+        with:
+          name: windows
+          path: |
+            *.dll
+            *.h
+  build-windows-64:
     runs-on: windows-2019
     needs:
       - test-linux
@@ -177,7 +204,8 @@ jobs:
       contents: write
     needs:
       - build-linux
-      - build-windows
+      - build-windows-32
+      - build-windows-64
       - build-mac
       - export-protobuf-definitions
     if: startsWith(github.ref, 'refs/tags/v')
