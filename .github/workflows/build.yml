@@ -86,8 +86,6 @@ jobs:
     runs-on: ubuntu-22.04
     needs:
       - test-linux
-      - test-windows
-#      - test-mac
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -107,12 +105,26 @@ jobs:
           path: |
             *.so
             *.h
-  build-windows-32:
+  build-windows:
     runs-on: windows-2019
     needs:
-      - test-linux
       - test-windows
-#      - test-mac
+    strategy:
+      matrix:
+        mingw: [ "MINGW32", "MINGW64" ]
+        include:
+#          - mingw: "MINGW32"
+#            package: "mingw-w64-i686"
+#            GOARCH: 386
+          - mingw: "MINGW64"
+            package: "mingw-w64-x86_64"
+            GOARCH: amd64
+    env:
+      MSYSTEM: ${{ matrix.mingw }}
+      CHERE_INVOKING: 1
+      GOARCH: ${{ matrix.GOARCH }}
+      CGO_ENABLED: 1
+    name: MSYS2 ${{ matrix.mingw }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -123,33 +135,12 @@ jobs:
         with:
           name: grpc
           path: pkg/a2l
-      - run: |
-          go get github.com/antlr4-go/antlr/v4
-          $env:GOARCH=386
-          $env:CGO_ENABLED=1
-          go build --buildmode=c-shared -o a2l_grpc_$(go env GOOS)_$(go env GOARCH).dll ./cmd/a2l/a2l.go
-      - uses: actions/upload-artifact@v4
-        with:
-          name: windows
-          path: |
-            *.dll
-            *.h
-  build-windows-64:
-    runs-on: windows-2019
-    needs:
-      - test-linux
-      - test-windows
-#      - test-mac
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v3
-        with:
-          name: antlr4
-          path: pkg/a2l/parser
-      - uses: actions/download-artifact@v3
-        with:
-          name: grpc
-          path: pkg/a2l
+      - name: Set up shell
+        run: echo ::add-path::C:\msys64\usr\bin\
+        shell: pwsh
+      - name: Print system version
+        run: |
+          uname
       - run: |
           go get github.com/antlr4-go/antlr/v4
           go build --buildmode=c-shared -o a2l_grpc_$(go env GOOS)_$(go env GOARCH).dll ./cmd/a2l/a2l.go
@@ -162,8 +153,6 @@ jobs:
 #  build-mac:
 #    runs-on: macos-latest-xlarge
 #    needs:
-#      - test-linux
-#      - test-windows
 #      - test-mac
 #    steps:
 #      - uses: actions/checkout@v4
@@ -204,8 +193,7 @@ jobs:
       contents: write
     needs:
       - build-linux
-      - build-windows-32
-      - build-windows-64
+      - build-windows
 #      - build-mac
       - export-protobuf-definitions
     if: startsWith(github.ref, 'refs/tags/v')
