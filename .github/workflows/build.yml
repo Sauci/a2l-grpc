@@ -30,11 +30,11 @@ jobs:
       - generate-grpc-sources
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: antlr4
           path: pkg/a2l/parser
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: grpc
           path: pkg/a2l
@@ -48,11 +48,11 @@ jobs:
       - generate-grpc-sources
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: antlr4
           path: pkg/a2l/parser
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: grpc
           path: pkg/a2l
@@ -66,11 +66,11 @@ jobs:
 #      - generate-grpc-sources
 #    steps:
 #      - uses: actions/checkout@v4
-#      - uses: actions/download-artifact@v3
+#      - uses: actions/download-artifact@v4
 #        with:
 #          name: antlr4
 #          path: pkg/a2l/parser
-#      - uses: actions/download-artifact@v3
+#      - uses: actions/download-artifact@v4
 #        with:
 #          name: grpc
 #          path: pkg/a2l
@@ -90,11 +90,11 @@ jobs:
 #      - test-mac
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: antlr4
           path: pkg/a2l/parser
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: grpc
           path: pkg/a2l
@@ -115,11 +115,11 @@ jobs:
 #      - test-mac
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: antlr4
           path: pkg/a2l/parser
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: grpc
           path: pkg/a2l
@@ -167,11 +167,11 @@ jobs:
 #      - test-mac
 #    steps:
 #      - uses: actions/checkout@v4
-#      - uses: actions/download-artifact@v3
+#      - uses: actions/download-artifact@v4
 #        with:
 #          name: antlr4
 #          path: pkg/a2l/parser
-#      - uses: actions/download-artifact@v3
+#      - uses: actions/download-artifact@v4
 #        with:
 #          name: grpc
 #          path: pkg/a2l
@@ -212,19 +212,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: mkdir a2l_grpc
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: linux
           path: a2l_grpc
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: windows
           path: a2l_grpc
-#      - uses: actions/download-artifact@v3
+#      - uses: actions/download-artifact@v4
 #        with:
 #          name: mac
 #          path: a2l_grpc
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: protobuf
           path: a2l_grpc/protobuf
