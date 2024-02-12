@@ -6,9 +6,9 @@ jobs:
   generate-antlr-sources:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: ./generate_antlr.sh
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: antlr4
           path: |
@@ -16,9 +16,9 @@ jobs:
   generate-grpc-sources:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: ./generate_grpc.sh
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: grpc
           path: |
@@ -29,7 +29,7 @@ jobs:
       - generate-antlr-sources
       - generate-grpc-sources
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v3
         with:
           name: antlr4
@@ -47,7 +47,7 @@ jobs:
       - generate-antlr-sources
       - generate-grpc-sources
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v3
         with:
           name: antlr4
@@ -89,7 +89,7 @@ jobs:
       - test-windows
       - test-mac
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v3
         with:
           name: antlr4
@@ -101,7 +101,7 @@ jobs:
       - run: |
           go get github.com/antlr4-go/antlr/v4
           go build --buildmode=c-shared -o a2l_grpc_$(go env GOOS)_$(go env GOARCH).so ./cmd/a2l/a2l.go
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: linux
           path: |
@@ -114,7 +114,7 @@ jobs:
       - test-windows
       - test-mac
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v3
         with:
           name: antlr4
@@ -128,7 +128,7 @@ jobs:
           $env:GOARCH=386
           $env:CGO_ENABLED=1
           go build --buildmode=c-shared -o a2l_grpc_$(go env GOOS)_$(go env GOARCH).dll ./cmd/a2l/a2l.go
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: windows
           path: |
@@ -141,7 +141,7 @@ jobs:
       - test-windows
       - test-mac
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v3
         with:
           name: antlr4
@@ -153,7 +153,7 @@ jobs:
       - run: |
           go get github.com/antlr4-go/antlr/v4
           go build --buildmode=c-shared -o a2l_grpc_$(go env GOOS)_$(go env GOARCH).dll ./cmd/a2l/a2l.go
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: windows
           path: |
@@ -192,8 +192,8 @@ jobs:
   export-protobuf-definitions:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/upload-artifact@v3
+      - uses: actions/checkout@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: protobuf
           path: |
@@ -210,7 +210,7 @@ jobs:
       - export-protobuf-definitions
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: mkdir a2l_grpc
       - uses: actions/download-artifact@v3
         with:
