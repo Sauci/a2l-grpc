@@ -120,10 +120,8 @@ jobs:
             path: "C:/msys64/usr/bin"
             GOARCH: amd64
     env:
-      MSYSTEM: ${{ matrix.mingw }}
-      CHERE_INVOKING: 1
-      GOARCH: ${{ matrix.GOARCH }}
       CGO_ENABLED: 1
+      GOARCH: ${{ matrix.GOARCH }}
     name: MSYS2 ${{ matrix.mingw }}
     steps:
       - uses: actions/checkout@v4
@@ -142,10 +140,10 @@ jobs:
       - shell: powershell
         run: |
           go get github.com/antlr4-go/antlr/v4
-          $env:PATH="${{ matrix.path }};$env:PATH" ;go build --buildmode=c-shared -o a2l_grpc_$(go env GOOS)_$(go env GOARCH).dll ./cmd/a2l/a2l.go
+          $env:PATH="${{ matrix.path }};$env:PATH" ;go build --buildmode=c-shared -o a2l_grpc_$(go env GOOS)_${{ matrix.GOARCH }}.dll ./cmd/a2l/a2l.go
       - uses: actions/upload-artifact@v4
         with:
-          name: windows
+          name: windows_${{ matrix.GOARCH }}
           path: |
             *.dll
             *.h
