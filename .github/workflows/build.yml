@@ -113,11 +113,11 @@ jobs:
       matrix:
         mingw: [ "MINGW32", "MINGW64" ]
         include:
-#          - mingw: "MINGW32"
-#            package: "mingw-w64-i686"
-#            GOARCH: 386
+          - mingw: "MINGW32"
+            path: "C:/msys64/mingw32/bin"
+            GOARCH: 386
           - mingw: "MINGW64"
-            package: "mingw-w64-x86_64"
+            path: "C:/msys64/usr/bin"
             GOARCH: amd64
     env:
       MSYSTEM: ${{ matrix.mingw }}
@@ -135,15 +135,14 @@ jobs:
         with:
           name: grpc
           path: pkg/a2l
-      - name: Set up shell
-        run: echo ::add-path::C:\msys64\usr\bin\
-        shell: pwsh
       - name: Print system version
+        shell: powershell
         run: |
           uname
-      - run: |
+      - shell: powershell
+        run: |
           go get github.com/antlr4-go/antlr/v4
-          go build --buildmode=c-shared -o a2l_grpc_$(go env GOOS)_$(go env GOARCH).dll ./cmd/a2l/a2l.go
+          $env:PATH="${{ matrix.path }};$env:PATH" ;go build --buildmode=c-shared -o a2l_grpc_$(go env GOOS)_$(go env GOARCH).dll ./cmd/a2l/a2l.go
       - uses: actions/upload-artifact@v4
         with:
           name: windows
