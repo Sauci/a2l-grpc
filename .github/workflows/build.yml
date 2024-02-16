@@ -1,14 +1,14 @@
 name: build
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   generate-antlr-sources:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: ./generate_antlr.sh
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: antlr4
           path: |
@@ -16,9 +16,9 @@ jobs:
   generate-grpc-sources:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: ./generate_grpc.sh
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: grpc
           path: |
@@ -29,12 +29,12 @@ jobs:
       - generate-antlr-sources
       - generate-grpc-sources
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
         with:
           name: antlr4
           path: pkg/a2l/parser
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: grpc
           path: pkg/a2l
@@ -47,12 +47,12 @@ jobs:
       - generate-antlr-sources
       - generate-grpc-sources
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
         with:
           name: antlr4
           path: pkg/a2l/parser
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: grpc
           path: pkg/a2l
@@ -65,17 +65,17 @@ jobs:
       - generate-antlr-sources
       - generate-grpc-sources
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
         with:
           name: antlr4
           path: pkg/a2l/parser
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: grpc
           path: pkg/a2l
       - name: Set up Go 1.21
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: "1.21"
           cache: true
@@ -86,22 +86,20 @@ jobs:
     runs-on: ubuntu-22.04
     needs:
       - test-linux
-      - test-windows
-      - test-mac
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
         with:
           name: antlr4
           path: pkg/a2l/parser
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: grpc
           path: pkg/a2l
       - run: |
           go get github.com/antlr4-go/antlr/v4
           go build --buildmode=c-shared -o a2l_grpc_$(go env GOOS)_$(go env GOARCH).so ./cmd/a2l/a2l.go
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: linux
           path: |
@@ -110,53 +108,68 @@ jobs:
   build-windows:
     runs-on: windows-2019
     needs:
-      - test-linux
       - test-windows
-      - test-mac
+    strategy:
+      matrix:
+        mingw: [ "MINGW32", "MINGW64" ]
+        include:
+          - mingw: "MINGW32"
+            path: "C:/msys64/mingw32/bin"
+            GOARCH: 386
+          - mingw: "MINGW64"
+            path: "C:/msys64/usr/bin"
+            GOARCH: amd64
+    env:
+      CGO_ENABLED: 1
+      GOARCH: ${{ matrix.GOARCH }}
+    name: MSYS2 ${{ matrix.mingw }}
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
         with:
           name: antlr4
           path: pkg/a2l/parser
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: grpc
           path: pkg/a2l
-      - run: |
+      - name: Print system version
+        shell: powershell
+        run: |
+          uname
+      - shell: powershell
+        run: |
           go get github.com/antlr4-go/antlr/v4
-          go build --buildmode=c-shared -o a2l_grpc_$(go env GOOS)_$(go env GOARCH).dll ./cmd/a2l/a2l.go
-      - uses: actions/upload-artifact@v3
+          $env:PATH="${{ matrix.path }};$env:PATH" ;go build --buildmode=c-shared -o a2l_grpc_$(go env GOOS)_${{ matrix.GOARCH }}.dll ./cmd/a2l/a2l.go
+      - uses: actions/upload-artifact@v4
         with:
-          name: windows
+          name: windows_${{ matrix.GOARCH }}
           path: |
             *.dll
             *.h
   build-mac:
     runs-on: macos-latest-xlarge
     needs:
-      - test-linux
-      - test-windows
       - test-mac
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
         with:
           name: antlr4
           path: pkg/a2l/parser
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: grpc
           path: pkg/a2l
       - name: Set up Go 1.21
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: "1.21"
           cache: true
       - run: |
           go get github.com/antlr4-go/antlr/v4
           go build --buildmode=c-shared -o a2l_grpc_$(go env GOOS)_$(go env GOARCH).dylib ./cmd/a2l/a2l.go
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: mac
           path: |
@@ -165,8 +178,8 @@ jobs:
   export-protobuf-definitions:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/upload-artifact@v3
+      - uses: actions/checkout@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: protobuf
           path: |
@@ -182,21 +195,25 @@ jobs:
       - export-protobuf-definitions
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: mkdir a2l_grpc
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: linux
           path: a2l_grpc
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
-          name: windows
+          name: windows_386
           path: a2l_grpc
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows_amd64
+          path: a2l_grpc
+      - uses: actions/download-artifact@v4
         with:
           name: mac
           path: a2l_grpc
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: protobuf
           path: a2l_grpc/protobuf
