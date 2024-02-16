@@ -59,29 +59,29 @@ jobs:
       - run: |
           go get github.com/antlr4-go/antlr/v4
           go test ./cmd/a2l/...
-#  test-mac:
-#    runs-on: macos-latest-xlarge
-#    needs:
-#      - generate-antlr-sources
-#      - generate-grpc-sources
-#    steps:
-#      - uses: actions/checkout@v4
-#      - uses: actions/download-artifact@v4
-#        with:
-#          name: antlr4
-#          path: pkg/a2l/parser
-#      - uses: actions/download-artifact@v4
-#        with:
-#          name: grpc
-#          path: pkg/a2l
-#      - name: Set up Go 1.21
-#        uses: actions/setup-go@v4
-#        with:
-#          go-version: "1.21"
-#          cache: true
-#      - run: |
-#          go get github.com/antlr4-go/antlr/v4
-#          go test ./cmd/a2l/...
+  test-mac:
+    runs-on: macos-latest-xlarge
+    needs:
+      - generate-antlr-sources
+      - generate-grpc-sources
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: antlr4
+          path: pkg/a2l/parser
+      - uses: actions/download-artifact@v4
+        with:
+          name: grpc
+          path: pkg/a2l
+      - name: Set up Go 1.21
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.21"
+          cache: true
+      - run: |
+          go get github.com/antlr4-go/antlr/v4
+          go test ./cmd/a2l/...
   build-linux:
     runs-on: ubuntu-22.04
     needs:
@@ -147,34 +147,34 @@ jobs:
           path: |
             *.dll
             *.h
-#  build-mac:
-#    runs-on: macos-latest-xlarge
-#    needs:
-#      - test-mac
-#    steps:
-#      - uses: actions/checkout@v4
-#      - uses: actions/download-artifact@v4
-#        with:
-#          name: antlr4
-#          path: pkg/a2l/parser
-#      - uses: actions/download-artifact@v4
-#        with:
-#          name: grpc
-#          path: pkg/a2l
-#      - name: Set up Go 1.21
-#        uses: actions/setup-go@v4
-#        with:
-#          go-version: "1.21"
-#          cache: true
-#      - run: |
-#          go get github.com/antlr4-go/antlr/v4
-#          go build --buildmode=c-shared -o a2l_grpc_$(go env GOOS)_$(go env GOARCH).dylib ./cmd/a2l/a2l.go
-#      - uses: actions/upload-artifact@v4
-#        with:
-#          name: mac
-#          path: |
-#            *.dylib
-#            *.h
+  build-mac:
+    runs-on: macos-latest-xlarge
+    needs:
+      - test-mac
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: antlr4
+          path: pkg/a2l/parser
+      - uses: actions/download-artifact@v4
+        with:
+          name: grpc
+          path: pkg/a2l
+      - name: Set up Go 1.21
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.21"
+          cache: true
+      - run: |
+          go get github.com/antlr4-go/antlr/v4
+          go build --buildmode=c-shared -o a2l_grpc_$(go env GOOS)_$(go env GOARCH).dylib ./cmd/a2l/a2l.go
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mac
+          path: |
+            *.dylib
+            *.h
   export-protobuf-definitions:
     runs-on: ubuntu-22.04
     steps:
@@ -191,7 +191,7 @@ jobs:
     needs:
       - build-linux
       - build-windows
-#      - build-mac
+      - build-mac
       - export-protobuf-definitions
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
@@ -203,12 +203,16 @@ jobs:
           path: a2l_grpc
       - uses: actions/download-artifact@v4
         with:
-          name: windows
+          name: windows_386
           path: a2l_grpc
-#      - uses: actions/download-artifact@v4
-#        with:
-#          name: mac
-#          path: a2l_grpc
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows_amd64
+          path: a2l_grpc
+      - uses: actions/download-artifact@v4
+        with:
+          name: mac
+          path: a2l_grpc
       - uses: actions/download-artifact@v4
         with:
           name: protobuf
