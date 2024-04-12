@@ -86,6 +86,32 @@ jobs:
     runs-on: ubuntu-22.04
     needs:
       - test-linux
+    strategy:
+      matrix:
+        target: [ amd64, arm64, arm ]
+        include:
+          - target: amd64
+            CGO_ENABLED: 1
+            GOARCH: amd64
+            CC: gcc
+          - target: arm64
+            CGO_ENABLED: 1
+            GOARCH: arm64
+            CC: /usr/local/gcc-linaro-4.8-2015.06-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-gcc
+            toolchain_source: https://releases.linaro.org/archive/15.06/components/toolchain/binaries/4.8/aarch64-linux-gnu/gcc-linaro-4.8-2015.06-x86_64_aarch64-linux-gnu.tar.xz
+            toolchain_extract: sudo tar -xf gcc-linaro-4.8-2015.06-x86_64_aarch64-linux-gnu.tar.xz -C /usr/local
+          - target: arm
+            CGO_ENABLED: 1
+            GOARCH: arm
+            CC: /usr/local/gcc-linaro-4.8-2015.06-x86_64_arm-linux-gnueabi/bin/arm-linux-gnueabi-gcc
+            toolchain_source: https://releases.linaro.org/archive/15.06/components/toolchain/binaries/4.8/arm-linux-gnueabi/gcc-linaro-4.8-2015.06-x86_64_arm-linux-gnueabi.tar.xz
+            toolchain_extract: sudo tar -xf gcc-linaro-4.8-2015.06-x86_64_arm-linux-gnueabi.tar.xz -C /usr/local
+    env:
+      CGO_ENABLED: ${{ matrix.CGO_ENABLED }}
+      GOOS: linux
+      GOARCH: ${{ matrix.GOARCH }}
+      CC: ${{ matrix.CC }}
+    name: build-linux-${{ matrix.target }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -96,12 +122,16 @@ jobs:
         with:
           name: grpc
           path: pkg/a2l
+      - if: ${{ matrix.CC != 'gcc' }}
+        run: |
+          wget ${{ matrix.toolchain_source }}
+          ${{ matrix.toolchain_extract }}
       - run: |
           go get github.com/antlr4-go/antlr/v4
           go build --buildmode=c-shared -o a2l_grpc_$(go env GOOS)_$(go env GOARCH).so ./cmd/a2l/a2l.go
       - uses: actions/upload-artifact@v4
         with:
-          name: linux
+          name: linux_${{ matrix.target }}
           path: |
             *.so
             *.h
@@ -199,7 +229,15 @@ jobs:
       - run: mkdir a2l_grpc
       - uses: actions/download-artifact@v4
         with:
-          name: linux
+          name: linux_amd64
+          path: a2l_grpc
+      - uses: actions/download-artifact@v4
+        with:
+          name: linux_arm64
+          path: a2l_grpc
+      - uses: actions/download-artifact@v4
+        with:
+          name: linux_arm
           path: a2l_grpc
       - uses: actions/download-artifact@v4
         with:
