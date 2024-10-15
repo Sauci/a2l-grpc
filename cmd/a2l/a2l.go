@@ -70,104 +70,133 @@ type grpcA2LImplType struct {
 	a2l.UnimplementedA2LServer
 }
 
-func (s *grpcA2LImplType) GetTreeFromA2L(_ context.Context, request *a2l.TreeFromA2LRequest) (result *a2l.TreeResponse, err error) {
-	var tree *a2l.RootNodeType
-	var parseError error
-
-	result = &a2l.TreeResponse{}
-
-	if tree, parseError = getTreeFromString(string(request.A2L)); parseError == nil {
-		result.Tree = tree
+//export GetTreeFromA2LLocal
+func GetTreeFromA2LLocal(request []byte) (result *a2l.RootNodeType, errString *string) {
+	if tree, parseError := getTreeFromString(string(request)); parseError == nil {
+		result = tree
 	} else {
-		errString := parseError.Error()
-		result.Error = &errString
+		errStringValue := parseError.Error()
+		errString = &errStringValue
 	}
 
-	return result, err
+	return result, errString
 }
 
-func (s *grpcA2LImplType) GetJSONFromTree(_ context.Context, request *a2l.JSONFromTreeRequest) (result *a2l.JSONResponse, err error) {
+func (s *grpcA2LImplType) GetTreeFromA2L(_ context.Context, request *a2l.TreeFromA2LRequest) (result *a2l.TreeResponse, err error) {
+	var treeResult *a2l.RootNodeType
+	var errString *string
+
+	treeResult, errString = GetTreeFromA2LLocal(request.A2L)
+
+	return &a2l.TreeResponse{Tree: treeResult, Error: errString}, err
+}
+
+//export GetJSONFromTreeLocal
+func GetJSONFromTreeLocal(request *a2l.RootNodeType, indent *uint32, allowPartial *bool, emitUnpopulated *bool) (result []byte, errString *string) {
 	var rawData []byte
 	var indentedData []byte
 	var parseError error
-	indent := ""
-	allowPartial := false
-	emitUnpopulated := false
+	indentValue := ""
+	allowPartialValue := false
+	emitUnpopulatedValue := false
 
-	result = &a2l.JSONResponse{}
-
-	if request.Indent != nil {
-		for i := uint32(0); i < *request.Indent; i++ {
-			indent += " "
+	if indent != nil {
+		for i := uint32(0); i < *indent; i++ {
+			indentValue += " "
 		}
 	}
 
-	if request.AllowPartial != nil {
-		allowPartial = *request.AllowPartial
+	if allowPartial != nil {
+		allowPartialValue = *allowPartial
 	}
 
-	if request.EmitUnpopulated != nil {
-		emitUnpopulated = *request.EmitUnpopulated
+	if emitUnpopulated != nil {
+		emitUnpopulatedValue = *emitUnpopulated
 	}
 
 	opt := protojson.MarshalOptions{
-		AllowPartial:    allowPartial,
-		EmitUnpopulated: emitUnpopulated}
+		AllowPartial:    allowPartialValue,
+		EmitUnpopulated: emitUnpopulatedValue}
 
-	if rawData, parseError = opt.Marshal(request.Tree); parseError == nil {
+	if rawData, parseError = opt.Marshal(request); parseError == nil {
 		// Note: see https://github.com/golang/protobuf/issues/1121
 		buffer := bytes.NewBuffer(indentedData)
-		if err = json.Indent(buffer, rawData, "", indent); err == nil {
-			result.Json = buffer.Bytes()
+		if err := json.Indent(buffer, rawData, "", indentValue); err == nil {
+			result = buffer.Bytes()
 		} else {
-			errString := err.Error()
-			result.Error = &errString
+			errStringValue := err.Error()
+			errString = &errStringValue
 		}
 	} else {
-		errString := parseError.Error()
-		result.Error = &errString
+		errStringValue := parseError.Error()
+		errString = &errStringValue
 	}
 
-	return result, err
+	return result, errString
 }
 
-func (s *grpcA2LImplType) GetTreeFromJSON(_ context.Context, request *a2l.TreeFromJSONRequest) (result *a2l.TreeResponse, err error) {
+func (s *grpcA2LImplType) GetJSONFromTree(_ context.Context, request *a2l.JSONFromTreeRequest) (result *a2l.JSONResponse, err error) {
+	var byteResult []byte
+	var errString *string
+
+	byteResult, errString = GetJSONFromTreeLocal(request.Tree, request.Indent, request.AllowPartial, request.EmitUnpopulated)
+
+	return &a2l.JSONResponse{Json: byteResult, Error: errString}, err
+}
+
+//export GetTreeFromJSONLocal
+func GetTreeFromJSONLocal(request []byte, allowPartial *bool) (result *a2l.RootNodeType, errString *string) {
 	var parseError error
-	allowPartial := false
+	allowPartialValue := false
 
-	result = &a2l.TreeResponse{Tree: &a2l.RootNodeType{}}
-
-	if request.AllowPartial != nil {
-		allowPartial = *request.AllowPartial
+	if allowPartial != nil {
+		allowPartialValue = *allowPartial
 	}
 
 	opt := protojson.UnmarshalOptions{
-		AllowPartial: allowPartial,
+		AllowPartial: allowPartialValue,
 	}
 
-	if parseError = opt.Unmarshal(request.Json, result.Tree); parseError != nil {
-		errString := parseError.Error()
-		result.Error = &errString
+	if parseError = opt.Unmarshal(request, result); parseError != nil {
+		errStringValue := parseError.Error()
+		errString = &errStringValue
 	}
 
-	return result, err
+	return result, errString
 }
 
-func (s *grpcA2LImplType) GetA2LFromTree(_ context.Context, request *a2l.A2LFromTreeRequest) (result *a2l.A2LResponse, err error) {
-	indent := ""
-	sorted := false
+func (s *grpcA2LImplType) GetTreeFromJSON(_ context.Context, request *a2l.TreeFromJSONRequest) (result *a2l.TreeResponse, err error) {
+	var treeResult *a2l.RootNodeType
+	var errString *string
 
-	if request.Indent != nil {
-		for i := uint32(0); i < *request.Indent; i++ {
-			indent += " "
+	treeResult, errString = GetTreeFromJSONLocal(request.Json, request.AllowPartial)
+
+	return &a2l.TreeResponse{Tree: treeResult, Error: errString}, err
+}
+
+//export GetA2LFromTreeLocal
+func GetA2LFromTreeLocal(request *a2l.RootNodeType, indent *uint32, sorted *bool) (result []byte, err error) {
+	indentValue := ""
+	sortedValue := false
+	if indent != nil {
+		for i := uint32(0); i < *indent; i++ {
+			indentValue += " "
 		}
 	}
 
-	if request.Sorted != nil {
-		sorted = *request.Sorted
+	if sorted != nil {
+		sortedValue = *sorted
 	}
 
-	return &a2l.A2LResponse{A2L: []byte(request.Tree.MarshalA2L(0, indent, sorted))}, nil
+	return []byte(request.MarshalA2L(0, indentValue, sortedValue)), nil
+}
+
+func (s *grpcA2LImplType) GetA2LFromTree(_ context.Context, request *a2l.A2LFromTreeRequest) (result *a2l.A2LResponse, err error) {
+	var byteResult []byte
+
+	byteResult, err = GetA2LFromTreeLocal(request.Tree, request.Indent, request.Sorted)
+
+	return &a2l.A2LResponse{A2L: byteResult}, err
 }
 
 var serverMutex sync.Mutex
