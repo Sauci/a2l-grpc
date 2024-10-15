@@ -70,133 +70,109 @@ type grpcA2LImplType struct {
 	a2l.UnimplementedA2LServer
 }
 
-//export GetTreeFromA2LLocal
-func GetTreeFromA2LLocal(request []byte) (result *a2l.RootNodeType, errString *string) {
-	if tree, parseError := getTreeFromString(string(request)); parseError == nil {
-		result = tree
-	} else {
-		errStringValue := parseError.Error()
-		errString = &errStringValue
-	}
-
-	return result, errString
-}
-
 func (s *grpcA2LImplType) GetTreeFromA2L(_ context.Context, request *a2l.TreeFromA2LRequest) (result *a2l.TreeResponse, err error) {
-	var treeResult *a2l.RootNodeType
-	var errString *string
-
-	treeResult, errString = GetTreeFromA2LLocal(request.A2L)
-
-	return &a2l.TreeResponse{Tree: treeResult, Error: errString}, err
-}
-
-//export GetJSONFromTreeLocal
-func GetJSONFromTreeLocal(request *a2l.RootNodeType, indent *uint32, allowPartial *bool, emitUnpopulated *bool) (result []byte, errString *string) {
-	var rawData []byte
-	var indentedData []byte
+	var tree *a2l.RootNodeType
 	var parseError error
-	indentValue := ""
-	allowPartialValue := false
-	emitUnpopulatedValue := false
 
-	if indent != nil {
-		for i := uint32(0); i < *indent; i++ {
-			indentValue += " "
-		}
-	}
+	result = &a2l.TreeResponse{}
 
-	if allowPartial != nil {
-		allowPartialValue = *allowPartial
-	}
-
-	if emitUnpopulated != nil {
-		emitUnpopulatedValue = *emitUnpopulated
-	}
-
-	opt := protojson.MarshalOptions{
-		AllowPartial:    allowPartialValue,
-		EmitUnpopulated: emitUnpopulatedValue}
-
-	if rawData, parseError = opt.Marshal(request); parseError == nil {
-		// Note: see https://github.com/golang/protobuf/issues/1121
-		buffer := bytes.NewBuffer(indentedData)
-		if err := json.Indent(buffer, rawData, "", indentValue); err == nil {
-			result = buffer.Bytes()
-		} else {
-			errStringValue := err.Error()
-			errString = &errStringValue
-		}
+	if tree, parseError = getTreeFromString(string(request.A2L)); parseError == nil {
+		result.Tree = tree
 	} else {
-		errStringValue := parseError.Error()
-		errString = &errStringValue
+		errString := parseError.Error()
+		result.Error = &errString
 	}
 
-	return result, errString
+	return result, err
 }
 
 func (s *grpcA2LImplType) GetJSONFromTree(_ context.Context, request *a2l.JSONFromTreeRequest) (result *a2l.JSONResponse, err error) {
-	var byteResult []byte
-	var errString *string
-
-	byteResult, errString = GetJSONFromTreeLocal(request.Tree, request.Indent, request.AllowPartial, request.EmitUnpopulated)
-
-	return &a2l.JSONResponse{Json: byteResult, Error: errString}, err
-}
-
-//export GetTreeFromJSONLocal
-func GetTreeFromJSONLocal(request []byte, allowPartial *bool) (result *a2l.RootNodeType, errString *string) {
+	var rawData []byte
+	var indentedData []byte
 	var parseError error
-	allowPartialValue := false
+	indent := ""
+	allowPartial := false
+	emitUnpopulated := false
 
-	if allowPartial != nil {
-		allowPartialValue = *allowPartial
-	}
+	result = &a2l.JSONResponse{}
 
-	opt := protojson.UnmarshalOptions{
-		AllowPartial: allowPartialValue,
-	}
-
-	if parseError = opt.Unmarshal(request, result); parseError != nil {
-		errStringValue := parseError.Error()
-		errString = &errStringValue
-	}
-
-	return result, errString
-}
-
-func (s *grpcA2LImplType) GetTreeFromJSON(_ context.Context, request *a2l.TreeFromJSONRequest) (result *a2l.TreeResponse, err error) {
-	var treeResult *a2l.RootNodeType
-	var errString *string
-
-	treeResult, errString = GetTreeFromJSONLocal(request.Json, request.AllowPartial)
-
-	return &a2l.TreeResponse{Tree: treeResult, Error: errString}, err
-}
-
-//export GetA2LFromTreeLocal
-func GetA2LFromTreeLocal(request *a2l.RootNodeType, indent *uint32, sorted *bool) (result []byte, err error) {
-	indentValue := ""
-	sortedValue := false
-	if indent != nil {
-		for i := uint32(0); i < *indent; i++ {
-			indentValue += " "
+	if request.Indent != nil {
+		for i := uint32(0); i < *request.Indent; i++ {
+			indent += " "
 		}
 	}
 
-	if sorted != nil {
-		sortedValue = *sorted
+	if request.AllowPartial != nil {
+		allowPartial = *request.AllowPartial
 	}
 
-	return []byte(request.MarshalA2L(0, indentValue, sortedValue)), nil
+	if request.EmitUnpopulated != nil {
+		emitUnpopulated = *request.EmitUnpopulated
+	}
+
+	opt := protojson.MarshalOptions{
+		AllowPartial:    allowPartial,
+		EmitUnpopulated: emitUnpopulated}
+
+	if rawData, parseError = opt.Marshal(request.Tree); parseError == nil {
+		// Note: see https://github.com/golang/protobuf/issues/1121
+		buffer := bytes.NewBuffer(indentedData)
+		if err = json.Indent(buffer, rawData, "", indent); err == nil {
+			result.Json = buffer.Bytes()
+		} else {
+			errString := err.Error()
+			result.Error = &errString
+		}
+	} else {
+		errString := parseError.Error()
+		result.Error = &errString
+	}
+
+	return result, err
+}
+
+func (s *grpcA2LImplType) GetTreeFromJSON(_ context.Context, request *a2l.TreeFromJSONRequest) (result *a2l.TreeResponse, err error) {
+	var parseError error
+	allowPartial := false
+
+	result = &a2l.TreeResponse{Tree: &a2l.RootNodeType{}}
+
+	if request.AllowPartial != nil {
+		allowPartial = *request.AllowPartial
+	}
+
+	opt := protojson.UnmarshalOptions{
+		AllowPartial: allowPartial,
+	}
+
+	if parseError = opt.Unmarshal(request.Json, result.Tree); parseError != nil {
+		errString := parseError.Error()
+		result.Error = &errString
+	}
+
+	return result, err
 }
 
 func (s *grpcA2LImplType) GetA2LFromTree(_ context.Context, request *a2l.A2LFromTreeRequest) (result *a2l.A2LResponse, err error) {
-	var byteResult []byte
+	indent := ""
+	sorted := false
 
-	byteResult, err = GetA2LFromTreeLocal(request.Tree, request.Indent, request.Sorted)
+	if request.Indent != nil {
+		for i := uint32(0); i < *request.Indent; i++ {
+			indent += " "
+		}
+	}
 
-	return &a2l.A2LResponse{A2L: byteResult}, err
+	if request.Sorted != nil {
+		sorted = *request.Sorted
+	}
+
+	return &a2l.A2LResponse{A2L: []byte(request.Tree.MarshalA2L(0, indent, sorted))}, nil
+}
+
+//export GetJSONByteArrayFromA2LByteArray
+func GetJSONByteArrayFromA2LByteArray(a2lByteArray []byte) {
+	_ = a2lByteArray
 }
 
 var serverMutex sync.Mutex
