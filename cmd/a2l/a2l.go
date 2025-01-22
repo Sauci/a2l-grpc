@@ -3,7 +3,6 @@ package main
 import (
 	"C"
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/antlr4-go/antlr/v4"
@@ -11,10 +10,27 @@ import (
 	"github.com/sauci/a2l-grpc/pkg/a2l/parser"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
+	"io"
 	"net"
 	"strings"
 	"sync"
 )
+
+// It's the size that we set for one chunk
+var sizeOfStreamMsg = 4 * 1024 * 1024
+
+func chunkifyBySize(data []byte, chunkSize int) [][]byte {
+	var chunks [][]byte
+	for start := 0; start < len(data); start += chunkSize {
+		end := start + chunkSize
+		if end > len(data) {
+			end = len(data)
+		}
+		chunks = append(chunks, data[start:end])
+	}
+	return chunks
+}
 
 type A2LSyntaxError struct {
 	line, column int
@@ -70,104 +86,221 @@ type grpcA2LImplType struct {
 	a2l.UnimplementedA2LServer
 }
 
-func (s *grpcA2LImplType) GetTreeFromA2L(_ context.Context, request *a2l.TreeFromA2LRequest) (result *a2l.TreeResponse, err error) {
-	var tree *a2l.RootNodeType
+func (s *grpcA2LImplType) GetTreeFromA2L(stream a2l.A2L_GetTreeFromA2LServer) error {
+	var buffer bytes.Buffer
 	var parseError error
+	var err error
+	var serializedTree []byte
+	var chunk []byte
+	var request *a2l.TreeFromA2LRequest
+	tree := &a2l.RootNodeType{}
+	response := &a2l.TreeResponse{}
 
-	result = &a2l.TreeResponse{}
-
-	if tree, parseError = getTreeFromString(string(request.A2L)); parseError == nil {
-		result.Tree = tree
-	} else {
-		errString := parseError.Error()
-		result.Error = &errString
+	for {
+		request, err = stream.Recv()
+		if err != nil {
+			if err == io.EOF {
+				err = nil
+			}
+			break
+		}
+		buffer.Write(request.A2L)
 	}
 
-	return result, err
+	if err == nil {
+		if tree, parseError = getTreeFromString(buffer.String()); parseError == nil {
+			if serializedTree, err = proto.Marshal(tree); err == nil {
+				for _, chunk = range chunkifyBySize(serializedTree, sizeOfStreamMsg) {
+					response.SerializedTreeChunk = chunk
+					err = stream.Send(response)
+				}
+			} else {
+				response.Error = proto.String(fmt.Sprintf("An error occure during serialization of Tree: %v", err))
+				err = stream.Send(response)
+			}
+		} else {
+			errString := parseError.Error()
+			response.Error = &errString
+			err = stream.Send(response)
+		}
+	}
+
+	return err
 }
 
-func (s *grpcA2LImplType) GetJSONFromTree(_ context.Context, request *a2l.JSONFromTreeRequest) (result *a2l.JSONResponse, err error) {
+func (s *grpcA2LImplType) GetJSONFromTree(stream a2l.A2L_GetJSONFromTreeServer) (err error) {
 	var rawData []byte
-	var indentedData []byte
+	var buffer bytes.Buffer
+	var chunk []byte
 	var parseError error
+	var request *a2l.JSONFromTreeRequest
+	tree := &a2l.RootNodeType{}
+	response := &a2l.JSONResponse{}
 	indent := ""
 	allowPartial := false
 	emitUnpopulated := false
+	// Note: optionsParsed := false avoid to parse option for each chunk
+	optionsParsed := false
 
-	result = &a2l.JSONResponse{}
-
-	if request.Indent != nil {
-		for i := uint32(0); i < *request.Indent; i++ {
-			indent += " "
+	for {
+		request, err = stream.Recv()
+		if err != nil {
+			if err == io.EOF {
+				err = nil
+			}
+			break
 		}
+
+		if !optionsParsed {
+			if request.Indent != nil {
+				for i := uint32(0); i < *request.Indent; i++ {
+					indent += " "
+				}
+			}
+			if request.AllowPartial != nil {
+				allowPartial = *request.AllowPartial
+			}
+			if request.EmitUnpopulated != nil {
+				emitUnpopulated = *request.EmitUnpopulated
+			}
+			optionsParsed = true
+		}
+		// Use a buffer to receive all chunks
+		buffer.Write(request.Tree)
 	}
+	if err == nil {
+		if parseError = proto.Unmarshal(buffer.Bytes(), tree); parseError == nil {
+			opt := protojson.MarshalOptions{
+				AllowPartial:    allowPartial,
+				EmitUnpopulated: emitUnpopulated}
 
-	if request.AllowPartial != nil {
-		allowPartial = *request.AllowPartial
-	}
-
-	if request.EmitUnpopulated != nil {
-		emitUnpopulated = *request.EmitUnpopulated
-	}
-
-	opt := protojson.MarshalOptions{
-		AllowPartial:    allowPartial,
-		EmitUnpopulated: emitUnpopulated}
-
-	if rawData, parseError = opt.Marshal(request.Tree); parseError == nil {
-		// Note: see https://github.com/golang/protobuf/issues/1121
-		buffer := bytes.NewBuffer(indentedData)
-		if err = json.Indent(buffer, rawData, "", indent); err == nil {
-			result.Json = buffer.Bytes()
+			if rawData, parseError = opt.Marshal(tree); parseError == nil {
+				// Note: see https://github.com/golang/protobuf/issues/1121
+				var indentedBuffer bytes.Buffer
+				if err = json.Indent(&indentedBuffer, rawData, "", indent); err == nil {
+					rawData = indentedBuffer.Bytes()
+					for _, chunk = range chunkifyBySize(rawData, sizeOfStreamMsg) {
+						response.Json = chunk
+						err = stream.Send(response)
+					}
+				} else {
+					response.Error = proto.String(fmt.Sprintf("An error occure during json indent: %v", err))
+					err = stream.Send(response)
+				}
+			} else {
+				errString := parseError.Error()
+				response.Error = &errString
+				err = stream.Send(response)
+			}
 		} else {
-			errString := err.Error()
-			result.Error = &errString
+			errString := parseError.Error()
+			response.Error = &errString
+			err = stream.Send(response)
 		}
-	} else {
-		errString := parseError.Error()
-		result.Error = &errString
 	}
 
-	return result, err
+	return err
 }
 
-func (s *grpcA2LImplType) GetTreeFromJSON(_ context.Context, request *a2l.TreeFromJSONRequest) (result *a2l.TreeResponse, err error) {
+func (s *grpcA2LImplType) GetTreeFromJSON(stream a2l.A2L_GetTreeFromJSONServer) (err error) {
 	var parseError error
+	var buffer bytes.Buffer
+	var serializedTree []byte
+	var chunk []byte
+	var request *a2l.TreeFromJSONRequest
+	tree := &a2l.RootNodeType{}
+	response := &a2l.TreeResponse{}
 	allowPartial := false
+	// Note: optionsParsed := false avoid to parse option for each chunk
+	optionsParsed := false
 
-	result = &a2l.TreeResponse{Tree: &a2l.RootNodeType{}}
+	for {
+		request, err = stream.Recv()
+		if err != nil {
+			if err == io.EOF {
+				err = nil
+			}
+			break
+		}
+		if !optionsParsed {
+			if request.AllowPartial != nil {
+				allowPartial = *request.AllowPartial
+			}
+			optionsParsed = true
+		}
+		// Use a buffer to receive all chunks
+		buffer.Write(request.Json)
+	}
+	if err == nil {
+		opt := protojson.UnmarshalOptions{
+			AllowPartial: allowPartial,
+		}
 
-	if request.AllowPartial != nil {
-		allowPartial = *request.AllowPartial
+		if parseError = opt.Unmarshal(buffer.Bytes(), tree); parseError == nil {
+			if serializedTree, err = proto.Marshal(tree); err == nil {
+				for _, chunk = range chunkifyBySize(serializedTree, sizeOfStreamMsg) {
+					response.SerializedTreeChunk = chunk
+					err = stream.Send(response)
+				}
+			} else {
+				response.Error = proto.String(fmt.Sprintf("An error occure during serialization of Tree: %v", err))
+				err = stream.Send(response)
+			}
+		} else {
+			errString := parseError.Error()
+			response.Error = &errString
+			err = stream.Send(response)
+		}
 	}
 
-	opt := protojson.UnmarshalOptions{
-		AllowPartial: allowPartial,
-	}
-
-	if parseError = opt.Unmarshal(request.Json, result.Tree); parseError != nil {
-		errString := parseError.Error()
-		result.Error = &errString
-	}
-
-	return result, err
+	return err
 }
 
-func (s *grpcA2LImplType) GetA2LFromTree(_ context.Context, request *a2l.A2LFromTreeRequest) (result *a2l.A2LResponse, err error) {
+func (s *grpcA2LImplType) GetA2LFromTree(stream a2l.A2L_GetA2LFromTreeServer) (err error) {
+	var buffer bytes.Buffer
+	var request *a2l.A2LFromTreeRequest
+	var chunk []byte
+	var a2lDataBytes []byte
+	tree := &a2l.RootNodeType{}
+	response := &a2l.A2LResponse{}
 	indent := ""
 	sorted := false
+	// Note: optionsParsed := false avoid to parse option for each chunk
+	optionsParsed := false
 
-	if request.Indent != nil {
-		for i := uint32(0); i < *request.Indent; i++ {
-			indent += " "
+	for {
+		request, err = stream.Recv()
+		if err != nil {
+			if err == io.EOF {
+				err = nil
+			}
+			break
+		}
+		if !optionsParsed {
+			if request.Indent != nil {
+				for i := uint32(0); i < *request.Indent; i++ {
+					indent += " "
+				}
+			}
+			if request.Sorted != nil {
+				sorted = *request.Sorted
+			}
+			optionsParsed = true
+		}
+		// Use a buffer to receive all chunks
+		buffer.Write(request.Tree)
+	}
+	if err == nil {
+		if err = proto.Unmarshal(buffer.Bytes(), tree); err == nil {
+			a2lDataBytes = []byte(tree.MarshalA2L(0, indent, sorted))
+			for _, chunk = range chunkifyBySize(a2lDataBytes, sizeOfStreamMsg) {
+				response.A2L = chunk
+				err = stream.Send(response)
+			}
 		}
 	}
 
-	if request.Sorted != nil {
-		sorted = *request.Sorted
-	}
-
-	return &a2l.A2LResponse{A2L: []byte(request.Tree.MarshalA2L(0, indent, sorted))}, nil
+	return err
 }
 
 var serverMutex sync.Mutex
@@ -190,7 +323,7 @@ func Create(port C.int) (result C.int) {
 
 	if result == 0 {
 		if listener, err = net.Listen("tcp", fmt.Sprintf(":%v", port)); err == nil {
-			server = grpc.NewServer(grpc.MaxRecvMsgSize(200*1024*1024), grpc.MaxSendMsgSize(200*1024*1024))
+			server = grpc.NewServer(grpc.MaxRecvMsgSize(sizeOfStreamMsg), grpc.MaxSendMsgSize(sizeOfStreamMsg))
 
 			a2l.RegisterA2LServer(server, &grpcA2LImplType{})
 
