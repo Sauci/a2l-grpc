@@ -18,7 +18,8 @@ import (
 )
 
 // It's the size that we set for one chunk
-var sizeOfStreamMsg = 4 * 1024 * 1024
+var protocolSizeMargin = 256
+var sizeOfStreamMsg = 4*1024*1024 - protocolSizeMargin
 
 func chunkifyBySize(data []byte, chunkSize int) [][]byte {
 	var chunks [][]byte
@@ -323,7 +324,7 @@ func Create(port C.int) (result C.int) {
 
 	if result == 0 {
 		if listener, err = net.Listen("tcp", fmt.Sprintf(":%v", port)); err == nil {
-			server = grpc.NewServer(grpc.MaxRecvMsgSize(sizeOfStreamMsg), grpc.MaxSendMsgSize(sizeOfStreamMsg))
+			server = grpc.NewServer(grpc.MaxRecvMsgSize(sizeOfStreamMsg+protocolSizeMargin), grpc.MaxSendMsgSize(sizeOfStreamMsg+protocolSizeMargin))
 
 			a2l.RegisterA2LServer(server, &grpcA2LImplType{})
 
