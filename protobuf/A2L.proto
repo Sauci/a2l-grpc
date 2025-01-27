@@ -254,6 +254,11 @@ message CoeffsType {
   FloatType F = 6 [json_name = "F"];
 }
 
+message CoeffsLinearType {
+  FloatType A = 1 [json_name = "A"];
+  FloatType B = 2 [json_name = "B"];
+}
+
 message ComparisonQuantityType {
   IdentType Name = 1 [json_name = "Name"];
 }
@@ -266,8 +271,9 @@ message CompuMethodType {
   StringType Unit = 5 [json_name = "Unit"];
   optional FormulaType FORMULA = 6 [json_name = "FORMULA"];
   optional CoeffsType COEFFS = 7 [json_name = "COEFFS"];
-  optional CompuTabRefType COMPU_TAB_REF = 8 [json_name = "COMPU_TAB_REF"];
-  optional RefUnitType REF_UNIT = 9 [json_name = "REF_UNIT"];
+  optional CoeffsLinearType COEFFS_LINEAR = 8 [json_name = "COEFFS_LINEAR"];
+  optional CompuTabRefType COMPU_TAB_REF = 9 [json_name = "COMPU_TAB_REF"];
+  optional RefUnitType REF_UNIT = 10 [json_name = "REF_UNIT"];
 }
 
 message CompuTabRefType {

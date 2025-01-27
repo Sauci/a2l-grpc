@@ -777,6 +777,16 @@ func (t *CoeffsType) MarshalA2L(indentLevel int, indentString string, _ bool) (r
 		t.F.A2LString()), indentLevel, indentString)
 }
 
+func (t *CoeffsLinearType) MapChildNodes(_ any) {
+	panic("leaf node")
+}
+
+func (t *CoeffsLinearType) MarshalA2L(indentLevel int, indentString string, _ bool) (result string) {
+	return indentContent(fmt.Sprintf("COEFFS_LINEAR %s %s",
+		t.A.A2LString(),
+		t.B.A2LString()), indentLevel, indentString)
+}
+
 func (t *ComparisonQuantityType) MapChildNodes(_ any) {
 	panic("leaf node")
 }
@@ -795,6 +805,8 @@ func (t *CompuMethodType) MapChildNodes(node any) {
 		t.FORMULA = node.(*FormulaType)
 	case *CoeffsType:
 		t.COEFFS = node.(*CoeffsType)
+	case *CoeffsLinearType:
+		t.COEFFS_LINEAR = node.(*CoeffsLinearType)
 	case *CompuTabRefType:
 		t.COMPU_TAB_REF = node.(*CompuTabRefType)
 	case *RefUnitType:
