@@ -224,7 +224,7 @@ func Test_GetJSONFromTree(t *testing.T) {
 			var receivedJSON []byte
 			var response *a2l.JSONResponse
 			var firstRequest *a2l.JSONFromTreeRequest
-			grpc := grpcA2LImplType{}
+			grpc := grpcA2LImplType{chunkSize: 4 * 1024 * 1024}
 
 			mockStream := newMockStreamBase[*a2l.JSONFromTreeRequest, *a2l.JSONResponse]()
 			defer mockStream.Close()
@@ -479,7 +479,7 @@ func TestGrpcA2LImplType_GetA2LFromTree(t *testing.T) {
 			var receivedA2L []byte
 			var response *a2l.A2LResponse
 			var firstRequest *a2l.A2LFromTreeRequest
-			grpc := grpcA2LImplType{}
+			grpc := grpcA2LImplType{chunkSize: 4 * 1024 * 1024}
 
 			mockStream := newMockStreamBase[*a2l.A2LFromTreeRequest, *a2l.A2LResponse]()
 			defer mockStream.Close()

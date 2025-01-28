@@ -17,9 +17,7 @@ import (
 	"sync"
 )
 
-// It's the size that we set for one chunk
 var protocolSizeMargin = 256
-var sizeOfStreamMsg = 4*1024*1024 - protocolSizeMargin
 
 func chunkifyBySize(data []byte, chunkSize int) [][]byte {
 	var chunks [][]byte
@@ -85,6 +83,7 @@ func getTreeFromString(a2lString string) (result *a2l.RootNodeType, err error) {
 
 type grpcA2LImplType struct {
 	a2l.UnimplementedA2LServer
+	chunkSize int
 }
 
 func (s *grpcA2LImplType) GetTreeFromA2L(stream a2l.A2L_GetTreeFromA2LServer) error {
@@ -111,7 +110,7 @@ func (s *grpcA2LImplType) GetTreeFromA2L(stream a2l.A2L_GetTreeFromA2LServer) er
 	if err == nil {
 		if tree, parseError = getTreeFromString(buffer.String()); parseError == nil {
 			if serializedTree, err = proto.Marshal(tree); err == nil {
-				for _, chunk = range chunkifyBySize(serializedTree, sizeOfStreamMsg) {
+				for _, chunk = range chunkifyBySize(serializedTree, s.chunkSize) {
 					response.SerializedTreeChunk = chunk
 					err = stream.Send(response)
 				}
@@ -180,7 +179,7 @@ func (s *grpcA2LImplType) GetJSONFromTree(stream a2l.A2L_GetJSONFromTreeServer) 
 				var indentedBuffer bytes.Buffer
 				if err = json.Indent(&indentedBuffer, rawData, "", indent); err == nil {
 					rawData = indentedBuffer.Bytes()
-					for _, chunk = range chunkifyBySize(rawData, sizeOfStreamMsg) {
+					for _, chunk = range chunkifyBySize(rawData, s.chunkSize) {
 						response.Json = chunk
 						err = stream.Send(response)
 					}
@@ -239,7 +238,7 @@ func (s *grpcA2LImplType) GetTreeFromJSON(stream a2l.A2L_GetTreeFromJSONServer) 
 
 		if parseError = opt.Unmarshal(buffer.Bytes(), tree); parseError == nil {
 			if serializedTree, err = proto.Marshal(tree); err == nil {
-				for _, chunk = range chunkifyBySize(serializedTree, sizeOfStreamMsg) {
+				for _, chunk = range chunkifyBySize(serializedTree, s.chunkSize) {
 					response.SerializedTreeChunk = chunk
 					err = stream.Send(response)
 				}
@@ -294,7 +293,7 @@ func (s *grpcA2LImplType) GetA2LFromTree(stream a2l.A2L_GetA2LFromTreeServer) (e
 	if err == nil {
 		if err = proto.Unmarshal(buffer.Bytes(), tree); err == nil {
 			a2lDataBytes = []byte(tree.MarshalA2L(0, indent, sorted))
-			for _, chunk = range chunkifyBySize(a2lDataBytes, sizeOfStreamMsg) {
+			for _, chunk = range chunkifyBySize(a2lDataBytes, s.chunkSize) {
 				response.A2L = chunk
 				err = stream.Send(response)
 			}
@@ -309,7 +308,7 @@ var serverMutex sync.Mutex
 var server *grpc.Server
 
 //export Create
-func Create(port C.int) (result C.int) {
+func Create(port C.int, maxMsgSize C.int) (result C.int) {
 	var err error
 	var listener net.Listener
 
@@ -324,9 +323,9 @@ func Create(port C.int) (result C.int) {
 
 	if result == 0 {
 		if listener, err = net.Listen("tcp", fmt.Sprintf(":%v", port)); err == nil {
-			server = grpc.NewServer(grpc.MaxRecvMsgSize(sizeOfStreamMsg+protocolSizeMargin), grpc.MaxSendMsgSize(sizeOfStreamMsg+protocolSizeMargin))
+			server = grpc.NewServer(grpc.MaxRecvMsgSize(int(maxMsgSize)), grpc.MaxSendMsgSize(int(maxMsgSize)))
 
-			a2l.RegisterA2LServer(server, &grpcA2LImplType{})
+			a2l.RegisterA2LServer(server, &grpcA2LImplType{chunkSize: int(maxMsgSize) - protocolSizeMargin})
 
 			go func() {
 				err = server.Serve(listener)
@@ -356,7 +355,7 @@ func Close() (result C.int) {
 }
 
 func main() {
-	Create(3333)
+	Create(3333, 4*1024*1024)
 
 	for {
 		select {}
