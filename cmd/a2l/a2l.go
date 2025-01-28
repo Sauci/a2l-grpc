@@ -112,10 +112,12 @@ func (s *grpcA2LImplType) GetTreeFromA2L(stream a2l.A2L_GetTreeFromA2LServer) er
 			if serializedTree, err = proto.Marshal(tree); err == nil {
 				for _, chunk = range chunkifyBySize(serializedTree, s.chunkSize) {
 					response.SerializedTreeChunk = chunk
-					err = stream.Send(response)
+					if err = stream.Send(response); err != nil {
+						break
+					}
 				}
 			} else {
-				response.Error = proto.String(fmt.Sprintf("An error occure during serialization of Tree: %v", err))
+				response.Error = proto.String(fmt.Sprintf("An error occured during serialization of Tree: %v", err))
 				err = stream.Send(response)
 			}
 		} else {
@@ -181,10 +183,12 @@ func (s *grpcA2LImplType) GetJSONFromTree(stream a2l.A2L_GetJSONFromTreeServer) 
 					rawData = indentedBuffer.Bytes()
 					for _, chunk = range chunkifyBySize(rawData, s.chunkSize) {
 						response.Json = chunk
-						err = stream.Send(response)
+						if err = stream.Send(response); err != nil {
+							break
+						}
 					}
 				} else {
-					response.Error = proto.String(fmt.Sprintf("An error occure during json indent: %v", err))
+					response.Error = proto.String(fmt.Sprintf("An error occured during json indent: %v", err))
 					err = stream.Send(response)
 				}
 			} else {
@@ -240,10 +244,12 @@ func (s *grpcA2LImplType) GetTreeFromJSON(stream a2l.A2L_GetTreeFromJSONServer) 
 			if serializedTree, err = proto.Marshal(tree); err == nil {
 				for _, chunk = range chunkifyBySize(serializedTree, s.chunkSize) {
 					response.SerializedTreeChunk = chunk
-					err = stream.Send(response)
+					if err = stream.Send(response); err != nil {
+						break
+					}
 				}
 			} else {
-				response.Error = proto.String(fmt.Sprintf("An error occure during serialization of Tree: %v", err))
+				response.Error = proto.String(fmt.Sprintf("An error occured during serialization of Tree: %v", err))
 				err = stream.Send(response)
 			}
 		} else {
@@ -295,7 +301,9 @@ func (s *grpcA2LImplType) GetA2LFromTree(stream a2l.A2L_GetA2LFromTreeServer) (e
 			a2lDataBytes = []byte(tree.MarshalA2L(0, indent, sorted))
 			for _, chunk = range chunkifyBySize(a2lDataBytes, s.chunkSize) {
 				response.A2L = chunk
-				err = stream.Send(response)
+				if err = stream.Send(response); err != nil {
+					break
+				}
 			}
 		}
 	}
