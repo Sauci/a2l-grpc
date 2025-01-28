@@ -5,10 +5,10 @@ import "protobuf/A2L.proto";
 option go_package = "./../pkg/a2l";
 
 service A2L {
-  rpc GetTreeFromA2L (TreeFromA2LRequest) returns (TreeResponse) {}
-  rpc GetJSONFromTree (JSONFromTreeRequest) returns (JSONResponse) {}
-  rpc GetTreeFromJSON (TreeFromJSONRequest) returns (TreeResponse) {}
-  rpc GetA2LFromTree (A2LFromTreeRequest) returns (A2LResponse) {}
+  rpc GetTreeFromA2L (stream TreeFromA2LRequest) returns (stream TreeResponse) {}
+  rpc GetJSONFromTree (stream JSONFromTreeRequest) returns (stream JSONResponse) {}
+  rpc GetTreeFromJSON (stream TreeFromJSONRequest) returns (stream TreeResponse) {}
+  rpc GetA2LFromTree (stream A2LFromTreeRequest) returns (stream A2LResponse) {}
 }
 
 message TreeFromA2LRequest {
@@ -21,20 +21,20 @@ message A2LResponse {
 }
 
 message JSONFromTreeRequest {
-  RootNodeType tree = 1;
+  bytes tree = 1;
   optional uint32 indent = 3;
   optional bool allow_partial = 4;
   optional bool emit_unpopulated = 5;
 }
 
 message A2LFromTreeRequest {
-  RootNodeType tree = 1;
+  bytes tree = 1;
   optional uint32 indent = 2;
   optional bool sorted = 3;
 }
 
 message TreeResponse {
-  RootNodeType tree = 1;
+  bytes serializedTreeChunk = 1;
   optional string error = 2;
 }
 
