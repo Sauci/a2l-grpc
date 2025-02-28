@@ -88,9 +88,9 @@ jobs:
       - test-linux
     strategy:
       matrix:
-        target: [ i386, amd64, arm64, arm ]
+        target: [ 386, amd64, arm64, arm ]
         include:
-          - target: i386
+          - target: 386
             CGO_ENABLED: 1
             GOARCH: 386
             CC: gcc
@@ -238,6 +238,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: mkdir a2l_grpc
+      - uses: actions/download-artifact@v4
+        with:
+          name: linux_386
+          path: a2l_grpc
       - uses: actions/download-artifact@v4
         with:
           name: linux_amd64
