@@ -88,22 +88,30 @@ jobs:
       - test-linux
     strategy:
       matrix:
-        target: [ amd64, arm64, arm ]
+        target: [ i386, amd64, arm64, arm ]
         include:
+          - target: i386
+            CGO_ENABLED: 1
+            GOARCH: 386
+            CC: gcc
+            CGO_FLAGS: -m32
           - target: amd64
             CGO_ENABLED: 1
             GOARCH: amd64
             CC: gcc
+            CGO_FLAGS: ""
           - target: arm64
             CGO_ENABLED: 1
             GOARCH: arm64
             CC: /usr/local/gcc-linaro-4.8-2015.06-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-gcc
+            CGO_FLAGS: ""
             toolchain_source: https://releases.linaro.org/archive/15.06/components/toolchain/binaries/4.8/aarch64-linux-gnu/gcc-linaro-4.8-2015.06-x86_64_aarch64-linux-gnu.tar.xz
             toolchain_extract: sudo tar -xf gcc-linaro-4.8-2015.06-x86_64_aarch64-linux-gnu.tar.xz -C /usr/local
           - target: arm
             CGO_ENABLED: 1
             GOARCH: arm
             CC: /usr/local/gcc-linaro-4.8-2015.06-x86_64_arm-linux-gnueabi/bin/arm-linux-gnueabi-gcc
+            CGO_FLAGS: ""
             toolchain_source: https://releases.linaro.org/archive/15.06/components/toolchain/binaries/4.8/arm-linux-gnueabi/gcc-linaro-4.8-2015.06-x86_64_arm-linux-gnueabi.tar.xz
             toolchain_extract: sudo tar -xf gcc-linaro-4.8-2015.06-x86_64_arm-linux-gnueabi.tar.xz -C /usr/local
     env:
@@ -122,6 +130,9 @@ jobs:
         with:
           name: grpc
           path: pkg/a2l
+      - if: ${{ matrix.GOARCH == '386' }}
+        run: |
+          sudo apt-get install libc6-dev-i386
       - if: ${{ matrix.CC != 'gcc' }}
         run: |
           wget ${{ matrix.toolchain_source }}
