@@ -133,6 +133,7 @@ message AxisPtsType {
   optional PhysUnitType PHYS_UNIT = 24 [json_name = "PHYS_UNIT"];
   optional StepSizeType STEP_SIZE = 25 [json_name = "STEP_SIZE"];
   optional SymbolLinkType SYMBOL_LINK = 26 [json_name = 'SYMBOL_LINK'];
+  optional MonotonyType MONOTONY = 27 [json_name = "MONOTONY"];
 }
 
 message AxisPtsXType {
