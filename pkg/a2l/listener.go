@@ -1,6 +1,6 @@
 package a2l
 
-import "github.com/sauci/a2l-grpc/pkg/a2l/parser"
+import "github.com/ngamber/a2l-grpc/pkg/a2l/parser"
 
 type Listener struct {
 	*parser.BaseA2LListener
