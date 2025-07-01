@@ -1,5 +1,18 @@
-.idea
+# IDE and build artifacts
+.idea/
 *.jar
 *.ps1
+
+# Go generated files
 pkg/a2l/*.pb.go
-pkg/a2l/parser
+pkg/a2l/parser/
+
+# Python generated files (protobuf/gRPC)
+protobuf/*_pb2.py
+protobuf/*_pb2_grpc.py
+protobuf/shared_pb2.py
+protobuf/shared_pb2_grpc.py
+
+# Python bytecode cache
+__pycache__/
+*.pyc
