@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"github.com/ngamber/a2l-grpc/pkg/a2l"
+	"github.com/sauci/a2l-grpc/pkg/a2l"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/proto"

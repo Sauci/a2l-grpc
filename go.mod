@@ -1,4 +1,4 @@
-module github.com/ngamber/a2l-grpc
+module github.com/sauci/a2l-grpc
 
 go 1.22
 
