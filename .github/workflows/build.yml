@@ -42,7 +42,7 @@ jobs:
           go get github.com/antlr4-go/antlr/v4
           go test ./cmd/a2l/...
   test-windows:
-    runs-on: windows-2019
+    runs-on: windows-2022
     needs:
       - generate-antlr-sources
       - generate-grpc-sources
@@ -147,7 +147,7 @@ jobs:
             *.so
             *.h
   build-windows:
-    runs-on: windows-2019
+    runs-on: windows-2022
     needs:
       - test-windows
     strategy:
