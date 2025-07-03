@@ -132,7 +132,8 @@ message AxisPtsType {
   optional EcuAddressExtensionType ECU_ADDRESS_EXTENSION = 23 [json_name = "ECU_ADDRESS_EXTENSION"];
   optional PhysUnitType PHYS_UNIT = 24 [json_name = "PHYS_UNIT"];
   optional StepSizeType STEP_SIZE = 25 [json_name = "STEP_SIZE"];
-  optional SymbolLinkType SYMBOL_LINK = 26 [json_name = 'SYMBOL_LINK'];
+  optional SymbolLinkType SYMBOL_LINK = 26 [json_name = "SYMBOL_LINK"];
+  optional MonotonyType MONOTONY = 27 [json_name = "MONOTONY"];
 }
 
 message AxisPtsXType {
@@ -239,10 +240,10 @@ message CharacteristicType {
   optional CalibrationAccessType CALIBRATION_ACCESS = 28 [json_name = "CALIBRATION_ACCESS"];
   optional MatrixDimType MATRIX_DIM = 29 [json_name = "MATRIX_DIM"];
   optional EcuAddressExtensionType ECU_ADDRESS_EXTENSION = 30 [json_name = "ECU_ADDRESS_EXTENSION"];
-  optional DiscreteType DISCRETE = 31 [json_name = 'DISCRETE'];
-  optional SymbolLinkType SYMBOL_LINK = 32 [json_name = 'SYMBOL_LINK'];
-  optional StepSizeType STEP_SIZE = 33 [json_name = 'STEP_SIZE'];
-  optional PhysUnitType PHYS_UNIT = 34 [json_name = 'PHYS_UNIT'];
+  optional DiscreteType DISCRETE = 31 [json_name = "DISCRETE"];
+  optional SymbolLinkType SYMBOL_LINK = 32 [json_name = "SYMBOL_LINK"];
+  optional StepSizeType STEP_SIZE = 33 [json_name = "STEP_SIZE"];
+  optional PhysUnitType PHYS_UNIT = 34 [json_name = "PHYS_UNIT"];
 }
 
 message CoeffsType {
@@ -577,9 +578,9 @@ message MeasurementType {
   repeated IfDataType IF_DATA = 23 [json_name = "IF_DATA"];
   optional MatrixDimType MATRIX_DIM = 24 [json_name = "MATRIX_DIM"];
   optional EcuAddressExtensionType ECU_ADDRESS_EXTENSION = 25 [json_name = "ECU_ADDRESS_EXTENSION"];
-  optional DiscreteType DISCRETE = 26 [json_name = 'DISCRETE'];
-  optional SymbolLinkType SYMBOL_LINK = 27 [json_name = 'SYMBOL_LINK'];
-  optional LayoutType LAYOUT = 28 [json_name = 'LAYOUT'];
+  optional DiscreteType DISCRETE = 26 [json_name = "DISCRETE"];
+  optional SymbolLinkType SYMBOL_LINK = 27 [json_name = "SYMBOL_LINK"];
+  optional LayoutType LAYOUT = 28 [json_name = "LAYOUT"];
   optional PhysUnitType PHYS_UNIT = 29 [json_name = "PHYS_UNIT"];
 }
 
@@ -914,8 +915,8 @@ message SupplierType {
 }
 
 message SymbolLinkType {
-  StringType SymbolName = 1 [json_name = 'SymbolName'];
-  LongType Offset = 2 [json_name = 'Offset'];
+  StringType SymbolName = 1 [json_name = "SymbolName"];
+  LongType Offset = 2 [json_name = "Offset"];
 }
 
 message SystemConstantType {

@@ -1,10 +1,11 @@
 package a2l
 
 import (
-	"facette.io/natsort"
 	"fmt"
 	sort2 "sort"
 	"strings"
+
+	"facette.io/natsort"
 )
 
 //func (t *AddrTypeType) MapChildNodes(_ any) {
@@ -325,6 +326,8 @@ func (t *AxisPtsType) MapChildNodes(node any) {
 		t.STEP_SIZE = node.(*StepSizeType)
 	case *SymbolLinkType:
 		t.SYMBOL_LINK = node.(*SymbolLinkType)
+	case *MonotonyType:
+		t.MONOTONY = node.(*MonotonyType)
 	default:
 		panic("not implemented yet...")
 	}
