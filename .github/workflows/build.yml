@@ -103,17 +103,17 @@ jobs:
           - target: arm64
             CGO_ENABLED: 1
             GOARCH: arm64
-            CC: /usr/local/gcc-linaro-4.8-2015.06-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-gcc
+            CC: /usr/local/aarch64--glibc--stable-2020.08-1/bin/aarch64-buildroot-linux-gnu-gcc
             CGO_FLAGS: ""
-            toolchain_source: https://releases.linaro.org/archive/15.06/components/toolchain/binaries/4.8/aarch64-linux-gnu/gcc-linaro-4.8-2015.06-x86_64_aarch64-linux-gnu.tar.xz
-            toolchain_extract: sudo tar -xf gcc-linaro-4.8-2015.06-x86_64_aarch64-linux-gnu.tar.xz -C /usr/local
+            toolchain_source: https://toolchains.bootlin.com/downloads/releases/toolchains/aarch64/tarballs/aarch64--glibc--stable-2020.08-1.tar.bz2
+            toolchain_extract: sudo tar -xf aarch64--glibc--stable-2020.08-1.tar.bz2 -C /usr/local
           - target: arm
             CGO_ENABLED: 1
             GOARCH: arm
-            CC: /usr/local/gcc-linaro-4.8-2015.06-x86_64_arm-linux-gnueabi/bin/arm-linux-gnueabi-gcc
+            CC: /usr/local/armv5-eabi--glibc--stable-2020.08-1/bin/arm-buildroot-linux-gnueabi-gcc
             CGO_FLAGS: ""
-            toolchain_source: https://releases.linaro.org/archive/15.06/components/toolchain/binaries/4.8/arm-linux-gnueabi/gcc-linaro-4.8-2015.06-x86_64_arm-linux-gnueabi.tar.xz
-            toolchain_extract: sudo tar -xf gcc-linaro-4.8-2015.06-x86_64_arm-linux-gnueabi.tar.xz -C /usr/local
+            toolchain_source: https://toolchains.bootlin.com/downloads/releases/toolchains/armv5-eabi/tarballs/armv5-eabi--glibc--stable-2020.08-1.tar.bz2
+            toolchain_extract: sudo tar -xf armv5-eabi--glibc--stable-2020.08-1.tar.bz2 -C /usr/local
     env:
       CGO_ENABLED: ${{ matrix.CGO_ENABLED }}
       GOOS: linux
