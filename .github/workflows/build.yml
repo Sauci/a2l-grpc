@@ -179,6 +179,11 @@ jobs:
         shell: powershell
         run: |
           uname
+      - if: ${{ matrix.GOARCH == '386' }}
+        name: Install 32-bit MinGW toolchain
+        shell: powershell
+        run: |
+          C:\msys64\usr\bin\pacman.exe -Sy --noconfirm mingw-w64-i686-gcc
       - shell: powershell
         run: |
           go get github.com/antlr4-go/antlr/v4
