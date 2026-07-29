@@ -4,7 +4,10 @@ import (
 	"context"
 	"github.com/sauci/a2l-grpc/pkg/a2l"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 	"io"
 	"testing"
@@ -73,6 +76,74 @@ func (m *mockStreamBase[R, S]) SetTrailer(metadata.MD)       {}
 func (m *mockStreamBase[R, S]) Context() context.Context     { return context.Background() }
 func (m *mockStreamBase[R, S]) SendMsg(interface{}) error    { return nil }
 func (m *mockStreamBase[R, S]) RecvMsg(interface{}) error    { return nil }
+
+func Test_GetTreeFromA2L_ConversionOverflowReturnsError(t *testing.T) {
+	a2lString := `/begin PROJECT _ "_"
+ /begin MODULE _ "_"
+  /begin CHARACTERISTIC c "_" VALUE 0xFFFFFFFFFFFFFFFF _ 0 _ 0 0
+  /end CHARACTERISTIC
+ /end MODULE
+/end PROJECT`
+
+	impl := grpcA2LImplType{chunkSize: 4 * 1024 * 1024}
+
+	mockStream := newMockStreamBase[*a2l.TreeFromA2LRequest, *a2l.TreeResponse]()
+	defer mockStream.Close()
+
+	mockStream.SendRequest(&a2l.TreeFromA2LRequest{A2L: []byte(a2lString)})
+
+	if err := impl.GetTreeFromA2L(mockStream); err == nil {
+		if response, err := mockStream.RecvResponse(); err == nil {
+			if assert.NotNil(t, response.Error) {
+				assert.Contains(t, *response.Error, "value out of range")
+			}
+		} else {
+			t.Fatal(err)
+		}
+	} else {
+		t.Fatal(err)
+	}
+}
+
+func Test_getTreeFromString_ConversionOverflowReturnsError(t *testing.T) {
+	tree, err := getTreeFromString(`/begin PROJECT _ "_"
+ /begin MODULE _ "_"
+  /begin CHARACTERISTIC c "_" VALUE 0xFFFFFFFFFFFFFFFF _ 0 _ 0 0
+  /end CHARACTERISTIC
+ /end MODULE
+/end PROJECT`)
+
+	assert.Nil(t, tree)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "value out of range")
+}
+
+func Test_RecoverUnaryInterceptor(t *testing.T) {
+	response, err := recoverUnaryInterceptor(
+		context.Background(),
+		nil,
+		&grpc.UnaryServerInfo{FullMethod: "/A2L/Test"},
+		func(context.Context, interface{}) (interface{}, error) {
+			panic("test panic")
+		})
+
+	assert.Nil(t, response)
+	assert.Equal(t, codes.Internal, status.Code(err))
+	assert.Contains(t, err.Error(), "test panic")
+}
+
+func Test_RecoverStreamInterceptor(t *testing.T) {
+	err := recoverStreamInterceptor(
+		nil,
+		nil,
+		&grpc.StreamServerInfo{FullMethod: "/A2L/Test"},
+		func(interface{}, grpc.ServerStream) error {
+			panic("test panic")
+		})
+
+	assert.Equal(t, codes.Internal, status.Code(err))
+	assert.Contains(t, err.Error(), "test panic")
+}
 
 func Test_GetJSONFromTree(t *testing.T) {
 	type testCaseType struct {
