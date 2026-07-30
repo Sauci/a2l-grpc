@@ -195,7 +195,7 @@ jobs:
             *.dll
             *.h
   build-mac-intel:
-    runs-on: macos-13
+    runs-on: macos-15-intel
     needs:
       - test-mac
     steps:
