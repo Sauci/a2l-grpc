@@ -3,12 +3,15 @@ package main
 import (
 	"C"
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/antlr4-go/antlr/v4"
 	"github.com/sauci/a2l-grpc/pkg/a2l"
 	"github.com/sauci/a2l-grpc/pkg/a2l/parser"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 	"io"
@@ -61,6 +64,18 @@ func (l *A2LErrorListener) SyntaxError(_ antlr.Recognizer, _ interface{}, line, 
 
 func getTreeFromString(a2lString string) (result *a2l.RootNodeType, err error) {
 	errorListener := A2LErrorListener{Errors: make([]A2LSyntaxError, 0)}
+
+	defer func() {
+		if r := recover(); r != nil {
+			result = nil
+			if len(errorListener.Errors) != 0 {
+				err = fmt.Errorf("%v\n%v", strings.Join(errorListener.GetErrors(), "\n"), r)
+			} else {
+				err = fmt.Errorf("error while building A2L tree: %v", r)
+			}
+		}
+	}()
+
 	lexer := parser.NewA2LLexer(antlr.NewInputStream(a2lString))
 	lexer.RemoveErrorListeners()
 	lexer.AddErrorListener(&errorListener)
@@ -316,6 +331,26 @@ func GetJSONByteArrayFromA2LByteArray(a2lByteArray []byte) {
 	_ = a2lByteArray
 }
 
+func recoverUnaryInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = status.Errorf(codes.Internal, "%v: %v", info.FullMethod, r)
+		}
+	}()
+
+	return handler(ctx, req)
+}
+
+func recoverStreamInterceptor(srv interface{}, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = status.Errorf(codes.Internal, "%v: %v", info.FullMethod, r)
+		}
+	}()
+
+	return handler(srv, ss)
+}
+
 var serverMutex sync.Mutex
 
 var server *grpc.Server
@@ -336,7 +371,11 @@ func Create(port C.int, maxMsgSize C.int) (result C.int) {
 
 	if result == 0 {
 		if listener, err = net.Listen("tcp", fmt.Sprintf(":%v", port)); err == nil {
-			server = grpc.NewServer(grpc.MaxRecvMsgSize(int(maxMsgSize)), grpc.MaxSendMsgSize(int(maxMsgSize)))
+			server = grpc.NewServer(
+				grpc.MaxRecvMsgSize(int(maxMsgSize)),
+				grpc.MaxSendMsgSize(int(maxMsgSize)),
+				grpc.ChainUnaryInterceptor(recoverUnaryInterceptor),
+				grpc.ChainStreamInterceptor(recoverStreamInterceptor))
 
 			a2l.RegisterA2LServer(server, &grpcA2LImplType{chunkSize: int(maxMsgSize) - protocolSizeMargin})
 
