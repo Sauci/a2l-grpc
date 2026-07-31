@@ -732,8 +732,8 @@ func (n *Listener) ExitExtendedLimits(_ *parser.ExtendedLimitsContext) {
 
 func (n *Listener) EnterFixAxisParDist(ctx *parser.FixAxisParDistContext) {
 	n.Push(&FixAxisParDistType{
-		Offset:    a2lIntToIntType(ctx.GetOffset()),
-		Distance:  a2lIntToIntType(ctx.GetDistance()),
+		Offset:    floatToFloatType(ctx.GetOffset()),
+		Distance:  floatToFloatType(ctx.GetDistance()),
 		Numberapo: a2lIntToIntType(ctx.GetNumberapo()),
 	})
 }
@@ -762,8 +762,8 @@ func (n *Listener) ExitFixAxisParList(_ *parser.FixAxisParListContext) {
 
 func (n *Listener) EnterFixAxisPar(ctx *parser.FixAxisParContext) {
 	n.Push(&FixAxisParType{
-		Offset:    a2lIntToIntType(ctx.GetOffset()),
-		Shift:     a2lIntToIntType(ctx.GetShift()),
+		Offset:    floatToFloatType(ctx.GetOffset()),
+		Shift:     floatToFloatType(ctx.GetShift()),
 		Numberapo: a2lIntToIntType(ctx.GetNumberapo()),
 	})
 }
@@ -1960,6 +1960,333 @@ func (n *Listener) EnterVirtual(ctx *parser.VirtualContext) {
 }
 
 func (n *Listener) ExitVirtual(_ *parser.VirtualContext) {
+	node := n.Pop()
+
+	n.Last().MapChildNodes(node)
+}
+
+func (n *Listener) EnterNoAxisPts4(ctx *parser.NoAxisPts4Context) {
+	n.Push(&NoAxisPts4Type{
+		Position: a2lIntToIntType(ctx.GetPosition()),
+		DataType: &DataTypeType{Value: ctx.GetDatatype().GetText()},
+	})
+}
+
+func (n *Listener) ExitNoAxisPts4(_ *parser.NoAxisPts4Context) {
+	node := n.Pop()
+
+	n.Last().MapChildNodes(node)
+}
+
+func (n *Listener) EnterNoAxisPts5(ctx *parser.NoAxisPts5Context) {
+	n.Push(&NoAxisPts5Type{
+		Position: a2lIntToIntType(ctx.GetPosition()),
+		DataType: &DataTypeType{Value: ctx.GetDatatype().GetText()},
+	})
+}
+
+func (n *Listener) ExitNoAxisPts5(_ *parser.NoAxisPts5Context) {
+	node := n.Pop()
+
+	n.Last().MapChildNodes(node)
+}
+
+func (n *Listener) EnterNoRescale4(ctx *parser.NoRescale4Context) {
+	n.Push(&NoRescale4Type{
+		Position: a2lIntToIntType(ctx.GetPosition()),
+		DataType: &DataTypeType{Value: ctx.GetDatatype().GetText()},
+	})
+}
+
+func (n *Listener) ExitNoRescale4(_ *parser.NoRescale4Context) {
+	node := n.Pop()
+
+	n.Last().MapChildNodes(node)
+}
+
+func (n *Listener) EnterNoRescale5(ctx *parser.NoRescale5Context) {
+	n.Push(&NoRescale5Type{
+		Position: a2lIntToIntType(ctx.GetPosition()),
+		DataType: &DataTypeType{Value: ctx.GetDatatype().GetText()},
+	})
+}
+
+func (n *Listener) ExitNoRescale5(_ *parser.NoRescale5Context) {
+	node := n.Pop()
+
+	n.Last().MapChildNodes(node)
+}
+
+func (n *Listener) EnterSrcAddr4(ctx *parser.SrcAddr4Context) {
+	n.Push(&SrcAddr4Type{
+		Position: a2lIntToIntType(ctx.GetPosition()),
+		DataType: &DataTypeType{Value: ctx.GetDatatype().GetText()},
+	})
+}
+
+func (n *Listener) ExitSrcAddr4(_ *parser.SrcAddr4Context) {
+	node := n.Pop()
+
+	n.Last().MapChildNodes(node)
+}
+
+func (n *Listener) EnterSrcAddr5(ctx *parser.SrcAddr5Context) {
+	n.Push(&SrcAddr5Type{
+		Position: a2lIntToIntType(ctx.GetPosition()),
+		DataType: &DataTypeType{Value: ctx.GetDatatype().GetText()},
+	})
+}
+
+func (n *Listener) ExitSrcAddr5(_ *parser.SrcAddr5Context) {
+	node := n.Pop()
+
+	n.Last().MapChildNodes(node)
+}
+
+func (n *Listener) EnterRipAddr4(ctx *parser.RipAddr4Context) {
+	n.Push(&RipAddr4Type{
+		Position: a2lIntToIntType(ctx.GetPosition()),
+		DataType: &DataTypeType{Value: ctx.GetDatatype().GetText()},
+	})
+}
+
+func (n *Listener) ExitRipAddr4(_ *parser.RipAddr4Context) {
+	node := n.Pop()
+
+	n.Last().MapChildNodes(node)
+}
+
+func (n *Listener) EnterRipAddr5(ctx *parser.RipAddr5Context) {
+	n.Push(&RipAddr5Type{
+		Position: a2lIntToIntType(ctx.GetPosition()),
+		DataType: &DataTypeType{Value: ctx.GetDatatype().GetText()},
+	})
+}
+
+func (n *Listener) ExitRipAddr5(_ *parser.RipAddr5Context) {
+	node := n.Pop()
+
+	n.Last().MapChildNodes(node)
+}
+
+func (n *Listener) EnterShiftOp4(ctx *parser.ShiftOp4Context) {
+	n.Push(&ShiftOp4Type{
+		Position: a2lIntToIntType(ctx.GetPosition()),
+		DataType: &DataTypeType{Value: ctx.GetDatatype().GetText()},
+	})
+}
+
+func (n *Listener) ExitShiftOp4(_ *parser.ShiftOp4Context) {
+	node := n.Pop()
+
+	n.Last().MapChildNodes(node)
+}
+
+func (n *Listener) EnterShiftOp5(ctx *parser.ShiftOp5Context) {
+	n.Push(&ShiftOp5Type{
+		Position: a2lIntToIntType(ctx.GetPosition()),
+		DataType: &DataTypeType{Value: ctx.GetDatatype().GetText()},
+	})
+}
+
+func (n *Listener) ExitShiftOp5(_ *parser.ShiftOp5Context) {
+	node := n.Pop()
+
+	n.Last().MapChildNodes(node)
+}
+
+func (n *Listener) EnterOffset4(ctx *parser.Offset4Context) {
+	n.Push(&Offset4Type{
+		Position: a2lIntToIntType(ctx.GetPosition()),
+		DataType: &DataTypeType{Value: ctx.GetDatatype().GetText()},
+	})
+}
+
+func (n *Listener) ExitOffset4(_ *parser.Offset4Context) {
+	node := n.Pop()
+
+	n.Last().MapChildNodes(node)
+}
+
+func (n *Listener) EnterOffset5(ctx *parser.Offset5Context) {
+	n.Push(&Offset5Type{
+		Position: a2lIntToIntType(ctx.GetPosition()),
+		DataType: &DataTypeType{Value: ctx.GetDatatype().GetText()},
+	})
+}
+
+func (n *Listener) ExitOffset5(_ *parser.Offset5Context) {
+	node := n.Pop()
+
+	n.Last().MapChildNodes(node)
+}
+
+func (n *Listener) EnterDistOp4(ctx *parser.DistOp4Context) {
+	n.Push(&DistOp4Type{
+		Position: a2lIntToIntType(ctx.GetPosition()),
+		DataType: &DataTypeType{Value: ctx.GetDatatype().GetText()},
+	})
+}
+
+func (n *Listener) ExitDistOp4(_ *parser.DistOp4Context) {
+	node := n.Pop()
+
+	n.Last().MapChildNodes(node)
+}
+
+func (n *Listener) EnterDistOp5(ctx *parser.DistOp5Context) {
+	n.Push(&DistOp5Type{
+		Position: a2lIntToIntType(ctx.GetPosition()),
+		DataType: &DataTypeType{Value: ctx.GetDatatype().GetText()},
+	})
+}
+
+func (n *Listener) ExitDistOp5(_ *parser.DistOp5Context) {
+	node := n.Pop()
+
+	n.Last().MapChildNodes(node)
+}
+
+func (n *Listener) EnterAxisPts4(ctx *parser.AxisPts4Context) {
+	n.Push(&AxisPts4Type{
+		Position:   a2lIntToIntType(ctx.GetPosition()),
+		DataType:   &DataTypeType{Value: ctx.GetDatatype().GetText()},
+		IndexIncr:  &IndexOrderType{Value: ctx.GetIndexIncr().GetText()},
+		Addressing: &AddrTypeType{Value: ctx.GetAddressing().GetText()},
+	})
+}
+
+func (n *Listener) ExitAxisPts4(_ *parser.AxisPts4Context) {
+	node := n.Pop()
+
+	n.Last().MapChildNodes(node)
+}
+
+func (n *Listener) EnterAxisPts5(ctx *parser.AxisPts5Context) {
+	n.Push(&AxisPts5Type{
+		Position:   a2lIntToIntType(ctx.GetPosition()),
+		DataType:   &DataTypeType{Value: ctx.GetDatatype().GetText()},
+		IndexIncr:  &IndexOrderType{Value: ctx.GetIndexIncr().GetText()},
+		Addressing: &AddrTypeType{Value: ctx.GetAddressing().GetText()},
+	})
+}
+
+func (n *Listener) ExitAxisPts5(_ *parser.AxisPts5Context) {
+	node := n.Pop()
+
+	n.Last().MapChildNodes(node)
+}
+
+func (n *Listener) EnterAxisRescale4(ctx *parser.AxisRescale4Context) {
+	n.Push(&AxisRescale4Type{
+		Position:                a2lIntToIntType(ctx.GetPosition()),
+		DataType:                &DataTypeType{Value: ctx.GetDatatype().GetText()},
+		MaxNumberOfRescalePairs: a2lIntToIntType(ctx.GetMaxNumberOfRescalePairs()),
+		IndexIncr:               &IndexOrderType{Value: ctx.GetIndexIncr().GetText()},
+		Addressing:              &AddrTypeType{Value: ctx.GetAddressing().GetText()},
+	})
+}
+
+func (n *Listener) ExitAxisRescale4(_ *parser.AxisRescale4Context) {
+	node := n.Pop()
+
+	n.Last().MapChildNodes(node)
+}
+
+func (n *Listener) EnterAxisRescale5(ctx *parser.AxisRescale5Context) {
+	n.Push(&AxisRescale5Type{
+		Position:                a2lIntToIntType(ctx.GetPosition()),
+		DataType:                &DataTypeType{Value: ctx.GetDatatype().GetText()},
+		MaxNumberOfRescalePairs: a2lIntToIntType(ctx.GetMaxNumberOfRescalePairs()),
+		IndexIncr:               &IndexOrderType{Value: ctx.GetIndexIncr().GetText()},
+		Addressing:              &AddrTypeType{Value: ctx.GetAddressing().GetText()},
+	})
+}
+
+func (n *Listener) ExitAxisRescale5(_ *parser.AxisRescale5Context) {
+	node := n.Pop()
+
+	n.Last().MapChildNodes(node)
+}
+
+func (n *Listener) EnterFixNoAxisPts4(ctx *parser.FixNoAxisPts4Context) {
+	n.Push(&FixNoAxisPts4Type{NumberOfAxisPoints: a2lIntToIntType(ctx.GetNumberOfAxisPoints())})
+}
+
+func (n *Listener) ExitFixNoAxisPts4(_ *parser.FixNoAxisPts4Context) {
+	node := n.Pop()
+
+	n.Last().MapChildNodes(node)
+}
+
+func (n *Listener) EnterFixNoAxisPts5(ctx *parser.FixNoAxisPts5Context) {
+	n.Push(&FixNoAxisPts5Type{NumberOfAxisPoints: a2lIntToIntType(ctx.GetNumberOfAxisPoints())})
+}
+
+func (n *Listener) ExitFixNoAxisPts5(_ *parser.FixNoAxisPts5Context) {
+	node := n.Pop()
+
+	n.Last().MapChildNodes(node)
+}
+
+func (n *Listener) EnterAlignmentInt64(ctx *parser.AlignmentInt64Context) {
+	n.Push(&AlignmentInt64Type{AlignmentBorder: a2lIntToIntType(ctx.GetAlignmentBorder())})
+}
+
+func (n *Listener) ExitAlignmentInt64(_ *parser.AlignmentInt64Context) {
+	node := n.Pop()
+
+	n.Last().MapChildNodes(node)
+}
+
+func (n *Listener) EnterStaticRecordLayout(ctx *parser.StaticRecordLayoutContext) {
+	n.Push(&StaticRecordLayoutType{Present: true})
+}
+
+func (n *Listener) ExitStaticRecordLayout(_ *parser.StaticRecordLayoutContext) {
+	node := n.Pop()
+
+	n.Last().MapChildNodes(node)
+}
+
+func (n *Listener) EnterStatusStringRef(ctx *parser.StatusStringRefContext) {
+	n.Push(&StatusStringRefType{ConversionTable: identifierToIdentType(ctx.GetConversionTable())})
+}
+
+func (n *Listener) ExitStatusStringRef(_ *parser.StatusStringRefContext) {
+	node := n.Pop()
+
+	n.Last().MapChildNodes(node)
+}
+
+func (n *Listener) EnterCoeffsLinear(ctx *parser.CoeffsLinearContext) {
+	n.Push(&CoeffsLinearType{
+		A: floatToFloatType(ctx.GetA()),
+		B: floatToFloatType(ctx.GetB()),
+	})
+}
+
+func (n *Listener) ExitCoeffsLinear(_ *parser.CoeffsLinearContext) {
+	node := n.Pop()
+
+	n.Last().MapChildNodes(node)
+}
+
+func (n *Listener) EnterDefaultValueNumeric(ctx *parser.DefaultValueNumericContext) {
+	n.Push(&DefaultValueNumericType{DisplayValue: floatToFloatType(ctx.GetDisplay_value())})
+}
+
+func (n *Listener) ExitDefaultValueNumeric(_ *parser.DefaultValueNumericContext) {
+	node := n.Pop()
+
+	n.Last().MapChildNodes(node)
+}
+
+func (n *Listener) EnterCalibrationHandleText(ctx *parser.CalibrationHandleTextContext) {
+	n.Push(&CalibrationHandleTextType{Text: a2lStringToStringType(ctx.GetText_())})
+}
+
+func (n *Listener) ExitCalibrationHandleText(_ *parser.CalibrationHandleTextContext) {
 	node := n.Pop()
 
 	n.Last().MapChildNodes(node)

@@ -6,9 +6,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/antlr4-go/antlr/v4"
 	"github.com/sauci/a2l-grpc/pkg/a2l"
-	"github.com/sauci/a2l-grpc/pkg/a2l/parser"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -16,7 +14,6 @@ import (
 	"google.golang.org/protobuf/proto"
 	"io"
 	"net"
-	"strings"
 	"sync"
 )
 
@@ -34,66 +31,8 @@ func chunkifyBySize(data []byte, chunkSize int) [][]byte {
 	return chunks
 }
 
-type A2LSyntaxError struct {
-	line, column int
-	msg          string
-}
-
-func (e A2LSyntaxError) String() string {
-	return fmt.Sprintf("%v:%v %v", e.line, e.column, e.msg)
-}
-
-type A2LErrorListener struct {
-	*antlr.DefaultErrorListener // Embed default which ensures we fit the interface
-	Errors                      []A2LSyntaxError
-}
-
-func (l *A2LErrorListener) GetErrors() (result []string) {
-	result = make([]string, 0)
-
-	for _, e := range l.Errors {
-		result = append(result, e.String())
-	}
-
-	return result
-}
-
-func (l *A2LErrorListener) SyntaxError(_ antlr.Recognizer, _ interface{}, line, column int, msg string, _ antlr.RecognitionException) {
-	l.Errors = append(l.Errors, A2LSyntaxError{line: line, column: column, msg: msg})
-}
-
 func getTreeFromString(a2lString string) (result *a2l.RootNodeType, err error) {
-	errorListener := A2LErrorListener{Errors: make([]A2LSyntaxError, 0)}
-
-	defer func() {
-		if r := recover(); r != nil {
-			result = nil
-			if len(errorListener.Errors) != 0 {
-				err = fmt.Errorf("%v\n%v", strings.Join(errorListener.GetErrors(), "\n"), r)
-			} else {
-				err = fmt.Errorf("error while building A2L tree: %v", r)
-			}
-		}
-	}()
-
-	lexer := parser.NewA2LLexer(antlr.NewInputStream(a2lString))
-	lexer.RemoveErrorListeners()
-	lexer.AddErrorListener(&errorListener)
-	tokenStream := antlr.NewCommonTokenStream(lexer, 0)
-	p := parser.NewA2LParser(tokenStream)
-	p.RemoveErrorListeners()
-	p.AddErrorListener(&errorListener)
-	p.BuildParseTrees = true
-
-	listener := a2l.NewListener()
-
-	antlr.ParseTreeWalkerDefault.Walk(listener, p.A2lFile())
-
-	if len(errorListener.Errors) != 0 {
-		err = fmt.Errorf(strings.Join(errorListener.GetErrors(), "\n"))
-	}
-
-	return listener.Tree(), err
+	return a2l.GetTreeFromString(a2lString)
 }
 
 type grpcA2LImplType struct {
@@ -110,6 +49,9 @@ func (s *grpcA2LImplType) GetTreeFromA2L(stream a2l.A2L_GetTreeFromA2LServer) er
 	var request *a2l.TreeFromA2LRequest
 	tree := &a2l.RootNodeType{}
 	response := &a2l.TreeResponse{}
+	options := a2l.ParseOptions{}
+	// Note: optionsParsed := false avoid to parse option for each chunk
+	optionsParsed := false
 
 	for {
 		request, err = stream.Recv()
@@ -119,17 +61,33 @@ func (s *grpcA2LImplType) GetTreeFromA2L(stream a2l.A2L_GetTreeFromA2LServer) er
 			}
 			break
 		}
+		if !optionsParsed {
+			if request.EnforceVersionCheck != nil {
+				options.EnforceVersionCheck = *request.EnforceVersionCheck
+			}
+			optionsParsed = true
+		}
 		buffer.Write(request.A2L)
 	}
 
 	if err == nil {
-		if tree, parseError = getTreeFromString(buffer.String()); parseError == nil {
+		var warnings []a2l.SyntaxError
+
+		tree, warnings, parseError = a2l.GetTreeFromStringWithOptions(buffer.String(), options)
+
+		// warnings are attached to the first response of the stream
+		for _, warning := range warnings {
+			response.Warnings = append(response.Warnings, warning.String())
+		}
+
+		if parseError == nil {
 			if serializedTree, err = proto.Marshal(tree); err == nil {
 				for _, chunk = range chunkifyBySize(serializedTree, s.chunkSize) {
 					response.SerializedTreeChunk = chunk
 					if err = stream.Send(response); err != nil {
 						break
 					}
+					response.Warnings = nil
 				}
 			} else {
 				response.Error = proto.String(fmt.Sprintf("An error occured during serialization of Tree: %v", err))

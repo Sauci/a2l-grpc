@@ -103,59 +103,21 @@ func numericToLongType(integerValue parser.INumericValueContext) (result *LongTy
 	return result
 }
 
-func floatToFloatType(integerValue parser.INumericValueContext) (result *FloatType) {
+// floatTextContext is the smallest surface of a parser context needed to convert a float value; it
+// is satisfied by both parser.IFloatValueContext and parser.INumericValueContext.
+type floatTextContext interface {
+	GetText() string
+}
+
+func floatToFloatType(integerValue floatTextContext) (result *FloatType) {
 	var err error
 	var tmpResult float64
-	var split []string
-	var integralSign string
-	var exponentSign string
 
 	if integerValue != nil {
-		result = &FloatType{}
+		rawString := integerValue.GetText()
 
-		processedString := integerValue.GetText()
-		originalString := integerValue.GetText()
-
-		if strings.HasPrefix(processedString, "+") {
-			integralSign = "+"
-			result.IntegralSign = &integralSign
-			processedString = strings.TrimLeft(processedString, "+")
-		} else if strings.HasPrefix(processedString, "-") {
-			integralSign = "-"
-			result.IntegralSign = &integralSign
-			processedString = strings.TrimLeft(processedString, "-")
-		}
-
-		if strings.Contains(processedString, ".") {
-			split = strings.Split(processedString, ".")
-			result.IntegralSize = uint32(len(split[0]))
-
-			if len(split) > 1 {
-				decimalString := split[1]
-				if strings.Contains(decimalString, "e") {
-					split = strings.Split(decimalString, "e")
-					result.DecimalSize = uint32(len(split[0]))
-					exponentString := split[1]
-
-					if strings.HasPrefix(exponentString, "+") {
-						exponentSign = "+"
-						result.ExponentSign = &exponentSign
-						exponentString = strings.TrimLeft(exponentString, "+")
-					} else if strings.HasPrefix(exponentString, "-") {
-						exponentSign = "-"
-						result.ExponentSign = &exponentSign
-						exponentString = strings.TrimLeft(exponentString, "-")
-					}
-
-					result.ExponentSize = uint32(len(exponentString))
-				} else {
-					result.DecimalSize = uint32(len(split[1]))
-				}
-			}
-		}
-
-		if tmpResult, err = strconv.ParseFloat(originalString, 64); err == nil {
-			result.Value = tmpResult
+		if tmpResult, err = strconv.ParseFloat(rawString, 64); err == nil {
+			result = &FloatType{Value: tmpResult, Source: rawString}
 		} else {
 			panic(err)
 		}

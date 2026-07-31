@@ -132,7 +132,8 @@ message AxisPtsType {
   optional EcuAddressExtensionType ECU_ADDRESS_EXTENSION = 23 [json_name = "ECU_ADDRESS_EXTENSION"];
   optional PhysUnitType PHYS_UNIT = 24 [json_name = "PHYS_UNIT"];
   optional StepSizeType STEP_SIZE = 25 [json_name = "STEP_SIZE"];
-  optional SymbolLinkType SYMBOL_LINK = 26 [json_name = 'SYMBOL_LINK'];
+  optional SymbolLinkType SYMBOL_LINK = 26 [json_name = "SYMBOL_LINK"];
+  optional MonotonyType MONOTONY = 27 [json_name = "MONOTONY"];
 }
 
 message AxisPtsXType {
@@ -150,6 +151,20 @@ message AxisPtsYType {
 }
 
 message AxisPtsZType {
+  IntType Position = 1 [json_name = "Position"];
+  DataTypeType DataType = 2 [json_name = "DataType"];
+  IndexOrderType IndexIncr = 3 [json_name = "IndexIncr"];
+  AddrTypeType Addressing = 4 [json_name = "Addressing"];
+}
+
+message AxisPts4Type {
+  IntType Position = 1 [json_name = "Position"];
+  DataTypeType DataType = 2 [json_name = "DataType"];
+  IndexOrderType IndexIncr = 3 [json_name = "IndexIncr"];
+  AddrTypeType Addressing = 4 [json_name = "Addressing"];
+}
+
+message AxisPts5Type {
   IntType Position = 1 [json_name = "Position"];
   DataTypeType DataType = 2 [json_name = "DataType"];
   IndexOrderType IndexIncr = 3 [json_name = "IndexIncr"];
@@ -180,6 +195,22 @@ message AxisRescaleZType {
   AddrTypeType Addressing = 5 [json_name = "Addressing"];
 }
 
+message AxisRescale4Type {
+  IntType Position = 1 [json_name = "Position"];
+  DataTypeType DataType = 2 [json_name = "DataType"];
+  IntType MaxNumberOfRescalePairs = 3 [json_name = "MaxNumberOfRescalePairs"];
+  IndexOrderType IndexIncr = 4 [json_name = "IndexIncr"];
+  AddrTypeType Addressing = 5 [json_name = "Addressing"];
+}
+
+message AxisRescale5Type {
+  IntType Position = 1 [json_name = "Position"];
+  DataTypeType DataType = 2 [json_name = "DataType"];
+  IntType MaxNumberOfRescalePairs = 3 [json_name = "MaxNumberOfRescalePairs"];
+  IndexOrderType IndexIncr = 4 [json_name = "IndexIncr"];
+  AddrTypeType Addressing = 5 [json_name = "Addressing"];
+}
+
 message BitOperationType {
   optional LeftShiftType LEFT_SHIFT = 1 [json_name = "LEFT_SHIFT"];
   optional RightShiftType RIGHT_SHIFT = 2 [json_name = "RIGHT_SHIFT"];
@@ -200,6 +231,11 @@ message CalibrationAccessType {
 
 message CalibrationHandleType {
   repeated LongType Handle = 1 [json_name = "Handle"];
+  optional CalibrationHandleTextType CALIBRATION_HANDLE_TEXT = 2 [json_name = "CALIBRATION_HANDLE_TEXT"];
+}
+
+message CalibrationHandleTextType {
+  StringType Text = 1 [json_name = "Text"];
 }
 
 message CalibrationMethodType {
@@ -274,6 +310,7 @@ message CompuMethodType {
   optional CoeffsLinearType COEFFS_LINEAR = 8 [json_name = "COEFFS_LINEAR"];
   optional CompuTabRefType COMPU_TAB_REF = 9 [json_name = "COMPU_TAB_REF"];
   optional RefUnitType REF_UNIT = 10 [json_name = "REF_UNIT"];
+  optional StatusStringRefType STATUS_STRING_REF = 11 [json_name = "STATUS_STRING_REF"];
 }
 
 message CompuTabRefType {
@@ -291,6 +328,7 @@ message CompuTabType {
   IntType NumberValuePairs = 4 [json_name = "NumberValuePairs"];
   repeated InValOutValType InValOutVal = 5 [json_name = "InValOutVal"];
   optional DefaultValueType DEFAULT_VALUE = 6 [json_name = "DEFAULT_VALUE"];
+  optional DefaultValueNumericType DEFAULT_VALUE_NUMERIC = 7 [json_name = "DEFAULT_VALUE_NUMERIC"];
 }
 
 message CompuVTabRangeType {
@@ -379,6 +417,16 @@ message DistOpZType {
   DataTypeType DataType = 2 [json_name = "DataType"];
 }
 
+message DistOp4Type {
+  IntType Position = 1 [json_name = "Position"];
+  DataTypeType DataType = 2 [json_name = "DataType"];
+}
+
+message DistOp5Type {
+  IntType Position = 1 [json_name = "Position"];
+  DataTypeType DataType = 2 [json_name = "DataType"];
+}
+
 message EcuAddressExtensionType {
   IntType Extension = 1 [json_name = "Extension"];
 }
@@ -409,8 +457,8 @@ message ExtendedLimitsType {
 }
 
 message FixAxisParDistType {
-  IntType Offset = 1 [json_name = "Offset"];
-  IntType Distance = 2 [json_name = "Distance"];
+  FloatType Offset = 1 [json_name = "Offset"];
+  FloatType Distance = 2 [json_name = "Distance"];
   IntType Numberapo = 3 [json_name = "Numberapo"];
 }
 
@@ -419,8 +467,8 @@ message FixAxisParListType {
 }
 
 message FixAxisParType {
-  IntType Offset = 1 [json_name = "Offset"];
-  IntType Shift = 2 [json_name = "Shift"];
+  FloatType Offset = 1 [json_name = "Offset"];
+  FloatType Shift = 2 [json_name = "Shift"];
   IntType Numberapo = 3 [json_name = "Numberapo"];
 }
 
@@ -433,6 +481,14 @@ message FixNoAxisPtsYType {
 }
 
 message FixNoAxisPtsZType {
+  IntType NumberOfAxisPoints = 1 [json_name = "NumberOfAxisPoints"];
+}
+
+message FixNoAxisPts4Type {
+  IntType NumberOfAxisPoints = 1 [json_name = "NumberOfAxisPoints"];
+}
+
+message FixNoAxisPts5Type {
   IntType NumberOfAxisPoints = 1 [json_name = "NumberOfAxisPoints"];
 }
 
@@ -484,6 +540,7 @@ message FunctionType {
   optional LocMeasurementType LOC_MEASUREMENT = 8 [json_name = "LOC_MEASUREMENT"];
   optional SubFunctionType SUB_FUNCTION = 9 [json_name = "SUB_FUNCTION"];
   optional FunctionVersionType FUNCTION_VERSION = 10 [json_name = "FUNCTION_VERSION"];
+  repeated IfDataType IF_DATA = 11 [json_name = "IF_DATA"];
 }
 
 message FunctionVersionType {
@@ -499,6 +556,7 @@ message GroupType {
   optional RefMeasurementType REF_MEASUREMENT = 6 [json_name = "REF_MEASUREMENT"];
   optional FunctionListType FUNCTION_LIST = 7 [json_name = "FUNCTION_LIST"];
   optional SubGroupType SUB_GROUP = 8 [json_name = "SUB_GROUP"];
+  repeated IfDataType IF_DATA = 9 [json_name = "IF_DATA"];
 }
 
 message GuardRailsType {
@@ -614,6 +672,7 @@ message ModCommonType {
   optional AlignmentLongType ALIGNMENT_LONG = 8 [json_name = "ALIGNMENT_LONG"];
   optional AlignmentFloat32IeeeType ALIGNMENT_FLOAT32_IEEE = 9 [json_name = "ALIGNMENT_FLOAT32_IEEE"];
   optional AlignmentFloat64IeeeType ALIGNMENT_FLOAT64_IEEE = 10 [json_name = "ALIGNMENT_FLOAT64_IEEE"];
+  optional AlignmentInt64Type ALIGNMENT_INT64 = 11 [json_name = "ALIGNMENT_INT64"];
 }
 
 message ModParType {
@@ -678,6 +737,16 @@ message NoAxisPtsZType {
   DataTypeType DataType = 2 [json_name = "DataType"];
 }
 
+message NoAxisPts4Type {
+  IntType Position = 1 [json_name = "Position"];
+  DataTypeType DataType = 2 [json_name = "DataType"];
+}
+
+message NoAxisPts5Type {
+  IntType Position = 1 [json_name = "Position"];
+  DataTypeType DataType = 2 [json_name = "DataType"];
+}
+
 message NoOfInterfacesType {
   IntType Num = 1 [json_name = "Num"];
 }
@@ -697,6 +766,16 @@ message NoRescaleZType {
   DataTypeType DataType = 2 [json_name = "DataType"];
 }
 
+message NoRescale4Type {
+  IntType Position = 1 [json_name = "Position"];
+  DataTypeType DataType = 2 [json_name = "DataType"];
+}
+
+message NoRescale5Type {
+  IntType Position = 1 [json_name = "Position"];
+  DataTypeType DataType = 2 [json_name = "DataType"];
+}
+
 message NumberType {
   IntType Number = 1 [json_name = "Number"];
 }
@@ -712,6 +791,16 @@ message OffsetYType {
 }
 
 message OffsetZType {
+  IntType Position = 1 [json_name = "Position"];
+  DataTypeType DataType = 2 [json_name = "DataType"];
+}
+
+message Offset4Type {
+  IntType Position = 1 [json_name = "Position"];
+  DataTypeType DataType = 2 [json_name = "DataType"];
+}
+
+message Offset5Type {
   IntType Position = 1 [json_name = "Position"];
   DataTypeType DataType = 2 [json_name = "DataType"];
 }
@@ -754,40 +843,62 @@ message RecordLayoutType {
   optional AxisPtsXType AXIS_PTS_X = 4 [json_name = "AXIS_PTS_X"];
   optional AxisPtsYType AXIS_PTS_Y = 5 [json_name = "AXIS_PTS_Y"];
   optional AxisPtsZType AXIS_PTS_Z = 6 [json_name = "AXIS_PTS_Z"];
-  optional AxisRescaleXType AXIS_RESCALE_X = 7 [json_name = "AXIS_RESCALE_X"];
-  optional AxisRescaleYType AXIS_RESCALE_Y = 8 [json_name = "AXIS_RESCALE_Y"];
-  optional AxisRescaleZType AXIS_RESCALE_Z = 9 [json_name = "AXIS_RESCALE_Z"];
-  optional NoAxisPtsXType NO_AXIS_PTS_X = 10 [json_name = "NO_AXIS_PTS_X"];
-  optional NoAxisPtsYType NO_AXIS_PTS_Y = 11 [json_name = "NO_AXIS_PTS_Y"];
-  optional NoAxisPtsZType NO_AXIS_PTS_Z = 12 [json_name = "NO_AXIS_PTS_Z"];
-  optional NoRescaleXType NO_RESCALE_X = 13 [json_name = "NO_RESCALE_X"];
-  optional NoRescaleYType NO_RESCALE_Y = 14 [json_name = "NO_RESCALE_Y"];
-  optional NoRescaleZType NO_RESCALE_Z = 15 [json_name = "NO_RESCALE_Z"];
-  optional FixNoAxisPtsXType FIX_NO_AXIS_PTS_X = 16 [json_name = "FIX_NO_AXIS_PTS_X"];
-  optional FixNoAxisPtsYType FIX_NO_AXIS_PTS_Y = 17 [json_name = "FIX_NO_AXIS_PTS_Y"];
-  optional FixNoAxisPtsZType FIX_NO_AXIS_PTS_Z = 18 [json_name = "FIX_NO_AXIS_PTS_Z"];
-  optional SrcAddrXType SRC_ADDR_X = 19 [json_name = "SRC_ADDR_X"];
-  optional SrcAddrYType SRC_ADDR_Y = 20 [json_name = "SRC_ADDR_Y"];
-  optional SrcAddrZType SRC_ADDR_Z = 21 [json_name = "SRC_ADDR_Z"];
-  optional RipAddrXType RIP_ADDR_X = 22 [json_name = "RIP_ADDR_X"];
-  optional RipAddrYType RIP_ADDR_Y = 23 [json_name = "RIP_ADDR_Y"];
-  optional RipAddrZType RIP_ADDR_Z = 24 [json_name = "RIP_ADDR_Z"];
-  optional RipAddrWType RIP_ADDR_W = 25 [json_name = "RIP_ADDR_W"];
-  optional ShiftOpXType SHIFT_OP_X = 26 [json_name = "SHIFT_OP_X"];
-  optional ShiftOpYType SHIFT_OP_Y = 27 [json_name = "SHIFT_OP_Y"];
-  optional ShiftOpZType SHIFT_OP_Z = 28 [json_name = "SHIFT_OP_Z"];
-  optional OffsetXType OFFSET_X = 29 [json_name = "OFFSET_X"];
-  optional OffsetYType OFFSET_Y = 30 [json_name = "OFFSET_Y"];
-  optional OffsetZType OFFSET_Z = 31 [json_name = "OFFSET_Z"];
-  optional DistOpXType DIST_OP_X = 32 [json_name = "DIST_OP_X"];
-  optional DistOpYType DIST_OP_Y = 33 [json_name = "DIST_OP_Y"];
-  optional DistOpZType DIST_OP_Z = 34 [json_name = "DIST_OP_Z"];
-  optional AlignmentByteType ALIGNMENT_BYTE = 35 [json_name = "ALIGNMENT_BYTE"];
-  optional AlignmentWordType ALIGNMENT_WORD = 36 [json_name = "ALIGNMENT_WORD"];
-  optional AlignmentLongType ALIGNMENT_LONG = 37 [json_name = "ALIGNMENT_LONG"];
-  optional AlignmentFloat32IeeeType ALIGNMENT_FLOAT32_IEEE = 38 [json_name = "ALIGNMENT_FLOAT32_IEEE"];
-  optional AlignmentFloat64IeeeType ALIGNMENT_FLOAT64_IEEE = 39 [json_name = "ALIGNMENT_FLOAT64_IEEE"];
-  repeated ReservedType RESERVED = 40 [json_name = "RESERVED"];
+  optional AxisPts4Type AXIS_PTS_4 = 7 [json_name = "AXIS_PTS_4"];
+  optional AxisPts5Type AXIS_PTS_5 = 8 [json_name = "AXIS_PTS_5"];
+  optional AxisRescaleXType AXIS_RESCALE_X = 9 [json_name = "AXIS_RESCALE_X"];
+  optional AxisRescaleYType AXIS_RESCALE_Y = 10 [json_name = "AXIS_RESCALE_Y"];
+  optional AxisRescaleZType AXIS_RESCALE_Z = 11 [json_name = "AXIS_RESCALE_Z"];
+  optional AxisRescale4Type AXIS_RESCALE_4 = 12 [json_name = "AXIS_RESCALE_4"];
+  optional AxisRescale5Type AXIS_RESCALE_5 = 13 [json_name = "AXIS_RESCALE_5"];
+  optional NoAxisPtsXType NO_AXIS_PTS_X = 14 [json_name = "NO_AXIS_PTS_X"];
+  optional NoAxisPtsYType NO_AXIS_PTS_Y = 15 [json_name = "NO_AXIS_PTS_Y"];
+  optional NoAxisPtsZType NO_AXIS_PTS_Z = 16 [json_name = "NO_AXIS_PTS_Z"];
+  optional NoAxisPts4Type NO_AXIS_PTS_4 = 17 [json_name = "NO_AXIS_PTS_4"];
+  optional NoAxisPts5Type NO_AXIS_PTS_5 = 18 [json_name = "NO_AXIS_PTS_5"];
+  optional NoRescaleXType NO_RESCALE_X = 19 [json_name = "NO_RESCALE_X"];
+  optional NoRescaleYType NO_RESCALE_Y = 20 [json_name = "NO_RESCALE_Y"];
+  optional NoRescaleZType NO_RESCALE_Z = 21 [json_name = "NO_RESCALE_Z"];
+  optional NoRescale4Type NO_RESCALE_4 = 22 [json_name = "NO_RESCALE_4"];
+  optional NoRescale5Type NO_RESCALE_5 = 23 [json_name = "NO_RESCALE_5"];
+  optional FixNoAxisPtsXType FIX_NO_AXIS_PTS_X = 24 [json_name = "FIX_NO_AXIS_PTS_X"];
+  optional FixNoAxisPtsYType FIX_NO_AXIS_PTS_Y = 25 [json_name = "FIX_NO_AXIS_PTS_Y"];
+  optional FixNoAxisPtsZType FIX_NO_AXIS_PTS_Z = 26 [json_name = "FIX_NO_AXIS_PTS_Z"];
+  optional FixNoAxisPts4Type FIX_NO_AXIS_PTS_4 = 27 [json_name = "FIX_NO_AXIS_PTS_4"];
+  optional FixNoAxisPts5Type FIX_NO_AXIS_PTS_5 = 28 [json_name = "FIX_NO_AXIS_PTS_5"];
+  optional SrcAddrXType SRC_ADDR_X = 29 [json_name = "SRC_ADDR_X"];
+  optional SrcAddrYType SRC_ADDR_Y = 30 [json_name = "SRC_ADDR_Y"];
+  optional SrcAddrZType SRC_ADDR_Z = 31 [json_name = "SRC_ADDR_Z"];
+  optional SrcAddr4Type SRC_ADDR_4 = 32 [json_name = "SRC_ADDR_4"];
+  optional SrcAddr5Type SRC_ADDR_5 = 33 [json_name = "SRC_ADDR_5"];
+  optional RipAddrXType RIP_ADDR_X = 34 [json_name = "RIP_ADDR_X"];
+  optional RipAddrYType RIP_ADDR_Y = 35 [json_name = "RIP_ADDR_Y"];
+  optional RipAddrZType RIP_ADDR_Z = 36 [json_name = "RIP_ADDR_Z"];
+  optional RipAddrWType RIP_ADDR_W = 37 [json_name = "RIP_ADDR_W"];
+  optional RipAddr4Type RIP_ADDR_4 = 38 [json_name = "RIP_ADDR_4"];
+  optional RipAddr5Type RIP_ADDR_5 = 39 [json_name = "RIP_ADDR_5"];
+  optional ShiftOpXType SHIFT_OP_X = 40 [json_name = "SHIFT_OP_X"];
+  optional ShiftOpYType SHIFT_OP_Y = 41 [json_name = "SHIFT_OP_Y"];
+  optional ShiftOpZType SHIFT_OP_Z = 42 [json_name = "SHIFT_OP_Z"];
+  optional ShiftOp4Type SHIFT_OP_4 = 43 [json_name = "SHIFT_OP_4"];
+  optional ShiftOp5Type SHIFT_OP_5 = 44 [json_name = "SHIFT_OP_5"];
+  optional OffsetXType OFFSET_X = 45 [json_name = "OFFSET_X"];
+  optional OffsetYType OFFSET_Y = 46 [json_name = "OFFSET_Y"];
+  optional OffsetZType OFFSET_Z = 47 [json_name = "OFFSET_Z"];
+  optional Offset4Type OFFSET_4 = 48 [json_name = "OFFSET_4"];
+  optional Offset5Type OFFSET_5 = 49 [json_name = "OFFSET_5"];
+  optional DistOpXType DIST_OP_X = 50 [json_name = "DIST_OP_X"];
+  optional DistOpYType DIST_OP_Y = 51 [json_name = "DIST_OP_Y"];
+  optional DistOpZType DIST_OP_Z = 52 [json_name = "DIST_OP_Z"];
+  optional DistOp4Type DIST_OP_4 = 53 [json_name = "DIST_OP_4"];
+  optional DistOp5Type DIST_OP_5 = 54 [json_name = "DIST_OP_5"];
+  optional AlignmentByteType ALIGNMENT_BYTE = 55 [json_name = "ALIGNMENT_BYTE"];
+  optional AlignmentWordType ALIGNMENT_WORD = 56 [json_name = "ALIGNMENT_WORD"];
+  optional AlignmentLongType ALIGNMENT_LONG = 57 [json_name = "ALIGNMENT_LONG"];
+  optional AlignmentFloat32IeeeType ALIGNMENT_FLOAT32_IEEE = 58 [json_name = "ALIGNMENT_FLOAT32_IEEE"];
+  optional AlignmentFloat64IeeeType ALIGNMENT_FLOAT64_IEEE = 59 [json_name = "ALIGNMENT_FLOAT64_IEEE"];
+  optional AlignmentInt64Type ALIGNMENT_INT64 = 60 [json_name = "ALIGNMENT_INT64"];
+  repeated ReservedType RESERVED = 61 [json_name = "RESERVED"];
+  optional StaticRecordLayoutType STATIC_RECORD_LAYOUT = 62 [json_name = "STATIC_RECORD_LAYOUT"];
 }
 
 message RefCharacteristicType {
@@ -820,6 +931,16 @@ message RightShiftType {
 }
 
 message RipAddrWType {
+  IntType Position = 1 [json_name = "Position"];
+  DataTypeType DataType = 2 [json_name = "DataType"];
+}
+
+message RipAddr4Type {
+  IntType Position = 1 [json_name = "Position"];
+  DataTypeType DataType = 2 [json_name = "DataType"];
+}
+
+message RipAddr5Type {
   IntType Position = 1 [json_name = "Position"];
   DataTypeType DataType = 2 [json_name = "DataType"];
 }
@@ -864,6 +985,16 @@ message ShiftOpZType {
   DataTypeType DataType = 2 [json_name = "DataType"];
 }
 
+message ShiftOp4Type {
+  IntType Position = 1 [json_name = "Position"];
+  DataTypeType DataType = 2 [json_name = "DataType"];
+}
+
+message ShiftOp5Type {
+  IntType Position = 1 [json_name = "Position"];
+  DataTypeType DataType = 2 [json_name = "DataType"];
+}
+
 message SiExponentsType {
   IntType Length = 1 [json_name = "Length"];
   IntType Mass = 2 [json_name = "Mass"];
@@ -889,6 +1020,16 @@ message SrcAddrYType {
 }
 
 message SrcAddrZType {
+  IntType Position = 1 [json_name = "Position"];
+  DataTypeType DataType = 2 [json_name = "DataType"];
+}
+
+message SrcAddr4Type {
+  IntType Position = 1 [json_name = "Position"];
+  DataTypeType DataType = 2 [json_name = "DataType"];
+}
+
+message SrcAddr5Type {
   IntType Position = 1 [json_name = "Position"];
   DataTypeType DataType = 2 [json_name = "DataType"];
 }
@@ -1009,4 +1150,20 @@ message VirtualCharacteristicType {
 
 message VirtualType {
   repeated IdentType MeasuringChannel = 1 [json_name = "MeasuringChannel"];
+}
+
+message AlignmentInt64Type {
+  IntType AlignmentBorder = 1 [json_name = "AlignmentBorder"];
+}
+
+message StaticRecordLayoutType {
+  bool Present = 1;
+}
+
+message StatusStringRefType {
+  IdentType ConversionTable = 1 [json_name = "ConversionTable"];
+}
+
+message DefaultValueNumericType {
+  FloatType DisplayValue = 1 [json_name = "DisplayValue"];
 }
