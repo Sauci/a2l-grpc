@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/sauci/a2l-grpc/pkg/a2l/parser"
 	"strconv"
+	"strings"
 )
 
 func stringToTagType(stringValue parser.IStringValueContext) (result *TagType) {
@@ -29,6 +30,9 @@ func arraySpecifierToLongType(integerValue parser.IArraySpecifierContext) (resul
 	} else if integerValue.INT() != nil {
 		base = 10
 		rawString = integerValue.INT().GetText()
+	} else if integerValue.HEX() != nil {
+		base = 16
+		rawString = strings.Replace(strings.Replace(integerValue.HEX().GetText(), "0X", "", -1), "0x", "", -1)
 	} else {
 		panic(fmt.Errorf("unimplemented array specifier conversion"))
 	}

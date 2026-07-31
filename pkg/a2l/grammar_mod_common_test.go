@@ -1,12 +1,7 @@
 package a2l
 
-// MOD_COMMON and the keywords it contains: ALIGNMENT_*, BYTE_ORDER, DATA_SIZE, DEPOSIT and
-// S_REC_LAYOUT.
-
 import (
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestGrammar_MOD_COMMON(t *testing.T) {
@@ -51,12 +46,10 @@ ALIGNMENT_FLOAT64_IEEE 8`)
 		parseFails(t, moduleScope("/begin MOD_COMMON\n/end MOD_COMMON"))
 	})
 
-	// Deviation: the optional part of every block is a repetition, so keywords which the
-	// specification declares once may occur several times. Only the last one reaches the tree.
+	// Chapter 6.3.90 declares the optional keywords of MOD_COMMON with [->], each of them may
+	// occur at most once.
 	t.Run("reject/repeated optional keyword", func(t *testing.T) {
-		deviation(t, "optional keywords may be repeated", func(t assert.TestingT) {
-			parseFails(t, modCommonScope("BYTE_ORDER MSB_LAST\nBYTE_ORDER MSB_FIRST"))
-		})
+		parseFails(t, modCommonScope("BYTE_ORDER MSB_LAST\nBYTE_ORDER MSB_FIRST"))
 	})
 }
 
@@ -148,13 +141,9 @@ func TestGrammar_ALIGNMENT_FLOAT64_IEEE(t *testing.T) {
 	})
 }
 
-// ALIGNMENT_INT64 and ALIGNMENT_FLOAT16_IEEE exist in the grammar but in neither the protobuf
-// definition nor the listener, so they are parsed and then silently dropped.
 func TestGrammar_ALIGNMENT_INT64(t *testing.T) {
 	t.Run("mandatory parameters", func(t *testing.T) {
-		deviation(t, "ALIGNMENT_INT64 has no node in the tree", func(t assert.TestingT) {
-			assertPreserved(t, modCommonScope("ALIGNMENT_INT64 8"), "ALIGNMENT_INT64")
-		})
+		assertPreserved(t, modCommonScope("ALIGNMENT_INT64 8"), "ALIGNMENT_INT64")
 	})
 
 	t.Run("reject/missing alignment border", func(t *testing.T) {
@@ -162,15 +151,11 @@ func TestGrammar_ALIGNMENT_INT64(t *testing.T) {
 	})
 }
 
+// ALIGNMENT_FLOAT16_IEEE belongs to ASAP2 1.7, which is not covered by the supported
+// specifications; the keyword is rejected.
 func TestGrammar_ALIGNMENT_FLOAT16_IEEE(t *testing.T) {
-	t.Run("mandatory parameters", func(t *testing.T) {
-		deviation(t, "ALIGNMENT_FLOAT16_IEEE has no node in the tree", func(t assert.TestingT) {
-			assertPreserved(t, modCommonScope("ALIGNMENT_FLOAT16_IEEE 2"), "ALIGNMENT_FLOAT16_IEEE")
-		})
-	})
-
-	t.Run("reject/missing alignment border", func(t *testing.T) {
-		parseFails(t, modCommonScope("ALIGNMENT_FLOAT16_IEEE"))
+	t.Run("reject/not part of the supported specifications", func(t *testing.T) {
+		parseFails(t, modCommonScope("ALIGNMENT_FLOAT16_IEEE 2"))
 	})
 }
 

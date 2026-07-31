@@ -1,6 +1,9 @@
 package a2l
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
 type A2LStringer interface {
 	A2LString() string
@@ -18,8 +21,18 @@ func (n *IntType) A2LString() string {
 	return fmt.Sprintf(format, n.Value)
 }
 
+// A2LString returns the value as written in the parsed file. A value which was not created by the
+// parser carries no source form and is formatted from its numeric value instead.
 func (n *FloatType) A2LString() string {
-	return fmt.Sprintf("%v", n.Value)
+	var format string
+
+	if n.Source != "" {
+		format = n.Source
+	} else {
+		format = strconv.FormatFloat(n.Value, 'f', -1, 64)
+	}
+
+	return format
 }
 
 func (n *LongType) A2LString() string {

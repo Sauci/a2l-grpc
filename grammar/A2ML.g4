@@ -33,8 +33,6 @@ predefinedTypeName:
    | name = 'uchar'
    | name = 'uint'
    | name = 'ulong'
-   | name = 'int64'
-   | name = 'uint64'
    | name = 'double'
    | name = 'float'
    )

@@ -1,7 +1,5 @@
 package a2l
 
-// A2ML (chapter 6.3.1) and the ASAP2 metalanguage it contains (chapter 8.1).
-
 import (
 	"testing"
 
@@ -33,10 +31,8 @@ func TestGrammar_A2ML(t *testing.T) {
 		equalNode(t, &A2MLType{}, a2ml)
 	})
 
-	// The specification of the metalanguage declares char, int, long, uchar, uint, ulong, double
-	// and float. The 64 bit integers belong to a later version of the standard.
 	for _, predefinedType := range []string{
-		"char", "int", "long", "uchar", "uint", "ulong", "double", "float", "int64", "uint64",
+		"char", "int", "long", "uchar", "uint", "ulong", "double", "float",
 	} {
 		t.Run("predefined type/"+predefinedType, func(t *testing.T) {
 			a2ml, ok := parseA2ML(t, "struct { "+predefinedType+"; };")
@@ -90,9 +86,7 @@ func TestGrammar_A2ML(t *testing.T) {
 	// Chapter 8.1 declares the array specifier as "[" <constant> "]", a constant may be written in
 	// hexadecimal notation.
 	t.Run("struct/hexadecimal array size", func(t *testing.T) {
-		deviation(t, "an array specifier does not accept a hexadecimal constant", func(t assert.TestingT) {
-			parse(t, a2mlScope("struct { uchar[0x08]; };"))
-		})
+		parse(t, a2mlScope("struct { uchar[0x08]; };"))
 	})
 
 	t.Run("enum/with values", func(t *testing.T) {
@@ -188,13 +182,10 @@ func TestGrammar_A2ML(t *testing.T) {
 	})
 
 	// Chapter 6.3.89: "Attention: The interface-specific parameters must be specified directly
-	// after the last mandatory parameter 'long identifier'." The grammar accepts the A2ML block at
-	// any position of the optional part of MODULE.
+	// after the last mandatory parameter 'long identifier'."
 	t.Run("reject/A2ML not directly after the module header", func(t *testing.T) {
-		deviation(t, "MODULE accepts A2ML at any position of the optional part", func(t assert.TestingT) {
-			parseFails(t, moduleScope(
-				"/begin MOD_PAR \"\"\n/end MOD_PAR\n/begin A2ML\nstruct { uint; };\n/end A2ML"))
-		})
+		parseFails(t, moduleScope(
+			"/begin MOD_PAR \"\"\n/end MOD_PAR\n/begin A2ML\nstruct { uint; };\n/end A2ML"))
 	})
 
 	t.Run("reject/missing semicolon", func(t *testing.T) {
@@ -203,6 +194,11 @@ func TestGrammar_A2ML(t *testing.T) {
 
 	t.Run("reject/unknown predefined type", func(t *testing.T) {
 		parseFails(t, a2mlScope("struct { byte; };"))
+	})
+
+	t.Run("reject/64 bit predefined types", func(t *testing.T) {
+		parseFails(t, a2mlScope("struct { int64; };"))
+		parseFails(t, a2mlScope("struct { uint64; };"))
 	})
 
 	t.Run("reject/unterminated struct", func(t *testing.T) {

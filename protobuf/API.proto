@@ -13,6 +13,9 @@ service A2L {
 
 message TreeFromA2LRequest {
   bytes a2l = 1;
+  // rejects files containing keywords which require a newer ASAP2 version than the one the file
+  // declares with ASAP2_VERSION; without this flag such keywords are reported as warnings
+  optional bool enforce_version_check = 2;
 }
 
 message A2LResponse {
@@ -36,6 +39,9 @@ message A2LFromTreeRequest {
 message TreeResponse {
   bytes serializedTreeChunk = 1;
   optional string error = 2;
+  // constructs requiring a newer ASAP2 version than the one the file declares, reported on the
+  // first response of the stream
+  repeated string warnings = 3;
 }
 
 message TreeFromJSONRequest {

@@ -1,7 +1,5 @@
 package a2l
 
-// UNIT (chapter 6.3.127) and FRAME (chapter 6.3.63).
-
 import (
 	"testing"
 
@@ -159,13 +157,10 @@ func TestGrammar_FRAME(t *testing.T) {
 		equalNodes(t, []*IfDataType{{Name: identVal("XCP")}, {Name: identVal("CANAPE")}}, frame.IF_DATA)
 	})
 
-	// Deviation: chapter 6.3.89 declares [-> FRAME], a module contains at most one frame. The
-	// grammar accepts a repetition and only the last one reaches the tree.
+	// Chapter 6.3.89 declares [-> FRAME]: a module contains at most one frame.
 	t.Run("reject/repeated FRAME", func(t *testing.T) {
-		deviation(t, "optional keywords may be repeated", func(t assert.TestingT) {
-			parseFails(t, moduleScope("/begin FRAME first \"\" 3 100\n/end FRAME\n"+
-				"/begin FRAME second \"\" 3 100\n/end FRAME"))
-		})
+		parseFails(t, moduleScope("/begin FRAME first \"\" 3 100\n/end FRAME\n"+
+			"/begin FRAME second \"\" 3 100\n/end FRAME"))
 	})
 
 	t.Run("reject/missing rate", func(t *testing.T) {

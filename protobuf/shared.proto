@@ -15,13 +15,14 @@ message LongType {
 }
 
 message FloatType {
+  // 2 to 6 described the layout of the value (sign, number of digits, exponent); they are
+  // replaced by Source, which holds the value as written
+  reserved 2 to 6;
+  reserved "IntegralSign", "IntegralSize", "DecimalSize", "ExponentSign", "ExponentSize";
   double Value = 1;
-  optional string IntegralSign = 2;
-  uint32 IntegralSize = 3;
-  uint32 DecimalSize = 4;
-  // uint32 FractionalSize = 4;
-  optional string ExponentSign = 5;
-  uint32 ExponentSize = 6;
+  // the value as written in the parsed file; it is reproduced verbatim when the tree is
+  // serialized back to A2L
+  string Source = 7;
 }
 
 message IdentType {

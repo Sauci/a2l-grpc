@@ -1,8 +1,5 @@
 package a2l
 
-// COMPU_METHOD (chapter 6.3.31), COMPU_VTAB_RANGE (chapter 6.3.35) and the keywords describing a
-// conversion.
-
 import (
 	"testing"
 
@@ -26,8 +23,6 @@ func TestGrammar_COMPU_METHOD(t *testing.T) {
 		}}, module.COMPU_METHOD)
 	})
 
-	// TAB_INTP, TAB_NOINTP, TAB_VERB, RAT_FUNC and FORM are defined by ASAP2 1.51, IDENTICAL and
-	// LINEAR were added later.
 	for _, conversionType := range []string{
 		"TAB_INTP", "TAB_NOINTP", "TAB_VERB", "RAT_FUNC", "FORM", "IDENTICAL", "LINEAR",
 	} {
@@ -119,12 +114,9 @@ func TestGrammar_COEFFS(t *testing.T) {
 	})
 }
 
-// COEFFS_LINEAR is not part of ASAP2 1.51, it belongs to a later version of the standard.
 func TestGrammar_COEFFS_LINEAR(t *testing.T) {
 	t.Run("mandatory parameters", func(t *testing.T) {
-		deviation(t, "COEFFS_LINEAR has no node in the tree", func(t assert.TestingT) {
-			assertPreserved(t, compuMethodScope("COEFFS_LINEAR 1.5 0"), "COEFFS_LINEAR")
-		})
+		assertPreserved(t, compuMethodScope("COEFFS_LINEAR 1.5 0"), "COEFFS_LINEAR")
 	})
 
 	t.Run("reject/single coefficient", func(t *testing.T) {
@@ -218,12 +210,9 @@ func TestGrammar_FORMULA_INV(t *testing.T) {
 	})
 }
 
-// STATUS_STRING_REF is not part of ASAP2 1.51, it belongs to a later version of the standard.
 func TestGrammar_STATUS_STRING_REF(t *testing.T) {
 	t.Run("mandatory parameters", func(t *testing.T) {
-		deviation(t, "STATUS_STRING_REF has no node in the tree", func(t assert.TestingT) {
-			assertPreserved(t, compuMethodScope("STATUS_STRING_REF compu_vtab"), "STATUS_STRING_REF")
-		})
+		assertPreserved(t, compuMethodScope("STATUS_STRING_REF compu_vtab"), "STATUS_STRING_REF")
 	})
 
 	t.Run("reject/missing conversion table", func(t *testing.T) {

@@ -1,10 +1,5 @@
 package a2l
 
-// Terminals of the grammar: identifiers, strings, integers, floating point values, hexadecimal
-// values, comments and block delimiters.
-//
-// Reference: ASAM MCD-2MC (ASAP2) interface specification, chapter 6.2 (predefined data types).
-
 import (
 	"testing"
 
@@ -84,26 +79,30 @@ func TestGrammar_Terminal_STRING(t *testing.T) {
 		})
 	}
 
-	// Deviation: chapter 6.2 allows a double inverted comma to be escaped by doubling it, as an
-	// alternative to the backslash notation, for compatibility with ASAP2 V1.2 and prior.
+	// Chapter 6.2 allows a double inverted comma inside a string to be escaped by doubling it,
+	// as an alternative to the backslash notation (compatibility with ASAP2 V1.2 and prior).
 	t.Run("accept/doubled quote", func(t *testing.T) {
-		deviation(t, "a doubled double quote is not accepted inside a string", func(t assert.TestingT) {
-			module, ok := parseModule(t, "/begin MOD_COMMON \"doubled \"\"quote\"\"\"\n/end MOD_COMMON")
-			if !ok || !assert.NotNil(t, module.MOD_COMMON) {
-				return
-			}
+		module, ok := parseModule(t, "/begin MOD_COMMON \"doubled \"\"quote\"\"\"\n/end MOD_COMMON")
+		if !ok || !assert.NotNil(t, module.MOD_COMMON) {
+			return
+		}
 
-			equalNode(t, strVal("doubled \"\"quote\"\""), module.MOD_COMMON.Comment)
-		})
+		equalNode(t, strVal("doubled \"\"quote\"\""), module.MOD_COMMON.Comment)
 	})
 
-	// Chapter 6.2 allows only the escape sequences \r\n (carriage return) and \" (double quote)
-	// inside a string. The lexer accepts any character behind a backslash.
+	// ASAM MCD-2 MC 1.6.1 (chapter 3.2) allows the escape sequences \", \', \\, \n, \r and \t
+	// (ASAP2 1.51 allowed \r\n and \" only); any other character behind a backslash is invalid.
+	t.Run("accept/tab and backslash escapes", func(t *testing.T) {
+		module, ok := parseModule(t, "/begin MOD_COMMON \"tab\\t and backslash \\\\\"\n/end MOD_COMMON")
+		if !ok || !assert.NotNil(t, module.MOD_COMMON) {
+			return
+		}
+
+		equalNode(t, strVal("tab\\t and backslash \\\\"), module.MOD_COMMON.Comment)
+	})
+
 	t.Run("reject/escape sequence not allowed by the specification", func(t *testing.T) {
-		deviation(t, "the lexer accepts arbitrary escape sequences inside a string",
-			func(t assert.TestingT) {
-				parseFails(t, moduleScope("/begin MOD_COMMON \"tab\\t\"\n/end MOD_COMMON"))
-			})
+		parseFails(t, moduleScope("/begin MOD_COMMON \"invalid \\q escape\"\n/end MOD_COMMON"))
 	})
 
 	t.Run("reject/unterminated string", func(t *testing.T) {
@@ -205,9 +204,7 @@ func TestGrammar_Terminal_FLOAT(t *testing.T) {
 		{literal: "1.5e+3", value: 1500},
 	} {
 		t.Run("accept/"+testCase.literal, func(t *testing.T) {
-			// Note: parseOnly, the layout of the value is not preserved by a parse/serialize
-			// cycle, see the "layout of the value is preserved" case below.
-			tree, ok := parseOnly(t, axisDescrScope("MAX_GRAD "+testCase.literal))
+			tree, ok := parse(t, axisDescrScope("MAX_GRAD "+testCase.literal))
 			if !ok {
 				return
 			}
@@ -221,28 +218,22 @@ func TestGrammar_Terminal_FLOAT(t *testing.T) {
 		})
 	}
 
-	// Deviation: the sign, the number of digits and the exponent of a float value are stored in
-	// the tree but ignored by the serializer, so the layout of the value is lost by a
-	// parse/serialize cycle.
-	for _, literal := range []string{"1.50", "+0.5", ".5", "1.", "1.5e3"} {
+	// The source form of a float value is part of the tree and is reproduced verbatim by the
+	// serializer ("12E-2" is the exponential notation example of ASAM MCD-2 MC 1.6.1, chapter
+	// 3.2).
+	for _, literal := range []string{"1.50", "+0.5", ".5", "1.", "1.5e3", "1e3", "12E-2", "1.5e-3"} {
 		t.Run("layout of the value is preserved/"+literal, func(t *testing.T) {
-			deviation(t, "the serializer ignores the layout of a float value", func(t assert.TestingT) {
-				parse(t, axisDescrScope("MAX_GRAD "+literal))
-			})
+			parse(t, axisDescrScope("MAX_GRAD "+literal))
 		})
 	}
 
-	// Deviation: the grammar accepts a hexadecimal value wherever a float is expected. The
-	// conversion then fails with a panic instead of the parser reporting a syntax error.
+	// Chapter 6.2 reserves the hexadecimal notation to the int and long data types.
 	t.Run("reject/hexadecimal value", func(t *testing.T) {
-		deviation(t, "a hexadecimal value used as float panics instead of being rejected",
-			func(t assert.TestingT) {
-				_, err := GetTreeFromString(axisDescrScope("MAX_GRAD 0x10"))
-				if assert.Error(t, err, "a hexadecimal value should not be accepted as a float") {
-					assert.NotContains(t, err.Error(), "error while building A2L tree",
-						"the parser should report a syntax error instead of an internal error")
-				}
-			})
+		_, err := GetTreeFromString(axisDescrScope("MAX_GRAD 0x10"))
+		if assert.Error(t, err, "a hexadecimal value should not be accepted as a float") {
+			assert.NotContains(t, err.Error(), "error while building A2L tree",
+				"the parser should report a syntax error instead of an internal error")
+		}
 	})
 
 	t.Run("reject/comma as decimal separator", func(t *testing.T) {
@@ -269,12 +260,9 @@ func TestGrammar_Terminal_Comment(t *testing.T) {
 		parse(t, projectScope("// a comment"))
 	})
 
-	// Deviation: the line comment rule requires a line break, a comment on the last line of a
-	// file is reported as an unrecognized token.
+	// A line comment on the last line of a file needs no terminating line break.
 	t.Run("accept/line comment at end of file", func(t *testing.T) {
-		deviation(t, "a line comment must be terminated by a line break", func(t assert.TestingT) {
-			parse(t, projectScope("")+"// a comment without line break")
-		})
+		parse(t, projectScope("")+"// a comment without line break")
 	})
 
 	t.Run("reject/unterminated block comment", func(t *testing.T) {
@@ -295,11 +283,12 @@ func TestGrammar_Terminal_BlockDelimiter(t *testing.T) {
 		parseFails(t, "/begin PROJECT project \"\"")
 	})
 
-	// Deviation: chapter 6.3 allows the short delimiters { and } to be used instead of /begin and
-	// /end. Their use is discouraged since ASAP2 1.31 but they are still part of the specification.
-	t.Run("accept/short delimiters", func(t *testing.T) {
-		deviation(t, "the short delimiters { and } are not supported", func(t assert.TestingT) {
-			parse(t, "PROJECT project \"\" { }")
-		})
+	// ASAP2 1.51 (chapter 6.3) declares the short form "<keyword> { <description_body> }" as an
+	// alternative to the /begin and /end delimiters, but no longer recommends it since version
+	// 1.31. ASAM MCD-2 MC 1.6.1 (chapter 1.4.2) removed it: "Since ASAM MCD-2 MC V1.6.0 always
+	// brackets of the form '/begin' '/end' are requested. Curly brackets '{' '}' are no longer
+	// supported."
+	t.Run("reject/short delimiters", func(t *testing.T) {
+		parseFails(t, "PROJECT { project \"\" }")
 	})
 }

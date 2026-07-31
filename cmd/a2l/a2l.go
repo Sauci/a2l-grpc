@@ -49,6 +49,9 @@ func (s *grpcA2LImplType) GetTreeFromA2L(stream a2l.A2L_GetTreeFromA2LServer) er
 	var request *a2l.TreeFromA2LRequest
 	tree := &a2l.RootNodeType{}
 	response := &a2l.TreeResponse{}
+	options := a2l.ParseOptions{}
+	// Note: optionsParsed := false avoid to parse option for each chunk
+	optionsParsed := false
 
 	for {
 		request, err = stream.Recv()
@@ -58,17 +61,33 @@ func (s *grpcA2LImplType) GetTreeFromA2L(stream a2l.A2L_GetTreeFromA2LServer) er
 			}
 			break
 		}
+		if !optionsParsed {
+			if request.EnforceVersionCheck != nil {
+				options.EnforceVersionCheck = *request.EnforceVersionCheck
+			}
+			optionsParsed = true
+		}
 		buffer.Write(request.A2L)
 	}
 
 	if err == nil {
-		if tree, parseError = getTreeFromString(buffer.String()); parseError == nil {
+		var warnings []a2l.SyntaxError
+
+		tree, warnings, parseError = a2l.GetTreeFromStringWithOptions(buffer.String(), options)
+
+		// warnings are attached to the first response of the stream
+		for _, warning := range warnings {
+			response.Warnings = append(response.Warnings, warning.String())
+		}
+
+		if parseError == nil {
 			if serializedTree, err = proto.Marshal(tree); err == nil {
 				for _, chunk = range chunkifyBySize(serializedTree, s.chunkSize) {
 					response.SerializedTreeChunk = chunk
 					if err = stream.Send(response); err != nil {
 						break
 					}
+					response.Warnings = nil
 				}
 			} else {
 				response.Error = proto.String(fmt.Sprintf("An error occured during serialization of Tree: %v", err))

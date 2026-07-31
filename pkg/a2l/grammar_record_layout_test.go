@@ -1,7 +1,5 @@
 package a2l
 
-// RECORD_LAYOUT and its component keywords.
-
 import (
 	"testing"
 
@@ -98,11 +96,9 @@ func TestGrammar_FNC_VALUES(t *testing.T) {
 		})
 	}
 
-	// UBYTE..FLOAT64_IEEE are defined by ASAP2 1.51, the 64 bit integers and FLOAT16_IEEE were
-	// added later.
 	for _, dataType := range []string{
 		"UBYTE", "SBYTE", "UWORD", "SWORD", "ULONG", "SLONG",
-		"A_UINT64", "A_INT64", "FLOAT16_IEEE", "FLOAT32_IEEE", "FLOAT64_IEEE",
+		"A_UINT64", "A_INT64", "FLOAT32_IEEE", "FLOAT64_IEEE",
 	} {
 		t.Run("enum/data type "+dataType, func(t *testing.T) {
 			recordLayout, ok := parseRecordLayout(t, "FNC_VALUES 1 "+dataType+" ROW_DIR DIRECT")
@@ -131,6 +127,10 @@ func TestGrammar_FNC_VALUES(t *testing.T) {
 
 	t.Run("reject/unknown data type", func(t *testing.T) {
 		parseFails(t, recordLayoutScope("FNC_VALUES 1 UINT24 ROW_DIR DIRECT"))
+	})
+
+	t.Run("reject/FLOAT16_IEEE data type", func(t *testing.T) {
+		parseFails(t, recordLayoutScope("FNC_VALUES 1 FLOAT16_IEEE ROW_DIR DIRECT"))
 	})
 }
 
@@ -172,22 +172,15 @@ func TestGrammar_RESERVED(t *testing.T) {
 	})
 }
 
-// The keywords below are accepted by the grammar but have neither a protobuf message nor a
-// listener, so they never reach the tree.
 func TestGrammar_STATIC_RECORD_LAYOUT(t *testing.T) {
 	t.Run("mandatory parameters", func(t *testing.T) {
-		deviation(t, "STATIC_RECORD_LAYOUT has no node in the tree", func(t assert.TestingT) {
-			assertPreserved(t, recordLayoutScope("STATIC_RECORD_LAYOUT"), "STATIC_RECORD_LAYOUT")
-		})
+		assertPreserved(t, recordLayoutScope("STATIC_RECORD_LAYOUT"), "STATIC_RECORD_LAYOUT")
 	})
 }
 
 func TestGrammar_AXIS_PTS_4(t *testing.T) {
 	t.Run("mandatory parameters", func(t *testing.T) {
-		deviation(t, "the fourth and fifth dimension keywords have no node in the tree",
-			func(t assert.TestingT) {
-				assertPreserved(t, recordLayoutScope("AXIS_PTS_4 1 UBYTE INDEX_INCR DIRECT"), "AXIS_PTS_4")
-			})
+		assertPreserved(t, recordLayoutScope("AXIS_PTS_4 1 UBYTE INDEX_INCR DIRECT"), "AXIS_PTS_4")
 	})
 
 	t.Run("reject/missing addressing", func(t *testing.T) {
@@ -197,9 +190,6 @@ func TestGrammar_AXIS_PTS_4(t *testing.T) {
 
 func TestGrammar_NO_AXIS_PTS_4(t *testing.T) {
 	t.Run("mandatory parameters", func(t *testing.T) {
-		deviation(t, "the fourth and fifth dimension keywords have no node in the tree",
-			func(t assert.TestingT) {
-				assertPreserved(t, recordLayoutScope("NO_AXIS_PTS_4 1 UBYTE"), "NO_AXIS_PTS_4")
-			})
+		assertPreserved(t, recordLayoutScope("NO_AXIS_PTS_4 1 UBYTE"), "NO_AXIS_PTS_4")
 	})
 }

@@ -1,7 +1,5 @@
 package a2l
 
-// MOD_PAR (chapter 6.3.91) and the keywords it contains.
-
 import (
 	"testing"
 
@@ -78,11 +76,9 @@ ECU_CALIBRATION_OFFSET 0x1000`)
 		parseFails(t, moduleScope("/begin MOD_PAR\n/end MOD_PAR"))
 	})
 
-	// Deviation: EPK is declared once by the specification.
+	// Chapter 6.3.91 declares [-> EPK]: at most one EPK per MOD_PAR.
 	t.Run("reject/repeated EPK", func(t *testing.T) {
-		deviation(t, "optional keywords may be repeated", func(t assert.TestingT) {
-			parseFails(t, modParScope("EPK \"first\"\nEPK \"second\""))
-		})
+		parseFails(t, modParScope("EPK \"first\"\nEPK \"second\""))
 	})
 }
 

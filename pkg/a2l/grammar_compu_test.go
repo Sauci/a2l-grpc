@@ -1,7 +1,5 @@
 package a2l
 
-// COMPU_TAB, COMPU_VTAB and the DEFAULT_VALUE / DEFAULT_VALUE_NUMERIC keywords they contain.
-
 import (
 	"testing"
 
@@ -128,21 +126,17 @@ func TestGrammar_DEFAULT_VALUE(t *testing.T) {
 	})
 }
 
-// DEFAULT_VALUE_NUMERIC has a rule in the grammar, but that rule is referenced by no other rule,
-// so the keyword can never be used.
 func TestGrammar_DEFAULT_VALUE_NUMERIC(t *testing.T) {
 	t.Run("mandatory parameters/in COMPU_TAB", func(t *testing.T) {
-		deviation(t, "DEFAULT_VALUE_NUMERIC is not reachable from any rule", func(t assert.TestingT) {
-			parse(t, moduleScope(
-				"/begin COMPU_TAB compu_tab \"\" TAB_INTP 1 0 1 DEFAULT_VALUE_NUMERIC 1.5\n/end COMPU_TAB"))
-		})
+		parse(t, moduleScope(
+			"/begin COMPU_TAB compu_tab \"\" TAB_INTP 1 0 1 DEFAULT_VALUE_NUMERIC 1.5\n/end COMPU_TAB"))
 	})
 
-	t.Run("mandatory parameters/in COMPU_VTAB_RANGE", func(t *testing.T) {
-		deviation(t, "DEFAULT_VALUE_NUMERIC is not reachable from any rule", func(t assert.TestingT) {
-			parse(t, moduleScope(
-				"/begin COMPU_VTAB_RANGE compu_vtab_range \"\" 1 0 1 \"on\" DEFAULT_VALUE_NUMERIC 1.5\n"+
-					"/end COMPU_VTAB_RANGE"))
-		})
+	// Neither ASAP2 1.51 nor ASAM MCD-2 MC 1.6.1 (chapter 3.5.37) declare DEFAULT_VALUE_NUMERIC
+	// for COMPU_VTAB_RANGE, the keyword belongs to COMPU_TAB only.
+	t.Run("reject/in COMPU_VTAB_RANGE", func(t *testing.T) {
+		parseFails(t, moduleScope(
+			"/begin COMPU_VTAB_RANGE compu_vtab_range \"\" 1 0 1 \"on\" DEFAULT_VALUE_NUMERIC 1.5\n"+
+				"/end COMPU_VTAB_RANGE"))
 	})
 }

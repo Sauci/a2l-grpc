@@ -1,7 +1,5 @@
 package a2l
 
-// VARIANT_CODING and its sub-keywords.
-
 import (
 	"testing"
 
@@ -62,25 +60,32 @@ func TestGrammar_VAR_NAMING(t *testing.T) {
 		equalNode(t, &VarNamingType{Tag: "NUMERIC"}, variantCoding.VAR_NAMING)
 	})
 
-	// Deviation: ASAP2 1.51 defines NUMERIC as the only value and reserves ALPHA for a future
-	// extension (chapter 6.3.138: "reserved for future extension (e.g. ALPHA = {A, B, C, D....})",
-	// later versions of the standard made it official). The grammar instead accepts the misspelled
-	// value APLHA, which exists in no version of the standard, and rejects ALPHA.
+	// NUMERIC is the only value defined by ASAP2 1.51 and ASAM MCD-2 MC 1.6.1 (chapter 3.5.134);
+	// ALPHA is named by the specification but reserved for a future extension, so it is accepted
+	// by the grammar and reported as a warning. The misspelled value APLHA exists in no version of
+	// the standard.
 	t.Run("enum/ALPHA", func(t *testing.T) {
-		deviation(t, "VAR_NAMING accepts APLHA instead of ALPHA", func(t assert.TestingT) {
-			variantCoding, ok := parseVariantCoding(t, "VAR_NAMING ALPHA")
-			if !ok {
-				return
-			}
+		variantCoding, ok := parseVariantCoding(t, "VAR_NAMING ALPHA")
+		if !ok {
+			return
+		}
 
-			equalNode(t, &VarNamingType{Tag: "ALPHA"}, variantCoding.VAR_NAMING)
-		})
+		equalNode(t, &VarNamingType{Tag: "ALPHA"}, variantCoding.VAR_NAMING)
+	})
+
+	t.Run("enum/ALPHA is warned about", func(t *testing.T) {
+		_, warnings, err := GetTreeFromStringWithOptions(variantCodingScope("VAR_NAMING ALPHA"),
+			ParseOptions{})
+		assert.NoError(t, err)
+
+		if assert.NotEmpty(t, warnings) {
+			assert.Contains(t, warnings[0].String(),
+				"VAR_NAMING ALPHA is reserved for a future extension of the standard")
+		}
 	})
 
 	t.Run("reject/misspelled ALPHA", func(t *testing.T) {
-		deviation(t, "VAR_NAMING accepts APLHA instead of ALPHA", func(t assert.TestingT) {
-			parseFails(t, variantCodingScope("VAR_NAMING APLHA"))
-		})
+		parseFails(t, variantCodingScope("VAR_NAMING APLHA"))
 	})
 
 	t.Run("reject/unknown tag", func(t *testing.T) {

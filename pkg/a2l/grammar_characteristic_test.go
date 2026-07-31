@@ -1,7 +1,5 @@
 package a2l
 
-// CHARACTERISTIC, AXIS_DESCR and MATRIX_DIM.
-
 import (
 	"testing"
 
@@ -30,8 +28,6 @@ func TestGrammar_CHARACTERISTIC(t *testing.T) {
 		}}, module.CHARACTERISTIC)
 	})
 
-	// VALUE, CURVE, MAP, CUBOID, VAL_BLK and ASCII are defined by ASAP2 1.51, CUBE_4 and CUBE_5
-	// were added later.
 	for _, characteristicType := range []string{
 		"ASCII", "CURVE", "MAP", "CUBOID", "CUBE_4", "CUBE_5", "VAL_BLK", "VALUE",
 	} {
@@ -93,21 +89,15 @@ ECU_ADDRESS_EXTENSION 1`)
 		}, characteristic)
 	})
 
-	// Deviation: DISCRETE, PHYS_UNIT and STEP_SIZE are parsed and stored in the tree, but
-	// CharacteristicType.MarshalA2L does not write them back, so they are lost by a
-	// parse/serialize cycle.
 	t.Run("optional/keywords dropped by the serializer", func(t *testing.T) {
-		deviation(t, "CHARACTERISTIC serializer ignores DISCRETE, PHYS_UNIT and STEP_SIZE",
-			func(t assert.TestingT) {
-				characteristic, ok := parseCharacteristic(t, "DISCRETE\nPHYS_UNIT \"km/h\"\nSTEP_SIZE 0.5")
-				if !ok {
-					return
-				}
+		characteristic, ok := parseCharacteristic(t, "DISCRETE\nPHYS_UNIT \"km/h\"\nSTEP_SIZE 0.5")
+		if !ok {
+			return
+		}
 
-				equalNode(t, &DiscreteType{Present: true}, characteristic.DISCRETE)
-				equalNode(t, &PhysUnitType{Unit: strVal("km/h")}, characteristic.PHYS_UNIT)
-				equalNode(t, &StepSizeType{StepSize: floatVal("0.5")}, characteristic.STEP_SIZE)
-			})
+		equalNode(t, &DiscreteType{Present: true}, characteristic.DISCRETE)
+		equalNode(t, &PhysUnitType{Unit: strVal("km/h")}, characteristic.PHYS_UNIT)
+		equalNode(t, &StepSizeType{StepSize: floatVal("0.5")}, characteristic.STEP_SIZE)
 	})
 
 	t.Run("list/several AXIS_DESCR", func(t *testing.T) {
@@ -203,17 +193,14 @@ CURVE_AXIS_REF curve_axis`)
 		}, axisDescr)
 	})
 
-	// Deviation: as for CHARACTERISTIC, the serializer of AXIS_DESCR ignores these two keywords.
 	t.Run("optional/keywords dropped by the serializer", func(t *testing.T) {
-		deviation(t, "AXIS_DESCR serializer ignores PHYS_UNIT and STEP_SIZE", func(t assert.TestingT) {
-			axisDescr, ok := parseAxisDescr(t, "STEP_SIZE 0.5\nPHYS_UNIT \"km/h\"")
-			if !ok {
-				return
-			}
+		axisDescr, ok := parseAxisDescr(t, "STEP_SIZE 0.5\nPHYS_UNIT \"km/h\"")
+		if !ok {
+			return
+		}
 
-			equalNode(t, &StepSizeType{StepSize: floatVal("0.5")}, axisDescr.STEP_SIZE)
-			equalNode(t, &PhysUnitType{Unit: strVal("km/h")}, axisDescr.PHYS_UNIT)
-		})
+		equalNode(t, &StepSizeType{StepSize: floatVal("0.5")}, axisDescr.STEP_SIZE)
+		equalNode(t, &PhysUnitType{Unit: strVal("km/h")}, axisDescr.PHYS_UNIT)
 	})
 
 	t.Run("optional/FIX_AXIS_PAR", func(t *testing.T) {
@@ -223,8 +210,8 @@ CURVE_AXIS_REF curve_axis`)
 		}
 
 		equalNode(t, &FixAxisParType{
-			Offset:    intVal("0"),
-			Shift:     intVal("4"),
+			Offset:    floatVal("0"),
+			Shift:     floatVal("4"),
 			Numberapo: intVal("6"),
 		}, axisDescr.FIX_AXIS_PAR)
 	})
@@ -236,8 +223,8 @@ CURVE_AXIS_REF curve_axis`)
 		}
 
 		equalNode(t, &FixAxisParDistType{
-			Offset:    intVal("0"),
-			Distance:  intVal("100"),
+			Offset:    floatVal("0"),
+			Distance:  floatVal("100"),
 			Numberapo: intVal("8"),
 		}, axisDescr.FIX_AXIS_PAR_DIST)
 	})
@@ -292,12 +279,9 @@ func TestGrammar_MATRIX_DIM(t *testing.T) {
 		}, module.MEASUREMENT[0].MATRIX_DIM)
 	})
 
-	// Deviation: ASAP2 1.51 requires the three dimensions. The grammar makes yDim and zDim
-	// optional, and the resulting tree cannot be serialized again.
+	// Chapter 6.3.83 declares the three dimensions as mandatory.
 	t.Run("reject/single dimension", func(t *testing.T) {
-		deviation(t, "MATRIX_DIM accepts less than three dimensions", func(t assert.TestingT) {
-			parseFails(t, characteristicScope("MATRIX_DIM 2"))
-		})
+		parseFails(t, characteristicScope("MATRIX_DIM 2"))
 	})
 
 	t.Run("reject/four dimensions", func(t *testing.T) {

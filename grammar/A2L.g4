@@ -7,15 +7,11 @@ a2lFile:
     asap2Version?
     a2mlVersion?
     project
+    EOF
     ;
 
 alignmentByte:
      'ALIGNMENT_BYTE'
-    alignmentBorder = integerValue
-    ;
-
-alignmentFloat16Ieee:
-     'ALIGNMENT_FLOAT16_IEEE'
     alignmentBorder = integerValue
     ;
 
@@ -127,8 +123,8 @@ ecuAddressExtension:
 
 extendedLimits:
      'EXTENDED_LIMITS'
-    lowerLimit = numericValue
-    upperLimit = numericValue
+    lowerLimit = floatValue
+    upperLimit = floatValue
     ;
 
 format:
@@ -155,8 +151,8 @@ guardRails:
 matrixDim:
      'MATRIX_DIM'
     xDim = integerValue
-    (yDim = integerValue)?
-    (zDim = integerValue)?
+    yDim = integerValue
+    zDim = integerValue
     ;
 
 maxRefresh:
@@ -208,7 +204,7 @@ refUnit:
 
 stepSize:
      'STEP_SIZE'
-    stepSize_ = numericValue
+    stepSize_ = floatValue
     ;
 
 symbolLink:
@@ -240,10 +236,8 @@ project:
     longIdentifier = stringValue
     /* optional part */
 
-    (
-        v_header += header |
-        v_module += module
-    )*
+    (v_header = header)?
+    (v_module += module)*
     END 'PROJECT'
     ;
 
@@ -270,8 +264,11 @@ module:
     longIdentifier = stringValue
     /* optional part */
 
+    /* the interface specific parameters must be specified directly after the last mandatory
+       parameter 'longIdentifier' */
+    (v_a2ml = a2ml)?
+
     (
-        v_a2ml += a2ml |
         v_ifData += ifData |
         v_axisPts += axisPts |
         v_characteristic += characteristic |
@@ -282,14 +279,10 @@ module:
         v_frame += frame |
         v_function += function |
         v_group += group |
-        v_instance += instance |
         v_measurement += measurement |
         v_modCommon += modCommon |
         v_modPar += modPar |
         v_recordLayout += recordLayout |
-        v_typedefCharacteristic += typedefCharacteristic |
-        v_typedefMeasurement += typedefMeasurement |
-        v_typedefStructure += typedefStructure |
         v_unit += unit |
         v_userRights += userRights |
         v_variantCoding += variantCoding
@@ -304,11 +297,11 @@ axisPts:
     address = integerValue
     inputQuantity = identifierValue
     vDeposit = identifierValue
-    maxDiff = numericValue
+    maxDiff = floatValue
     conversion = identifierValue
     maxAxisPoints = integerValue
-    lowerLimit = numericValue
-    upperLimit = numericValue
+    lowerLimit = floatValue
+    upperLimit = floatValue
     /* optional part */
 
     (
@@ -352,10 +345,10 @@ characteristic:
 
     address = integerValue
     deposit_ = identifierValue
-    maxDiff = numericValue
+    maxDiff = floatValue
     conversion = identifierValue
-    lowerLimit = numericValue
-    upperLimit = numericValue
+    lowerLimit = floatValue
+    upperLimit = floatValue
     /* optional part */
 
     (
@@ -403,8 +396,8 @@ axisDescr:
     inputQuantity = identifierValue
     conversion = identifierValue
     maxAxisPoints = integerValue
-    lowerLimit = numericValue
-    upperLimit = numericValue
+    lowerLimit = floatValue
+    upperLimit = floatValue
     /* optional part */
 
     (
@@ -439,27 +432,27 @@ curveAxisRef:
 
 fixAxisPar:
      'FIX_AXIS_PAR'
-    offset = integerValue
-    shift = integerValue
+    offset = floatValue
+    shift = floatValue
     numberapo = integerValue
     ;
 
 fixAxisParDist:
      'FIX_AXIS_PAR_DIST'
-    offset = integerValue
-    distance = integerValue
+    offset = floatValue
+    distance = floatValue
     numberapo = integerValue
     ;
 
 fixAxisParList:
     BEGIN 'FIX_AXIS_PAR_LIST'
-    (axisPts_Value += numericValue)*
+    (axisPts_Value += floatValue)*
     END 'FIX_AXIS_PAR_LIST'
     ;
 
 maxGrad:
      'MAX_GRAD'
-    maxGradient = numericValue
+    maxGradient = floatValue
     ;
 
 comparisonQuantity:
@@ -525,18 +518,18 @@ compuMethod:
 
 coeffs:
      'COEFFS'
-    a = numericValue
-    b = numericValue
-    c = numericValue
-    d = numericValue
-    e = numericValue
-    f = numericValue
+    a = floatValue
+    b = floatValue
+    c = floatValue
+    d = floatValue
+    e = floatValue
+    f = floatValue
     ;
 
 coeffsLinear:
      'COEFFS_LINEAR'
-    a = numericValue
-    b = numericValue
+    a = floatValue
+    b = floatValue
     ;
 
 compuTabRef:
@@ -577,18 +570,19 @@ compuTab:
     )
 
     numberValuePairs = integerValue
-    (inVal += numericValue outVal += numericValue)*
+    (inVal += floatValue outVal += floatValue)*
     /* optional part */
 
     (
-        vDefaultValue = defaultValue
+        vDefaultValue = defaultValue |
+        vDefaultValueNumeric = defaultValueNumeric
     )*
     END 'COMPU_TAB'
     ;
 
 defaultValueNumeric:
      'DEFAULT_VALUE_NUMERIC'
-    display_value = numericValue
+    display_value = floatValue
     ;
 
 compuVTab:
@@ -600,7 +594,7 @@ compuVTab:
         'TAB_VERB'
 
     numberValuePairs = integerValue
-    (inVal += numericValue outVal += stringValue)*
+    (inVal += floatValue outVal += stringValue)*
     /* optional part */
 
     (
@@ -614,7 +608,7 @@ compuVTabRange:
     name = identifierValue
     longIdentifier = stringValue
     numberValueTriples = integerValue
-    (inValMin += numericValue inValMax += numericValue outVal += stringValue)*
+    (inValMin += floatValue inValMax += floatValue outVal += stringValue)*
     /* optional part */
 
     (
@@ -707,6 +701,7 @@ group:
     (
         v_annotation += annotation |
         v_functionList = functionList |
+        v_ifData += ifData |
         v_refCharacteristic = refCharacteristic |
         v_refMeasurement = refMeasurement |
         v_root = root |
@@ -731,21 +726,6 @@ subGroup:
     END 'SUB_GROUP'
     ;
 
-instance:
-    BEGIN 'INSTANCE'
-    name = identifierValue
-    longIdentifier = stringValue
-    typeName = identifierValue
-    address = integerValue
-    /* optional part */
-
-    (
-        v_ifData += ifData |
-        v_ecuAddressExtension += ecuAddressExtension
-    )*
-    END 'INSTANCE'
-    ;
-
 measurement:
     BEGIN 'MEASUREMENT'
     name = identifierValue
@@ -753,9 +733,9 @@ measurement:
     datatype = dataType
     conversion = identifierValue
     resolution = integerValue
-    accuracy = numericValue
-    lowerLimit = numericValue
-    upperLimit = numericValue
+    accuracy = floatValue
+    lowerLimit = floatValue
+    upperLimit = floatValue
     /* optional part */
 
     (
@@ -853,7 +833,6 @@ modCommon:
 
     (
         v_alignmentByte += alignmentByte |
-        v_alignmentFloat16Ieee += alignmentFloat16Ieee |
         v_alignmentFloat32Ieee += alignmentFloat32Ieee |
         v_alignmentFloat64Ieee += alignmentFloat64Ieee |
         v_alignmentInt64 += alignmentInt64 |
@@ -923,7 +902,13 @@ calibrationMethod:
 calibrationHandle:
     BEGIN 'CALIBRATION_HANDLE'
     (handle += integerValue)*
+    (v_calibrationHandleText = calibrationHandleText)?
     END 'CALIBRATION_HANDLE'
+    ;
+
+calibrationHandleText:
+     'CALIBRATION_HANDLE_TEXT'
+    text_ = stringValue
     ;
 
 cpuType:
@@ -1064,7 +1049,6 @@ recordLayout:
 
     (
         v_alignmentByte += alignmentByte |
-        v_alignmentFloat16Ieee += alignmentFloat16Ieee |
         v_alignmentFloat32Ieee += alignmentFloat32Ieee |
         v_alignmentFloat64Ieee += alignmentFloat64Ieee |
         v_alignmentInt64 += alignmentInt64 |
@@ -1488,69 +1472,6 @@ srcAddr5:
     datatype = dataType
     ;
 
-typedefCharacteristic:
-    BEGIN 'TYPEDEF_CHARACTERISTIC'
-    name = identifierValue
-    longIdentifier = stringValue
-
-    type_ =
-    (
-        'ASCII' |
-        'CURVE' |
-        'MAP' |
-        'CUBOID' |
-        'CUBE_4' |
-        'CUBE_5' |
-        'VAL_BLK' |
-        'VALUE'
-    )
-
-    deposit_ = identifierValue
-    maxDiff = numericValue
-    conversion = identifierValue
-    lowerLimit = numericValue
-    upperLimit = numericValue
-    END 'TYPEDEF_CHARACTERISTIC'
-    ;
-
-typedefMeasurement:
-    BEGIN 'TYPEDEF_MEASUREMENT'
-    name = identifierValue
-    longIdentifier = stringValue
-    datatype = dataType
-    conversion = identifierValue
-    resolution = integerValue
-    accuracy = numericValue
-    lowerLimit = numericValue
-    upperLimit = numericValue
-    END 'TYPEDEF_MEASUREMENT'
-    ;
-
-typedefStructure:
-    BEGIN 'TYPEDEF_STRUCTURE'
-    name = identifierValue
-    longIdentifier = stringValue
-    size = integerValue
-    link = linkType
-    symbol = stringValue
-    /* optional part */
-
-    (
-        v_structureComponent += structureComponent
-    )*
-    END 'TYPEDEF_STRUCTURE'
-    ;
-
-structureComponent:
-    BEGIN 'STRUCTURE_COMPONENT'
-    name = identifierValue
-    deposit_ = identifierValue
-    offset = integerValue
-    link = linkType
-    symbol = stringValue
-    END 'STRUCTURE_COMPONENT'
-    ;
-
 unit:
     BEGIN 'UNIT'
     name = identifierValue
@@ -1586,8 +1507,8 @@ siExponents:
 
 unitConversion:
      'UNIT_CONVERSION'
-    gradient = numericValue
-    offset = numericValue
+    gradient = floatValue
+    offset = floatValue
     ;
 
 userRights:
@@ -1673,10 +1594,12 @@ varForbiddenComb:
 varNaming:
      'VAR_NAMING'
 
+    /* ALPHA is reserved for a future extension of the standard (ASAM MCD-2 MC 1.6.1,
+       chapter 3.5.134); its use is reported by the version check */
     tag =
     (
         'NUMERIC' |
-        'APLHA'
+        'ALPHA'
     )
 
     ;
@@ -1690,8 +1613,16 @@ integerValue:
     h = HEX | i = INT
     ;
 
+/* used by the imported IF_DATA and A2ML grammars, where a numeric value may be written in
+   hexadecimal notation */
 numericValue:
     f = FLOAT | i = INT | h = HEX
+    ;
+
+/* per chapter 6.2 of the specification the hexadecimal notation is reserved to the int and long
+   data types, a float parameter must not use it */
+floatValue:
+    f = FLOAT | i = INT
     ;
 
 stringValue:
@@ -1707,12 +1638,12 @@ partialIdentifier:
     ;
 
 arraySpecifier:
-    '[' (i = INT | n = IDENT) ']'
+    '[' (i = INT | h = HEX | n = IDENT) ']'
     ;
 
 dataType:
     v = ('UBYTE' | 'SBYTE' | 'UWORD' | 'SWORD' | 'ULONG' | 'SLONG' |
-    'A_UINT64' | 'A_INT64' | 'FLOAT16_IEEE' | 'FLOAT32_IEEE' | 'FLOAT64_IEEE')
+    'A_UINT64' | 'A_INT64' | 'FLOAT32_IEEE' | 'FLOAT64_IEEE')
     ;
 
 datasize:
@@ -1729,10 +1660,6 @@ byteOrderValue:
 
 indexorder:
     v = ('INDEX_INCR' | 'INDEX_DECR')
-    ;
-
-linkType:
-    v = 'SYMBOL_TYPE_LINK'
     ;
 
 BEGIN:
@@ -1764,7 +1691,7 @@ HEX:   '0'('x' | 'X') ('a' .. 'f' | 'A' .. 'F' | '0' .. '9')+
     ;
 
 COMMENT:
-    ('//' ~('\n'|'\r')* '\r'? '\n'
+    ('//' ~('\n'|'\r')* ('\r'? '\n')?
     |   '/*' .*? '*/')
         -> channel(HIDDEN)
     ;
@@ -1772,33 +1699,15 @@ COMMENT:
 WS  :   (' ' | '\t' | '\r' | '\n') -> skip
     ;
 
+/* chapter 6.2 of the specification allows a double inverted comma inside a string to be escaped
+   either with a backslash or by doubling it (compatibility with ASAP2 V1.2 and prior) */
 STRING:
-    '"' ( ESC_SEQ | ~('\\'|'"') )* '"'
+    '"' ( ESC_SEQ | '""' | ~('\\'|'"') )* '"'
     ;
 
-fragment
-HEX_DIGIT : ('0'..'9'|'a'..'f'|'A'..'F') ;
-
+/* ASAM MCD-2 MC 1.6.1 (chapter 3.2) allows the escape sequences \", \', \\, \n, \r and \t;
+   ASAP2 1.51 allowed \r\n and \" only */
 fragment
 ESC_SEQ
-    :   '\\'
-        (   // The standard escaped character set such as tab, newline, etc.
-            [btnfr"'\\]
-        |   // A Java style Unicode escape sequence
-            UNICODE_ESC
-        |   // Invalid escape
-            .
-        |   // Invalid escape at end of file
-            EOF
-        )
-    ;
-fragment
-UNICODE_ESC
-    :   'u' (HEX_DIGIT (HEX_DIGIT (HEX_DIGIT HEX_DIGIT?)?)?)?
-;
-fragment
-OCTAL_ESC:
-    '\\' ('0'..'3') ('0'..'7') ('0'..'7')
-    |   '\\' ('0'..'7') ('0'..'7')
-    |   '\\' ('0'..'7')
+    :   '\\' ('r' | 'n' | 't' | '"' | '\'' | '\\')
     ;

@@ -1,7 +1,5 @@
 package a2l
 
-// ANNOTATION and its sub-keywords ANNOTATION_LABEL, ANNOTATION_ORIGIN and ANNOTATION_TEXT.
-
 import (
 	"testing"
 

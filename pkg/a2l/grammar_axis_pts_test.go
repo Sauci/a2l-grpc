@@ -1,7 +1,5 @@
 package a2l
 
-// AXIS_PTS (chapter 6.3.17) and the keywords describing the axis points of an AXIS_DESCR.
-
 import (
 	"testing"
 
@@ -109,12 +107,15 @@ ECU_ADDRESS_EXTENSION 1`)
 			"compu_method 8.0 0 0\n/end AXIS_PTS"))
 	})
 
-	// MONOTONY belongs to AXIS_DESCR, the specification does not declare it for AXIS_PTS.
-	t.Run("reject/MONOTONY", func(t *testing.T) {
-		deviation(t, "AXIS_PTS accepts MONOTONY and then fails with an internal error",
-			func(t assert.TestingT) {
-				parseFailsWithSyntaxError(t, axisPtsScope("MONOTONY MON_INCREASE"))
-			})
+	// ASAP2 1.51 declares MONOTONY for AXIS_DESCR only, ASAM MCD-2 MC 1.6.1 (chapter 3.5.18)
+	// added it to AXIS_PTS.
+	t.Run("optional/MONOTONY", func(t *testing.T) {
+		axisPts, ok := parseAxisPts(t, "MONOTONY MON_INCREASE")
+		if !ok {
+			return
+		}
+
+		equalNode(t, &MonotonyType{Monotony: "MON_INCREASE"}, axisPts.MONOTONY)
 	})
 }
 
@@ -160,8 +161,22 @@ func TestGrammar_FIX_AXIS_PAR(t *testing.T) {
 		}
 
 		equalNode(t, &FixAxisParType{
-			Offset:    intVal("0"),
-			Shift:     intVal("4"),
+			Offset:    floatVal("0"),
+			Shift:     floatVal("4"),
+			Numberapo: intVal("6"),
+		}, axisDescr.FIX_AXIS_PAR)
+	})
+
+	// Offset and Shift are of type float since ASAM MCD-2 MC 1.6.1 (chapter 1.4.4).
+	t.Run("accept/float offset and shift", func(t *testing.T) {
+		axisDescr, ok := parseAxisDescr(t, "FIX_AXIS_PAR 0.5 4.25 6")
+		if !ok {
+			return
+		}
+
+		equalNode(t, &FixAxisParType{
+			Offset:    floatVal("0.5"),
+			Shift:     floatVal("4.25"),
 			Numberapo: intVal("6"),
 		}, axisDescr.FIX_AXIS_PAR)
 	})
@@ -170,8 +185,8 @@ func TestGrammar_FIX_AXIS_PAR(t *testing.T) {
 		parseFails(t, axisDescrScope("FIX_AXIS_PAR 0 4"))
 	})
 
-	t.Run("reject/float parameter", func(t *testing.T) {
-		parseFails(t, axisDescrScope("FIX_AXIS_PAR 0.0 4 6"))
+	t.Run("reject/float number of axis points", func(t *testing.T) {
+		parseFails(t, axisDescrScope("FIX_AXIS_PAR 0 4 6.0"))
 	})
 }
 
@@ -183,8 +198,8 @@ func TestGrammar_FIX_AXIS_PAR_DIST(t *testing.T) {
 		}
 
 		equalNode(t, &FixAxisParDistType{
-			Offset:    intVal("0"),
-			Distance:  intVal("100"),
+			Offset:    floatVal("0"),
+			Distance:  floatVal("100"),
 			Numberapo: intVal("8"),
 		}, axisDescr.FIX_AXIS_PAR_DIST)
 	})
@@ -242,7 +257,6 @@ func TestGrammar_MAX_GRAD(t *testing.T) {
 }
 
 func TestGrammar_MONOTONY(t *testing.T) {
-	// ASAP2 1.51 defines these four values, MONOTONOUS, STRICT_MON and NOT_MON were added later.
 	for _, monotony := range []string{
 		"MON_INCREASE", "MON_DECREASE", "STRICT_INCREASE", "STRICT_DECREASE",
 		"MONOTONOUS", "STRICT_MON", "NOT_MON",

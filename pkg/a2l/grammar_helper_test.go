@@ -29,10 +29,6 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-/*
-** Scope builders: wrap an A2L fragment into the smallest valid enclosing blocks.
- */
-
 func fileScope(body string) string {
 	return body + "\n"
 }
@@ -110,11 +106,6 @@ func varCriterionScope(body string) string {
 	return variantCodingScope("/begin VAR_CRITERION criterion \"\" first second\n" + body + "\n/end VAR_CRITERION")
 }
 
-/*
-** Parse helpers. Every helper returns ok == false when the fragment could not be parsed or
-** when the expected node is missing, so that the caller can stop without dereferencing nil.
- */
-
 // parse parses src, asserts that no syntax error is reported and that the resulting tree is
 // round-trip stable.
 func parse(t assert.TestingT, src string) (*RootNodeType, bool) {
@@ -131,8 +122,7 @@ func parse(t assert.TestingT, src string) (*RootNodeType, bool) {
 }
 
 // parseOnly parses src and asserts that no syntax error is reported, without checking the
-// round-trip stability of the tree. It is meant for the cases where the serializer is known not to
-// reproduce the layout of the original content.
+// round-trip stability of the tree.
 func parseOnly(t assert.TestingT, src string) (*RootNodeType, bool) {
 	markHelper(t)
 
@@ -143,10 +133,6 @@ func parseOnly(t assert.TestingT, src string) (*RootNodeType, bool) {
 
 	return tree, true
 }
-
-/*
-** Navigation inside a parsed tree.
- */
 
 func moduleOf(t assert.TestingT, tree *RootNodeType) (*ModuleType, bool) {
 	markHelper(t)
@@ -188,7 +174,6 @@ func axisDescrOf(t assert.TestingT, tree *RootNodeType) (*AxisDescrType, bool) {
 	return characteristic.AXIS_DESCR[0], true
 }
 
-// parseFails asserts that src is rejected by the parser.
 func parseFails(t assert.TestingT, src string) bool {
 	markHelper(t)
 
@@ -446,11 +431,6 @@ func parseVariantCoding(t assert.TestingT, body string) (*VariantCodingType, boo
 	return module.VARIANT_CODING, assert.NotNil(t, module.VARIANT_CODING, "VARIANT_CODING is missing from the tree")
 }
 
-/*
-** Assertions.
- */
-
-// equalNode compares a single node of the tree with its expected content.
 func equalNode(t assert.TestingT, expected, actual proto.Message) bool {
 	markHelper(t)
 
@@ -470,7 +450,6 @@ func equalNode(t assert.TestingT, expected, actual proto.Message) bool {
 	return false
 }
 
-// equalNodes compares a repeated field of the tree with its expected content.
 func equalNodes[T proto.Message](t assert.TestingT, expected, actual []T) bool {
 	markHelper(t)
 
@@ -523,7 +502,6 @@ func marshalTree(t assert.TestingT, tree *RootNodeType) (content string, ok bool
 	return tree.MarshalA2L(0, "  ", false), true
 }
 
-// assertRoundTrip checks that serializing the tree and parsing the result yields the same tree.
 func assertRoundTrip(t assert.TestingT, tree *RootNodeType) bool {
 	markHelper(t)
 
@@ -738,44 +716,6 @@ func testIdentifierListKeyword[T proto.Message](
 	})
 }
 
-/*
-** Known deviations from the specification.
- */
-
-// deviation documents a known deviation of the current implementation from the specification. The
-// assertions of body describe the behaviour required by the specification:
-//
-//   - as long as they fail, the test fails as well and reports the deviation, so that a run of the
-//     suite lists everything which still has to be corrected;
-//   - as soon as they all pass, the deviation has been corrected and the test fails with a
-//     different message, so that the wrapper gets removed and the assertions become binding.
-func deviation(t *testing.T, reference string, body func(t assert.TestingT)) {
-	t.Helper()
-
-	recorder := &deviationRecorder{}
-
-	body(recorder)
-
-	if len(recorder.failures) == 0 {
-		t.Fatalf("known deviation %q does not reproduce anymore: "+
-			"remove the deviation() wrapper so that the assertions become binding", reference)
-	}
-
-	t.Errorf("deviation from the specification: %s\n%s", reference, strings.Join(recorder.failures, "\n"))
-}
-
-type deviationRecorder struct {
-	failures []string
-}
-
-func (r *deviationRecorder) Errorf(format string, args ...interface{}) {
-	r.failures = append(r.failures, fmt.Sprintf(format, args...))
-}
-
-/*
-** Value builders: they return the node the parser is expected to produce for an A2L literal.
- */
-
 func intVal(literal string) *IntType {
 	base, digits := numberBase(literal)
 
@@ -804,32 +744,7 @@ func floatVal(literal string) *FloatType {
 		panic(err)
 	}
 
-	result := &FloatType{Value: value}
-	mantissa := literal
-
-	if sign := mantissa[0:1]; sign == "+" || sign == "-" {
-		result.IntegralSign = proto.String(sign)
-		mantissa = mantissa[1:]
-	}
-
-	if integral, decimal, found := strings.Cut(mantissa, "."); found {
-		result.IntegralSize = uint32(len(integral))
-
-		if significand, exponent, hasExponent := strings.Cut(decimal, "e"); hasExponent {
-			result.DecimalSize = uint32(len(significand))
-
-			if sign := exponent[0:1]; sign == "+" || sign == "-" {
-				result.ExponentSign = proto.String(sign)
-				exponent = exponent[1:]
-			}
-
-			result.ExponentSize = uint32(len(exponent))
-		} else {
-			result.DecimalSize = uint32(len(decimal))
-		}
-	}
-
-	return result
+	return &FloatType{Value: value, Source: literal}
 }
 
 func identVal(value string) *IdentType {
@@ -859,10 +774,6 @@ func numberBase(literal string) (base int, digits string) {
 
 	return 10, literal
 }
-
-/*
-** Miscellaneous.
- */
 
 type tHelper interface {
 	Helper()

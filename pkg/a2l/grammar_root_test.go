@@ -1,8 +1,5 @@
 package a2l
 
-// Keywords of the file level: ASAP2_VERSION, A2ML_VERSION, PROJECT, HEADER, PROJECT_NO,
-// VERSION and MODULE.
-
 import (
 	"testing"
 
@@ -111,12 +108,9 @@ func TestGrammar_PROJECT(t *testing.T) {
 		parseFails(t, "")
 	})
 
-	// Deviation: a2lFile is not anchored to EOF, so everything which follows the PROJECT block
-	// is silently dropped instead of being reported as a syntax error.
+	// The description file consists of a single PROJECT block, content behind it is invalid.
 	t.Run("reject/content after PROJECT", func(t *testing.T) {
-		deviation(t, "a2lFile is not terminated by EOF", func(t assert.TestingT) {
-			parseFails(t, projectScope("")+"\nnot an A2L keyword\n")
-		})
+		parseFails(t, projectScope("")+"\nnot an A2L keyword\n")
 	})
 }
 
@@ -148,20 +142,15 @@ func TestGrammar_HEADER(t *testing.T) {
 		parseFails(t, projectScope("/begin HEADER\n/end HEADER"))
 	})
 
-	// Deviation: HEADER is declared once, before the MODULE blocks. The grammar accepts any
-	// number of them, at any position, and only the last one reaches the tree.
+	// Chapter 6.3.101 declares [-> HEADER]: at most one HEADER, before the MODULE blocks.
 	t.Run("reject/several HEADER", func(t *testing.T) {
-		deviation(t, "PROJECT accepts repeated HEADER", func(t assert.TestingT) {
-			parseFails(t, projectScope(
-				"/begin HEADER \"first\"\n/end HEADER\n/begin HEADER \"second\"\n/end HEADER"))
-		})
+		parseFails(t, projectScope(
+			"/begin HEADER \"first\"\n/end HEADER\n/begin HEADER \"second\"\n/end HEADER"))
 	})
 
 	t.Run("reject/HEADER after MODULE", func(t *testing.T) {
-		deviation(t, "PROJECT accepts HEADER after MODULE", func(t assert.TestingT) {
-			parseFails(t, projectScope(
-				"/begin MODULE module \"\" /end MODULE\n/begin HEADER \"comment\"\n/end HEADER"))
-		})
+		parseFails(t, projectScope(
+			"/begin MODULE module \"\" /end MODULE\n/begin HEADER \"comment\"\n/end HEADER"))
 	})
 }
 

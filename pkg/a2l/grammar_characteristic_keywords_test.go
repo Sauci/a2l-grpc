@@ -1,7 +1,5 @@
 package a2l
 
-// Keywords describing a single property of an adjustable object, a measurement object or an axis.
-
 import (
 	"testing"
 
@@ -351,20 +349,14 @@ func TestGrammar_REF_MEMORY_SEGMENT(t *testing.T) {
 	})
 }
 
-// DISCRETE, PHYS_UNIT, STEP_SIZE and SYMBOL_LINK are not part of ASAP2 1.51, they belong to a
-// later version of the standard. They are parsed into the tree, but the serializer does not write
-// them back.
 func TestGrammar_DISCRETE(t *testing.T) {
 	t.Run("mandatory parameters/in CHARACTERISTIC", func(t *testing.T) {
-		deviation(t, "CHARACTERISTIC serializer ignores DISCRETE, PHYS_UNIT and STEP_SIZE",
-			func(t assert.TestingT) {
-				characteristic, ok := parseCharacteristic(t, "DISCRETE")
-				if !ok {
-					return
-				}
+		characteristic, ok := parseCharacteristic(t, "DISCRETE")
+		if !ok {
+			return
+		}
 
-				equalNode(t, &DiscreteType{Present: true}, characteristic.DISCRETE)
-			})
+		equalNode(t, &DiscreteType{Present: true}, characteristic.DISCRETE)
 	})
 
 	t.Run("reject/with parameter", func(t *testing.T) {
@@ -374,15 +366,12 @@ func TestGrammar_DISCRETE(t *testing.T) {
 
 func TestGrammar_PHYS_UNIT(t *testing.T) {
 	t.Run("mandatory parameters/in CHARACTERISTIC", func(t *testing.T) {
-		deviation(t, "CHARACTERISTIC serializer ignores DISCRETE, PHYS_UNIT and STEP_SIZE",
-			func(t assert.TestingT) {
-				characteristic, ok := parseCharacteristic(t, "PHYS_UNIT \"km/h\"")
-				if !ok {
-					return
-				}
+		characteristic, ok := parseCharacteristic(t, "PHYS_UNIT \"km/h\"")
+		if !ok {
+			return
+		}
 
-				equalNode(t, &PhysUnitType{Unit: strVal("km/h")}, characteristic.PHYS_UNIT)
-			})
+		equalNode(t, &PhysUnitType{Unit: strVal("km/h")}, characteristic.PHYS_UNIT)
 	})
 
 	t.Run("reject/identifier parameter", func(t *testing.T) {
@@ -392,15 +381,12 @@ func TestGrammar_PHYS_UNIT(t *testing.T) {
 
 func TestGrammar_STEP_SIZE(t *testing.T) {
 	t.Run("mandatory parameters/in CHARACTERISTIC", func(t *testing.T) {
-		deviation(t, "CHARACTERISTIC serializer ignores DISCRETE, PHYS_UNIT and STEP_SIZE",
-			func(t assert.TestingT) {
-				characteristic, ok := parseCharacteristic(t, "STEP_SIZE 0.25")
-				if !ok {
-					return
-				}
+		characteristic, ok := parseCharacteristic(t, "STEP_SIZE 0.25")
+		if !ok {
+			return
+		}
 
-				equalNode(t, &StepSizeType{StepSize: floatVal("0.25")}, characteristic.STEP_SIZE)
-			})
+		equalNode(t, &StepSizeType{StepSize: floatVal("0.25")}, characteristic.STEP_SIZE)
 	})
 
 	t.Run("reject/missing step size", func(t *testing.T) {
@@ -410,15 +396,13 @@ func TestGrammar_STEP_SIZE(t *testing.T) {
 
 func TestGrammar_SYMBOL_LINK(t *testing.T) {
 	t.Run("mandatory parameters/in CHARACTERISTIC", func(t *testing.T) {
-		deviation(t, "CHARACTERISTIC serializer ignores SYMBOL_LINK", func(t assert.TestingT) {
-			characteristic, ok := parseCharacteristic(t, "SYMBOL_LINK \"symbol\" 4")
-			if !ok {
-				return
-			}
+		characteristic, ok := parseCharacteristic(t, "SYMBOL_LINK \"symbol\" 4")
+		if !ok {
+			return
+		}
 
-			equalNode(t, &SymbolLinkType{SymbolName: strVal("symbol"), Offset: longVal("4")},
-				characteristic.SYMBOL_LINK)
-		})
+		equalNode(t, &SymbolLinkType{SymbolName: strVal("symbol"), Offset: longVal("4")},
+			characteristic.SYMBOL_LINK)
 	})
 
 	t.Run("reject/missing offset", func(t *testing.T) {

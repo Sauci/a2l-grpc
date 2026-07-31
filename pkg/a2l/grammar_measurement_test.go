@@ -1,7 +1,5 @@
 package a2l
 
-// MEASUREMENT (chapter 6.3.86) and the keywords it contains.
-
 import (
 	"testing"
 
@@ -312,21 +310,15 @@ func TestGrammar_VIRTUAL(t *testing.T) {
 	})
 }
 
-// LAYOUT, DISCRETE, PHYS_UNIT and SYMBOL_LINK are not part of ASAP2 1.51, they belong to a later
-// version of the standard.
 func TestGrammar_LAYOUT(t *testing.T) {
-	// Deviation: LAYOUT is parsed and stored in the tree, but MeasurementType.MarshalA2L does not
-	// write it back, so it is lost by a parse/serialize cycle.
 	for _, indexMode := range []string{"ROW_DIR", "COLUMN_DIR"} {
 		t.Run("enum/"+indexMode, func(t *testing.T) {
-			deviation(t, "MEASUREMENT serializer ignores LAYOUT", func(t assert.TestingT) {
-				measurement, ok := parseMeasurement(t, "LAYOUT "+indexMode)
-				if !ok {
-					return
-				}
+			measurement, ok := parseMeasurement(t, "LAYOUT "+indexMode)
+			if !ok {
+				return
+			}
 
-				equalNode(t, &LayoutType{IndexMode: indexMode}, measurement.LAYOUT)
-			})
+			equalNode(t, &LayoutType{IndexMode: indexMode}, measurement.LAYOUT)
 		})
 	}
 

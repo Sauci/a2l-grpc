@@ -1,8 +1,5 @@
 package a2l
 
-// FUNCTION (chapter 6.3.65), GROUP (chapter 6.3.68), USER_RIGHTS (chapter 6.3.130) and the
-// identifier lists they contain.
-
 import (
 	"testing"
 
@@ -63,12 +60,15 @@ FUNCTION_VERSION "1.0"`)
 		parseFails(t, moduleScope("/begin FUNCTION function\n/end FUNCTION"))
 	})
 
-	// ASAP2 1.51 does not declare IF_DATA for FUNCTION.
-	t.Run("reject/IF_DATA", func(t *testing.T) {
-		deviation(t, "FUNCTION accepts IF_DATA and then fails with an internal error",
-			func(t assert.TestingT) {
-				parseFailsWithSyntaxError(t, functionScope("/begin IF_DATA XCP\n/end IF_DATA"))
-			})
+	// ASAP2 1.51 does not declare IF_DATA for FUNCTION, ASAM MCD-2 MC 1.6.1 (chapter 3.5.68)
+	// added it.
+	t.Run("optional/IF_DATA", func(t *testing.T) {
+		function, ok := parseFunction(t, "/begin IF_DATA XCP\n/end IF_DATA")
+		if !ok {
+			return
+		}
+
+		equalNodes(t, []*IfDataType{{Name: identVal("XCP")}}, function.IF_DATA)
 	})
 }
 
@@ -219,6 +219,16 @@ func TestGrammar_FUNCTION_LIST(t *testing.T) {
 }
 
 func TestGrammar_GROUP(t *testing.T) {
+	// ASAM MCD-2 MC 1.6.1 (chapter 3.5.71) declares IF_DATA for GROUP.
+	t.Run("optional/IF_DATA", func(t *testing.T) {
+		group, ok := parseGroup(t, "/begin IF_DATA XCP\n/end IF_DATA")
+		if !ok {
+			return
+		}
+
+		equalNodes(t, []*IfDataType{{Name: identVal("XCP")}}, group.IF_DATA)
+	})
+
 	t.Run("mandatory parameters", func(t *testing.T) {
 		module, ok := parseModule(t, "/begin GROUP group \"long identifier\"\n/end GROUP")
 		if !ok {
@@ -266,13 +276,10 @@ ROOT
 		parseFails(t, moduleScope("/begin GROUP group\n/end GROUP"))
 	})
 
-	// Deviation: the specification declares SUB_GROUP once per group. The grammar accepts a
-	// repetition, and only the last one is kept in the tree.
+	// Chapter 6.3.68 declares [-> SUB_GROUP]: at most one SUB_GROUP per GROUP.
 	t.Run("reject/repeated SUB_GROUP", func(t *testing.T) {
-		deviation(t, "optional keywords may be repeated", func(t assert.TestingT) {
-			parseFails(t, groupScope("/begin SUB_GROUP first\n/end SUB_GROUP\n"+
-				"/begin SUB_GROUP second\n/end SUB_GROUP"))
-		})
+		parseFails(t, groupScope("/begin SUB_GROUP first\n/end SUB_GROUP\n"+
+			"/begin SUB_GROUP second\n/end SUB_GROUP"))
 	})
 }
 

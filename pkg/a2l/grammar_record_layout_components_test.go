@@ -1,21 +1,8 @@
 package a2l
 
-// Components of RECORD_LAYOUT which share a prototype: the axis point, rescale, number of axis
-// points, source address, result of interpolation address, shift operand, offset and distance
-// operand keywords.
-//
-// ASAP2 1.51 defines these keywords for the X, Y and Z axis only, RIP_ADDR in addition for W. The
-// keywords for the fourth and fifth axis belong to a later version of the standard.
-
 import (
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
-
-/*
-** AXIS_PTS_X/_Y/_Z, chapter 6.3.19.
- */
 
 func TestGrammar_AXIS_PTS_X(t *testing.T) {
 	testAxisPtsKeyword(t, "AXIS_PTS_X",
@@ -43,16 +30,9 @@ func TestGrammar_AXIS_PTS_Z(t *testing.T) {
 
 func TestGrammar_AXIS_PTS_5(t *testing.T) {
 	t.Run("mandatory parameters", func(t *testing.T) {
-		deviation(t, "the fourth and fifth dimension keywords have no node in the tree",
-			func(t assert.TestingT) {
-				assertPreserved(t, recordLayoutScope("AXIS_PTS_5 1 UBYTE INDEX_INCR DIRECT"), "AXIS_PTS_5")
-			})
+		assertPreserved(t, recordLayoutScope("AXIS_PTS_5 1 UBYTE INDEX_INCR DIRECT"), "AXIS_PTS_5")
 	})
 }
-
-/*
-** AXIS_RESCALE_X/_Y/_Z, chapter 6.3.20.
- */
 
 func TestGrammar_AXIS_RESCALE_Y(t *testing.T) {
 	testAxisRescaleKeyword(t, "AXIS_RESCALE_Y",
@@ -86,25 +66,15 @@ func TestGrammar_AXIS_RESCALE_Z(t *testing.T) {
 
 func TestGrammar_AXIS_RESCALE_4(t *testing.T) {
 	t.Run("mandatory parameters", func(t *testing.T) {
-		deviation(t, "the fourth and fifth dimension keywords have no node in the tree",
-			func(t assert.TestingT) {
-				assertPreserved(t, recordLayoutScope("AXIS_RESCALE_4 1 UBYTE 4 INDEX_INCR DIRECT"), "AXIS_RESCALE_4")
-			})
+		assertPreserved(t, recordLayoutScope("AXIS_RESCALE_4 1 UBYTE 4 INDEX_INCR DIRECT"), "AXIS_RESCALE_4")
 	})
 }
 
 func TestGrammar_AXIS_RESCALE_5(t *testing.T) {
 	t.Run("mandatory parameters", func(t *testing.T) {
-		deviation(t, "the fourth and fifth dimension keywords have no node in the tree",
-			func(t assert.TestingT) {
-				assertPreserved(t, recordLayoutScope("AXIS_RESCALE_5 1 UBYTE 4 INDEX_INCR DIRECT"), "AXIS_RESCALE_5")
-			})
+		assertPreserved(t, recordLayoutScope("AXIS_RESCALE_5 1 UBYTE 4 INDEX_INCR DIRECT"), "AXIS_RESCALE_5")
 	})
 }
-
-/*
-** NO_AXIS_PTS_X/_Y/_Z, chapter 6.3.94.
- */
 
 func TestGrammar_NO_AXIS_PTS_X(t *testing.T) {
 	testPositionDataTypeKeyword(t, "NO_AXIS_PTS_X",
@@ -132,16 +102,9 @@ func TestGrammar_NO_AXIS_PTS_Z(t *testing.T) {
 
 func TestGrammar_NO_AXIS_PTS_5(t *testing.T) {
 	t.Run("mandatory parameters", func(t *testing.T) {
-		deviation(t, "the fourth and fifth dimension keywords have no node in the tree",
-			func(t assert.TestingT) {
-				assertPreserved(t, recordLayoutScope("NO_AXIS_PTS_5 1 UBYTE"), "NO_AXIS_PTS_5")
-			})
+		assertPreserved(t, recordLayoutScope("NO_AXIS_PTS_5 1 UBYTE"), "NO_AXIS_PTS_5")
 	})
 }
-
-/*
-** NO_RESCALE_X/_Y/_Z, chapter 6.3.96.
- */
 
 func TestGrammar_NO_RESCALE_X(t *testing.T) {
 	testPositionDataTypeKeyword(t, "NO_RESCALE_X",
@@ -169,25 +132,15 @@ func TestGrammar_NO_RESCALE_Z(t *testing.T) {
 
 func TestGrammar_NO_RESCALE_4(t *testing.T) {
 	t.Run("mandatory parameters", func(t *testing.T) {
-		deviation(t, "the fourth and fifth dimension keywords have no node in the tree",
-			func(t assert.TestingT) {
-				assertPreserved(t, recordLayoutScope("NO_RESCALE_4 1 UBYTE"), "NO_RESCALE_4")
-			})
+		assertPreserved(t, recordLayoutScope("NO_RESCALE_4 1 UBYTE"), "NO_RESCALE_4")
 	})
 }
 
 func TestGrammar_NO_RESCALE_5(t *testing.T) {
 	t.Run("mandatory parameters", func(t *testing.T) {
-		deviation(t, "the fourth and fifth dimension keywords have no node in the tree",
-			func(t assert.TestingT) {
-				assertPreserved(t, recordLayoutScope("NO_RESCALE_5 1 UBYTE"), "NO_RESCALE_5")
-			})
+		assertPreserved(t, recordLayoutScope("NO_RESCALE_5 1 UBYTE"), "NO_RESCALE_5")
 	})
 }
-
-/*
-** FIX_NO_AXIS_PTS_X/_Y/_Z, chapter 6.3.58.
- */
 
 func TestGrammar_FIX_NO_AXIS_PTS_X(t *testing.T) {
 	testFixNoAxisPtsKeyword(t, "FIX_NO_AXIS_PTS_X",
@@ -215,25 +168,15 @@ func TestGrammar_FIX_NO_AXIS_PTS_Z(t *testing.T) {
 
 func TestGrammar_FIX_NO_AXIS_PTS_4(t *testing.T) {
 	t.Run("mandatory parameters", func(t *testing.T) {
-		deviation(t, "the fourth and fifth dimension keywords have no node in the tree",
-			func(t assert.TestingT) {
-				assertPreserved(t, recordLayoutScope("FIX_NO_AXIS_PTS_4 17"), "FIX_NO_AXIS_PTS_4")
-			})
+		assertPreserved(t, recordLayoutScope("FIX_NO_AXIS_PTS_4 17"), "FIX_NO_AXIS_PTS_4")
 	})
 }
 
 func TestGrammar_FIX_NO_AXIS_PTS_5(t *testing.T) {
 	t.Run("mandatory parameters", func(t *testing.T) {
-		deviation(t, "the fourth and fifth dimension keywords have no node in the tree",
-			func(t assert.TestingT) {
-				assertPreserved(t, recordLayoutScope("FIX_NO_AXIS_PTS_5 17"), "FIX_NO_AXIS_PTS_5")
-			})
+		assertPreserved(t, recordLayoutScope("FIX_NO_AXIS_PTS_5 17"), "FIX_NO_AXIS_PTS_5")
 	})
 }
-
-/*
-** SRC_ADDR_X/_Y/_Z, chapter 6.3.121.
- */
 
 func TestGrammar_SRC_ADDR_X(t *testing.T) {
 	testPositionDataTypeKeyword(t, "SRC_ADDR_X",
@@ -261,25 +204,15 @@ func TestGrammar_SRC_ADDR_Z(t *testing.T) {
 
 func TestGrammar_SRC_ADDR_4(t *testing.T) {
 	t.Run("mandatory parameters", func(t *testing.T) {
-		deviation(t, "the fourth and fifth dimension keywords have no node in the tree",
-			func(t assert.TestingT) {
-				assertPreserved(t, recordLayoutScope("SRC_ADDR_4 1 UBYTE"), "SRC_ADDR_4")
-			})
+		assertPreserved(t, recordLayoutScope("SRC_ADDR_4 1 UBYTE"), "SRC_ADDR_4")
 	})
 }
 
 func TestGrammar_SRC_ADDR_5(t *testing.T) {
 	t.Run("mandatory parameters", func(t *testing.T) {
-		deviation(t, "the fourth and fifth dimension keywords have no node in the tree",
-			func(t assert.TestingT) {
-				assertPreserved(t, recordLayoutScope("SRC_ADDR_5 1 UBYTE"), "SRC_ADDR_5")
-			})
+		assertPreserved(t, recordLayoutScope("SRC_ADDR_5 1 UBYTE"), "SRC_ADDR_5")
 	})
 }
-
-/*
-** RIP_ADDR_W/_X/_Y/_Z, chapter 6.3.114.
- */
 
 func TestGrammar_RIP_ADDR_W(t *testing.T) {
 	testPositionDataTypeKeyword(t, "RIP_ADDR_W",
@@ -315,25 +248,15 @@ func TestGrammar_RIP_ADDR_Z(t *testing.T) {
 
 func TestGrammar_RIP_ADDR_4(t *testing.T) {
 	t.Run("mandatory parameters", func(t *testing.T) {
-		deviation(t, "the fourth and fifth dimension keywords have no node in the tree",
-			func(t assert.TestingT) {
-				assertPreserved(t, recordLayoutScope("RIP_ADDR_4 1 UBYTE"), "RIP_ADDR_4")
-			})
+		assertPreserved(t, recordLayoutScope("RIP_ADDR_4 1 UBYTE"), "RIP_ADDR_4")
 	})
 }
 
 func TestGrammar_RIP_ADDR_5(t *testing.T) {
 	t.Run("mandatory parameters", func(t *testing.T) {
-		deviation(t, "the fourth and fifth dimension keywords have no node in the tree",
-			func(t assert.TestingT) {
-				assertPreserved(t, recordLayoutScope("RIP_ADDR_5 1 UBYTE"), "RIP_ADDR_5")
-			})
+		assertPreserved(t, recordLayoutScope("RIP_ADDR_5 1 UBYTE"), "RIP_ADDR_5")
 	})
 }
-
-/*
-** SHIFT_OP_X/_Y/_Z, chapter 6.3.118.
- */
 
 func TestGrammar_SHIFT_OP_X(t *testing.T) {
 	testPositionDataTypeKeyword(t, "SHIFT_OP_X",
@@ -361,25 +284,15 @@ func TestGrammar_SHIFT_OP_Z(t *testing.T) {
 
 func TestGrammar_SHIFT_OP_4(t *testing.T) {
 	t.Run("mandatory parameters", func(t *testing.T) {
-		deviation(t, "the fourth and fifth dimension keywords have no node in the tree",
-			func(t assert.TestingT) {
-				assertPreserved(t, recordLayoutScope("SHIFT_OP_4 1 UBYTE"), "SHIFT_OP_4")
-			})
+		assertPreserved(t, recordLayoutScope("SHIFT_OP_4 1 UBYTE"), "SHIFT_OP_4")
 	})
 }
 
 func TestGrammar_SHIFT_OP_5(t *testing.T) {
 	t.Run("mandatory parameters", func(t *testing.T) {
-		deviation(t, "the fourth and fifth dimension keywords have no node in the tree",
-			func(t assert.TestingT) {
-				assertPreserved(t, recordLayoutScope("SHIFT_OP_5 1 UBYTE"), "SHIFT_OP_5")
-			})
+		assertPreserved(t, recordLayoutScope("SHIFT_OP_5 1 UBYTE"), "SHIFT_OP_5")
 	})
 }
-
-/*
-** OFFSET_X/_Y/_Z, chapter 6.3.98.
- */
 
 func TestGrammar_OFFSET_X(t *testing.T) {
 	testPositionDataTypeKeyword(t, "OFFSET_X",
@@ -407,25 +320,15 @@ func TestGrammar_OFFSET_Z(t *testing.T) {
 
 func TestGrammar_OFFSET_4(t *testing.T) {
 	t.Run("mandatory parameters", func(t *testing.T) {
-		deviation(t, "the fourth and fifth dimension keywords have no node in the tree",
-			func(t assert.TestingT) {
-				assertPreserved(t, recordLayoutScope("OFFSET_4 1 UBYTE"), "OFFSET_4")
-			})
+		assertPreserved(t, recordLayoutScope("OFFSET_4 1 UBYTE"), "OFFSET_4")
 	})
 }
 
 func TestGrammar_OFFSET_5(t *testing.T) {
 	t.Run("mandatory parameters", func(t *testing.T) {
-		deviation(t, "the fourth and fifth dimension keywords have no node in the tree",
-			func(t assert.TestingT) {
-				assertPreserved(t, recordLayoutScope("OFFSET_5 1 UBYTE"), "OFFSET_5")
-			})
+		assertPreserved(t, recordLayoutScope("OFFSET_5 1 UBYTE"), "OFFSET_5")
 	})
 }
-
-/*
-** DIST_OP_X/_Y/_Z, chapter 6.3.46.
- */
 
 func TestGrammar_DIST_OP_X(t *testing.T) {
 	testPositionDataTypeKeyword(t, "DIST_OP_X",
@@ -453,25 +356,15 @@ func TestGrammar_DIST_OP_Z(t *testing.T) {
 
 func TestGrammar_DIST_OP_4(t *testing.T) {
 	t.Run("mandatory parameters", func(t *testing.T) {
-		deviation(t, "the fourth and fifth dimension keywords have no node in the tree",
-			func(t assert.TestingT) {
-				assertPreserved(t, recordLayoutScope("DIST_OP_4 1 UBYTE"), "DIST_OP_4")
-			})
+		assertPreserved(t, recordLayoutScope("DIST_OP_4 1 UBYTE"), "DIST_OP_4")
 	})
 }
 
 func TestGrammar_DIST_OP_5(t *testing.T) {
 	t.Run("mandatory parameters", func(t *testing.T) {
-		deviation(t, "the fourth and fifth dimension keywords have no node in the tree",
-			func(t assert.TestingT) {
-				assertPreserved(t, recordLayoutScope("DIST_OP_5 1 UBYTE"), "DIST_OP_5")
-			})
+		assertPreserved(t, recordLayoutScope("DIST_OP_5 1 UBYTE"), "DIST_OP_5")
 	})
 }
-
-/*
-** IDENTIFICATION, chapter 6.3.71.
- */
 
 func TestGrammar_IDENTIFICATION(t *testing.T) {
 	testPositionDataTypeKeyword(t, "IDENTIFICATION",
