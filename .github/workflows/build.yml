@@ -2,6 +2,9 @@ name: build
 
 on: [push, pull_request]
 
+env:
+  LLVM_MINGW_VERSION: 20260616
+
 jobs:
   generate-antlr-sources:
     runs-on: ubuntu-22.04
@@ -64,6 +67,9 @@ jobs:
     needs:
       - generate-antlr-sources
       - generate-grpc-sources
+    env:
+      CGO_ENABLED: 1
+      GOARCH: arm64
     steps:
       - uses: actions/checkout@v7
       - uses: actions/download-artifact@v8
@@ -79,6 +85,14 @@ jobs:
         with:
           go-version: stable
           cache: true
+      - name: Install ARM64 MinGW toolchain
+        shell: powershell
+        run: |
+          $name = "llvm-mingw-$env:LLVM_MINGW_VERSION-ucrt-aarch64"
+          Invoke-WebRequest -Uri "https://github.com/mstorsjo/llvm-mingw/releases/download/$env:LLVM_MINGW_VERSION/$name.zip" -OutFile "$env:RUNNER_TEMP/toolchain.zip"
+          Expand-Archive -Path "$env:RUNNER_TEMP/toolchain.zip" -DestinationPath $env:RUNNER_TEMP
+          "$env:RUNNER_TEMP\$name\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          "CC=aarch64-w64-mingw32-gcc" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       - run: |
           go get github.com/antlr4-go/antlr/v4
           go test ./cmd/a2l/... ./pkg/a2l/...
@@ -224,7 +238,6 @@ jobs:
     env:
       CGO_ENABLED: 1
       GOARCH: arm64
-      LLVM_MINGW_VERSION: 20260616
     steps:
       - uses: actions/checkout@v7
       - uses: actions/download-artifact@v8
@@ -244,8 +257,8 @@ jobs:
         shell: powershell
         run: |
           $name = "llvm-mingw-$env:LLVM_MINGW_VERSION-ucrt-aarch64"
-          Invoke-WebRequest -Uri "https://github.com/mstorsjo/llvm-mingw/releases/download/$env:LLVM_MINGW_VERSION/$name.zip" -OutFile toolchain.zip
-          Expand-Archive -Path toolchain.zip -DestinationPath $env:RUNNER_TEMP
+          Invoke-WebRequest -Uri "https://github.com/mstorsjo/llvm-mingw/releases/download/$env:LLVM_MINGW_VERSION/$name.zip" -OutFile "$env:RUNNER_TEMP/toolchain.zip"
+          Expand-Archive -Path "$env:RUNNER_TEMP/toolchain.zip" -DestinationPath $env:RUNNER_TEMP
           "$env:RUNNER_TEMP\$name\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           "CC=aarch64-w64-mingw32-gcc" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       - shell: powershell
