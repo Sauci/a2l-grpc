@@ -59,6 +59,29 @@ jobs:
       - run: |
           go get github.com/antlr4-go/antlr/v4
           go test ./cmd/a2l/... ./pkg/a2l/...
+  test-windows-arm64:
+    runs-on: windows-11-arm
+    needs:
+      - generate-antlr-sources
+      - generate-grpc-sources
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: antlr4
+          path: pkg/a2l/parser
+      - uses: actions/download-artifact@v8
+        with:
+          name: grpc
+          path: pkg/a2l
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: stable
+          cache: true
+      - run: |
+          go get github.com/antlr4-go/antlr/v4
+          go test ./cmd/a2l/... ./pkg/a2l/...
   test-mac:
     runs-on: macos-latest-xlarge
     needs:
@@ -194,6 +217,47 @@ jobs:
           path: |
             *.dll
             *.h
+  build-windows-arm64:
+    runs-on: windows-11-arm
+    needs:
+      - test-windows-arm64
+    env:
+      CGO_ENABLED: 1
+      GOARCH: arm64
+      LLVM_MINGW_VERSION: 20260616
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: antlr4
+          path: pkg/a2l/parser
+      - uses: actions/download-artifact@v8
+        with:
+          name: grpc
+          path: pkg/a2l
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: stable
+          cache: true
+      - name: Install ARM64 MinGW toolchain
+        shell: powershell
+        run: |
+          $name = "llvm-mingw-$env:LLVM_MINGW_VERSION-ucrt-aarch64"
+          Invoke-WebRequest -Uri "https://github.com/mstorsjo/llvm-mingw/releases/download/$env:LLVM_MINGW_VERSION/$name.zip" -OutFile toolchain.zip
+          Expand-Archive -Path toolchain.zip -DestinationPath $env:RUNNER_TEMP
+          "$env:RUNNER_TEMP\$name\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          "CC=aarch64-w64-mingw32-gcc" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+      - shell: powershell
+        run: |
+          go get github.com/antlr4-go/antlr/v4
+          go build --buildmode=c-shared -o a2l_grpc_$(go env GOOS)_$(go env GOARCH).dll ./cmd/a2l/a2l.go
+      - uses: actions/upload-artifact@v7
+        with:
+          name: windows_arm64
+          path: |
+            *.dll
+            *.h
   build-mac-intel:
     runs-on: macos-15-intel
     needs:
@@ -211,7 +275,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v6
         with:
-          go-version-file: go.mod
+          go-version: stable
           cache: true
       - run: |
           go get github.com/antlr4-go/antlr/v4
@@ -239,7 +303,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v6
         with:
-          go-version-file: go.mod
+          go-version: stable
           cache: true
       - run: |
           go get github.com/antlr4-go/antlr/v4
@@ -266,6 +330,7 @@ jobs:
     needs:
       - build-linux
       - build-windows
+      - build-windows-arm64
       - build-mac-intel
       - build-mac-arm64
       - export-protobuf-definitions
@@ -296,6 +361,10 @@ jobs:
       - uses: actions/download-artifact@v8
         with:
           name: windows_amd64
+          path: a2l_grpc
+      - uses: actions/download-artifact@v8
+        with:
+          name: windows_arm64
           path: a2l_grpc
       - uses: actions/download-artifact@v8
         with:
