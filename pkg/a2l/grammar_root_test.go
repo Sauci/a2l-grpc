@@ -6,6 +6,55 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// The byte-order mark declares the encoding of the file (ASAM MCD-2 MC 1.6.1, chapter 1.5.2) and
+// is not part of its content. UTF-8 is the preferred encoding, and chapter 1.5.1 requires tools to
+// support at least it, so a leading UTF-8 mark has to be accepted and ignored.
+func TestGrammar_ByteOrderMark(t *testing.T) {
+	const byteOrderMark = "\uFEFF"
+
+	t.Run("accept/before ASAP2_VERSION", func(t *testing.T) {
+		tree, ok := parse(t, byteOrderMark+"ASAP2_VERSION 1 61\n"+projectScope(""))
+		if !ok {
+			return
+		}
+
+		equalNode(t, &ASAP2VersionType{
+			VersionNo: intVal("1"),
+			UpgradeNo: intVal("61"),
+		}, tree.ASAP2_VERSION)
+	})
+
+	t.Run("accept/before PROJECT", func(t *testing.T) {
+		tree, ok := parse(t, byteOrderMark+projectScope(""))
+		if !ok || !assert.NotNil(t, tree.PROJECT) {
+			return
+		}
+
+		equalNode(t, identVal("project"), tree.PROJECT.Name)
+	})
+
+	// The mark carries no information besides the encoding, so it must not reach the tree.
+	t.Run("tree is identical to the same content without the mark", func(t *testing.T) {
+		expected, ok := parseOnly(t, "ASAP2_VERSION 1 61\n"+projectScope(""))
+		if !ok {
+			return
+		}
+
+		actual, ok := parseOnly(t, byteOrderMark+"ASAP2_VERSION 1 61\n"+projectScope(""))
+		if !ok {
+			return
+		}
+
+		equalNode(t, expected, actual)
+	})
+
+	// Chapter 1.5.2 defines the mark as a byte sequence at the beginning of the file; the same
+	// sequence anywhere else is not a mark and stays invalid.
+	t.Run("reject/inside the file", func(t *testing.T) {
+		parseFails(t, projectScope(byteOrderMark))
+	})
+}
+
 func TestGrammar_ASAP2_VERSION(t *testing.T) {
 	t.Run("mandatory parameters", func(t *testing.T) {
 		tree, ok := parse(t, "ASAP2_VERSION 1 51\n"+projectScope(""))

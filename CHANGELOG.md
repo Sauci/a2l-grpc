@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Windows ARM64 shared library (`a2l_grpc_windows_arm64.dll`), built and tested natively in CI.
 
+### Fixed
+
+- A2L files starting with a UTF-8 byte-order mark are now parsed instead of being rejected on
+  their first character. The mark declares the encoding of the file (ASAM MCD-2 MC 1.6.1,
+  chapter 1.5.2) and is not part of its content.
+
 ## [0.2.0] - 2026-07-31
 
 ### Added

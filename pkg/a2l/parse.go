@@ -71,6 +71,10 @@ func GetTreeFromStringWithOptions(a2lString string, options ParseOptions) (resul
 		}
 	}()
 
+	// The byte-order mark declares the encoding of the file (ASAM MCD-2 MC 1.6.1, chapter 1.5.2).
+	// It is not part of the content and the lexer has no rule for it, so it is dropped here.
+	a2lString = strings.TrimPrefix(a2lString, "\uFEFF")
+
 	lexer := parser.NewA2LLexer(antlr.NewInputStream(a2lString))
 	lexer.RemoveErrorListeners()
 	lexer.AddErrorListener(&errorListener)
