@@ -75,7 +75,7 @@ ECU_ADDRESS_EXTENSION 1`)
 			DISPLAY_IDENTIFIER:    &DisplayIdentifierType{DisplayName: identVal("display_identifier")},
 			FORMAT:                &FormatType{FormatString: strVal("%4.2")},
 			BYTE_ORDER:            &ByteOrderType{ByteOrder: "MSB_FIRST"},
-			BIT_MASK:              &BitMaskType{Mask: longVal("0xFF")},
+			BIT_MASK:              &BitMaskType{Mask: uLongVal("0xFF")},
 			NUMBER:                &NumberType{Number: intVal("8")},
 			EXTENDED_LIMITS:       &ExtendedLimitsType{LowerLimit: floatVal("-20"), UpperLimit: floatVal("20")},
 			READ_ONLY:             &ReadOnlyType{Present: true},

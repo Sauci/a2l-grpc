@@ -738,6 +738,17 @@ func longVal(literal string) *LongType {
 	return &LongType{Value: value, Base: uint32(base), Size: uint32(len(digits))}
 }
 
+func uLongVal(literal string) *ULongType {
+	base, digits := numberBase(literal)
+
+	value, err := strconv.ParseUint(digits, base, 64)
+	if err != nil {
+		panic(err)
+	}
+
+	return &ULongType{Value: value, Base: uint32(base), Size: uint32(len(digits))}
+}
+
 func floatVal(literal string) *FloatType {
 	value, err := strconv.ParseFloat(literal, 64)
 	if err != nil {

@@ -197,9 +197,35 @@ func TestGrammar_HEADER(t *testing.T) {
 			"/begin HEADER \"first\"\n/end HEADER\n/begin HEADER \"second\"\n/end HEADER"))
 	})
 
-	t.Run("reject/HEADER after MODULE", func(t *testing.T) {
-		parseFails(t, projectScope(
-			"/begin MODULE module \"\" /end MODULE\n/begin HEADER \"comment\"\n/end HEADER"))
+	// Neither version prescribes an order for the optional elements. The prototype of chapter
+	// 3.5.99 lists HEADER before MODULE, but that is the order of the listing and not a syntax
+	// rule: the AXIS_PTS example of chapter 3.5.18 emits its own optional elements out of
+	// prototype order. Only the cardinality, "[-> HEADER]", is prescribed.
+	t.Run("HEADER after MODULE", func(t *testing.T) {
+		project, ok := parseProject(t,
+			"/begin MODULE module \"\" /end MODULE\n/begin HEADER \"comment\"\n/end HEADER")
+		if !ok {
+			return
+		}
+
+		equalNode(t, &HeaderType{Comment: strVal("comment")}, project.HEADER)
+		assert.Len(t, project.MODULE, 1)
+	})
+
+	t.Run("HEADER between two MODULE", func(t *testing.T) {
+		project, ok := parseProject(t,
+			"/begin MODULE first \"\" /end MODULE\n/begin HEADER \"comment\"\n/end HEADER\n"+
+				"/begin MODULE second \"\" /end MODULE")
+		if !ok {
+			return
+		}
+
+		equalNode(t, &HeaderType{Comment: strVal("comment")}, project.HEADER)
+
+		if assert.Len(t, project.MODULE, 2) {
+			assert.Equal(t, "first", project.MODULE[0].Name.Value)
+			assert.Equal(t, "second", project.MODULE[1].Name.Value)
+		}
 	})
 }
 

@@ -236,6 +236,11 @@ project:
     longIdentifier = stringValue
     /* optional part */
 
+    /* chapter 3.5.99 declares [-> HEADER] and [-> MODULE]*, i.e. at most one header and any
+       number of modules. It prescribes no order for them: the order of the prototype is the order
+       of the listing, not a syntax rule. Splitting the modules around the optional header keeps
+       the header at most once, which a single alternation loop could not express */
+    (v_module += module)*
     (v_header = header)?
     (v_module += module)*
     END 'PROJECT'
@@ -280,12 +285,12 @@ module:
         v_function += function |
         v_group += group |
         v_measurement += measurement |
-        v_modCommon += modCommon |
-        v_modPar += modPar |
+        v_modCommon = modCommon |
+        v_modPar = modPar |
         v_recordLayout += recordLayout |
         v_unit += unit |
         v_userRights += userRights |
-        v_variantCoding += variantCoding
+        v_variantCoding = variantCoding
     )*
     END 'MODULE'
     ;
@@ -306,22 +311,22 @@ axisPts:
 
     (
         v_annotation += annotation |
-        v_byteOrder += byteOrder |
-        v_calibrationAccess += calibrationAccess |
-        v_deposit += deposit |
-        v_displayIdentifier += displayIdentifier |
-        v_ecuAddressExtension += ecuAddressExtension |
-        v_extendedLimits += extendedLimits |
-        v_format_ += format |
-        v_functionList += functionList |
-        v_guardRails += guardRails |
+        v_byteOrder = byteOrder |
+        v_calibrationAccess = calibrationAccess |
+        v_deposit = deposit |
+        v_displayIdentifier = displayIdentifier |
+        v_ecuAddressExtension = ecuAddressExtension |
+        v_extendedLimits = extendedLimits |
+        v_format_ = format |
+        v_functionList = functionList |
+        v_guardRails = guardRails |
         v_ifData += ifData |
-        v_monotony += monotony |
-        v_physUnit += physUnit |
-        v_readOnly += readOnly |
-        v_refMemorySegment += refMemorySegment |
-        v_stepSize += stepSize |
-        v_symbolLink += symbolLink
+        v_monotony = monotony |
+        v_physUnit = physUnit |
+        v_readOnly = readOnly |
+        v_refMemorySegment = refMemorySegment |
+        v_stepSize = stepSize |
+        v_symbolLink = symbolLink
     )*
     END 'AXIS_PTS'
     ;
@@ -354,29 +359,29 @@ characteristic:
     (
         v_annotation += annotation |
         v_axisDescr += axisDescr |
-        v_bitMask += bitMask |
-        v_byteOrder += byteOrder |
-        v_calibrationAccess += calibrationAccess |
-        v_comparisonQuantity += comparisonQuantity |
-        v_dependentCharacteristic += dependentCharacteristic |
-        v_discrete += discrete |
-        v_displayIdentifier += displayIdentifier |
-        v_ecuAddressExtension += ecuAddressExtension |
-        v_extendedLimits += extendedLimits |
-        v_format_ += format |
-        v_functionList += functionList |
-        v_guardRails += guardRails |
+        v_bitMask = bitMask |
+        v_byteOrder = byteOrder |
+        v_calibrationAccess = calibrationAccess |
+        v_comparisonQuantity = comparisonQuantity |
+        v_dependentCharacteristic = dependentCharacteristic |
+        v_discrete = discrete |
+        v_displayIdentifier = displayIdentifier |
+        v_ecuAddressExtension = ecuAddressExtension |
+        v_extendedLimits = extendedLimits |
+        v_format_ = format |
+        v_functionList = functionList |
+        v_guardRails = guardRails |
         v_ifData += ifData |
-        v_mapList += mapList |
-        v_matrixDim += matrixDim |
-        v_maxRefresh += maxRefresh |
-        v_number += number |
-        v_physUnit += physUnit |
-        v_readOnly += readOnly |
-        v_refMemorySegment += refMemorySegment |
-        v_stepSize += stepSize |
-        v_symbolLink += symbolLink |
-        v_virtualCharacteristic += virtualCharacteristic
+        v_mapList = mapList |
+        v_matrixDim = matrixDim |
+        v_maxRefresh = maxRefresh |
+        v_number = number |
+        v_physUnit = physUnit |
+        v_readOnly = readOnly |
+        v_refMemorySegment = refMemorySegment |
+        v_stepSize = stepSize |
+        v_symbolLink = symbolLink |
+        v_virtualCharacteristic = virtualCharacteristic
     )*
     END 'CHARACTERISTIC'
     ;
@@ -402,20 +407,20 @@ axisDescr:
 
     (
         v_annotation += annotation |
-        v_axisPtsRef += axisPtsRef |
-        v_byteOrder += byteOrder |
-        v_curveAxisRef += curveAxisRef |
-        v_deposit += deposit |
-        v_extendedLimits += extendedLimits |
-        v_fixAxisPar += fixAxisPar |
-        v_fixAxisParDist += fixAxisParDist |
-        v_fixAxisParList += fixAxisParList |
-        v_format_ += format |
-        v_maxGrad += maxGrad |
-        v_monotony += monotony |
-        v_physUnit += physUnit |
-        v_readOnly += readOnly |
-        v_stepSize += stepSize
+        v_axisPtsRef = axisPtsRef |
+        v_byteOrder = byteOrder |
+        v_curveAxisRef = curveAxisRef |
+        v_deposit = deposit |
+        v_extendedLimits = extendedLimits |
+        v_fixAxisPar = fixAxisPar |
+        v_fixAxisParDist = fixAxisParDist |
+        v_fixAxisParList = fixAxisParList |
+        v_format_ = format |
+        v_maxGrad = maxGrad |
+        v_monotony = monotony |
+        v_physUnit = physUnit |
+        v_readOnly = readOnly |
+        v_stepSize = stepSize
     )*
     END 'AXIS_DESCR'
     ;
@@ -507,11 +512,11 @@ compuMethod:
 
     (
         vCoeffs = coeffs |
-        v_coeffsLinear += coeffsLinear |
+        v_coeffsLinear = coeffsLinear |
         vCompuTabRef = compuTabRef |
-        v_formula += formula |
+        v_formula = formula |
         vRefUnit = refUnit |
-        v_statusStringRef += statusStringRef
+        v_statusStringRef = statusStringRef
     )*
     END 'COMPU_METHOD'
     ;
@@ -543,7 +548,7 @@ formula:
     /* optional part */
 
     (
-        v_formulaInv += formulaInv
+        v_formulaInv = formulaInv
     )*
     END 'FORMULA'
     ;
@@ -626,7 +631,7 @@ frame:
     /* optional part */
 
     (
-        v_frameMeasurement += frameMeasurement |
+        v_frameMeasurement = frameMeasurement |
         v_ifData += ifData
     )*
     END 'FRAME'
@@ -645,14 +650,14 @@ function:
 
     (
         v_annotation += annotation |
-        v_defCharacteristic += defCharacteristic |
-        v_functionVersion += functionVersion |
+        v_defCharacteristic = defCharacteristic |
+        v_functionVersion = functionVersion |
         v_ifData += ifData |
-        v_inMeasurement += inMeasurement |
-        v_locMeasurement += locMeasurement |
-        v_outMeasurement += outMeasurement |
-        v_refCharacteristic += refCharacteristic |
-        v_subFunction += subFunction
+        v_inMeasurement = inMeasurement |
+        v_locMeasurement = locMeasurement |
+        v_outMeasurement = outMeasurement |
+        v_refCharacteristic = refCharacteristic |
+        v_subFunction = subFunction
     )*
     END 'FUNCTION'
     ;
@@ -742,24 +747,24 @@ measurement:
         v_annotation += annotation |
         vArraySize = arraySize |
         vBitMask = bitMask |
-        v_bitOperation += bitOperation |
-        v_byteOrder += byteOrder |
-        v_discrete += discrete |
-        v_displayIdentifier += displayIdentifier |
+        v_bitOperation = bitOperation |
+        v_byteOrder = byteOrder |
+        v_discrete = discrete |
+        v_displayIdentifier = displayIdentifier |
         vEcuAddress = ecuAddress |
         vEcuAddressExtension = ecuAddressExtension |
-        v_errorMask += errorMask |
+        v_errorMask = errorMask |
         vFormat = format |
-        v_functionList += functionList |
+        v_functionList = functionList |
         v_ifData += ifData |
-        v_layout += layout |
+        v_layout = layout |
         vMatrixDim = matrixDim |
-        v_maxRefresh += maxRefresh |
-        v_physUnit += physUnit |
-        v_readWrite += readWrite |
-        v_refMemorySegment += refMemorySegment |
-        v_symbolLink += symbolLink |
-        v_virtual += virtual
+        v_maxRefresh = maxRefresh |
+        v_physUnit = physUnit |
+        v_readWrite = readWrite |
+        v_refMemorySegment = refMemorySegment |
+        v_symbolLink = symbolLink |
+        v_virtual = virtual
     )*
     END 'MEASUREMENT'
     ;
@@ -774,9 +779,9 @@ bitOperation:
     /* optional part */
 
     (
-        v_leftShift += leftShift |
-        v_rightShift += rightShift |
-        v_signExtend += signExtend
+        v_leftShift = leftShift |
+        v_rightShift = rightShift |
+        v_signExtend = signExtend
     )*
     END 'BIT_OPERATION'
     ;
@@ -832,16 +837,16 @@ modCommon:
     /* optional part */
 
     (
-        v_alignmentByte += alignmentByte |
-        v_alignmentFloat32Ieee += alignmentFloat32Ieee |
-        v_alignmentFloat64Ieee += alignmentFloat64Ieee |
-        v_alignmentInt64 += alignmentInt64 |
-        v_alignmentLong += alignmentLong |
-        v_alignmentWord += alignmentWord |
-        v_byteOrder += byteOrder |
-        v_dataSize += dataSize |
-        v_deposit += deposit |
-        v_sRecLayout += sRecLayout
+        v_alignmentByte = alignmentByte |
+        v_alignmentFloat32Ieee = alignmentFloat32Ieee |
+        v_alignmentFloat64Ieee = alignmentFloat64Ieee |
+        v_alignmentInt64 = alignmentInt64 |
+        v_alignmentLong = alignmentLong |
+        v_alignmentWord = alignmentWord |
+        v_byteOrder = byteOrder |
+        v_dataSize = dataSize |
+        v_deposit = deposit |
+        v_sRecLayout = sRecLayout
     )*
     END 'MOD_COMMON'
     ;
@@ -864,20 +869,20 @@ modPar:
     (
         vAddrEpk += addrEpk |
         v_calibrationMethod += calibrationMethod |
-        v_cpuType += cpuType |
-        v_customer += customer |
-        v_customerNo += customerNo |
-        v_ecu += ecu |
-        v_ecuCalibrationOffset += ecuCalibrationOffset |
+        v_cpuType = cpuType |
+        v_customer = customer |
+        v_customerNo = customerNo |
+        v_ecu = ecu |
+        v_ecuCalibrationOffset = ecuCalibrationOffset |
         vEpk = epk |
         v_memoryLayout += memoryLayout |
         v_memorySegment += memorySegment |
-        v_noOfInterfaces += noOfInterfaces |
-        v_phoneNo += phoneNo |
-        v_supplier += supplier |
+        v_noOfInterfaces = noOfInterfaces |
+        v_phoneNo = phoneNo |
+        v_supplier = supplier |
         v_systemConstant += systemConstant |
-        v_user += user |
-        v_version += version
+        v_user = user |
+        v_version = version
     )*
     END 'MOD_PAR'
     ;
@@ -1048,67 +1053,67 @@ recordLayout:
     /* optional part */
 
     (
-        v_alignmentByte += alignmentByte |
-        v_alignmentFloat32Ieee += alignmentFloat32Ieee |
-        v_alignmentFloat64Ieee += alignmentFloat64Ieee |
-        v_alignmentInt64 += alignmentInt64 |
-        v_alignmentLong += alignmentLong |
-        v_alignmentWord += alignmentWord |
-        v_axisPtsX += axisPtsX |
-        v_axisPtsY += axisPtsY |
-        v_axisPtsZ += axisPtsZ |
-        v_axisPts4 += axisPts4 |
-        v_axisPts5 += axisPts5 |
-        v_axisRescaleX += axisRescaleX |
-        v_axisRescaleY += axisRescaleY |
-        v_axisRescaleZ += axisRescaleZ |
-        v_axisRescale4 += axisRescale4 |
-        v_axisRescale5 += axisRescale5 |
-        v_distOpX += distOpX |
-        v_distOpY += distOpY |
-        v_distOpZ += distOpZ |
-        v_distOp4 += distOp4 |
-        v_distOp5 += distOp5 |
-        v_fixNoAxisPtsX += fixNoAxisPtsX |
-        v_fixNoAxisPtsY += fixNoAxisPtsY |
-        v_fixNoAxisPtsZ += fixNoAxisPtsZ |
-        v_fixNoAxisPts4 += fixNoAxisPts4 |
-        v_fixNoAxisPts5 += fixNoAxisPts5 |
-        v_fncValues += fncValues |
-        v_identification += identification |
-        v_noAxisPtsX += noAxisPtsX |
-        v_noAxisPtsY += noAxisPtsY |
-        v_noAxisPtsZ += noAxisPtsZ |
-        v_noAxisPts4 += noAxisPts4 |
-        v_noAxisPts5 += noAxisPts5 |
-        v_staticRecordLayout += staticRecordLayout |
-        v_noRescaleX += noRescaleX |
-        v_noRescaleY += noRescaleY |
-        v_noRescaleZ += noRescaleZ |
-        v_noRescale4 += noRescale4 |
-        v_noRescale5 += noRescale5 |
-        v_offsetX += offsetX |
-        v_offsetY += offsetY |
-        v_offsetZ += offsetZ |
-        v_offset4 += offset4 |
-        v_offset5 += offset5 |
+        v_alignmentByte = alignmentByte |
+        v_alignmentFloat32Ieee = alignmentFloat32Ieee |
+        v_alignmentFloat64Ieee = alignmentFloat64Ieee |
+        v_alignmentInt64 = alignmentInt64 |
+        v_alignmentLong = alignmentLong |
+        v_alignmentWord = alignmentWord |
+        v_axisPtsX = axisPtsX |
+        v_axisPtsY = axisPtsY |
+        v_axisPtsZ = axisPtsZ |
+        v_axisPts4 = axisPts4 |
+        v_axisPts5 = axisPts5 |
+        v_axisRescaleX = axisRescaleX |
+        v_axisRescaleY = axisRescaleY |
+        v_axisRescaleZ = axisRescaleZ |
+        v_axisRescale4 = axisRescale4 |
+        v_axisRescale5 = axisRescale5 |
+        v_distOpX = distOpX |
+        v_distOpY = distOpY |
+        v_distOpZ = distOpZ |
+        v_distOp4 = distOp4 |
+        v_distOp5 = distOp5 |
+        v_fixNoAxisPtsX = fixNoAxisPtsX |
+        v_fixNoAxisPtsY = fixNoAxisPtsY |
+        v_fixNoAxisPtsZ = fixNoAxisPtsZ |
+        v_fixNoAxisPts4 = fixNoAxisPts4 |
+        v_fixNoAxisPts5 = fixNoAxisPts5 |
+        v_fncValues = fncValues |
+        v_identification = identification |
+        v_noAxisPtsX = noAxisPtsX |
+        v_noAxisPtsY = noAxisPtsY |
+        v_noAxisPtsZ = noAxisPtsZ |
+        v_noAxisPts4 = noAxisPts4 |
+        v_noAxisPts5 = noAxisPts5 |
+        v_staticRecordLayout = staticRecordLayout |
+        v_noRescaleX = noRescaleX |
+        v_noRescaleY = noRescaleY |
+        v_noRescaleZ = noRescaleZ |
+        v_noRescale4 = noRescale4 |
+        v_noRescale5 = noRescale5 |
+        v_offsetX = offsetX |
+        v_offsetY = offsetY |
+        v_offsetZ = offsetZ |
+        v_offset4 = offset4 |
+        v_offset5 = offset5 |
         v_reserved += reserved |
-        v_ripAddrW += ripAddrW |
-        v_ripAddrX += ripAddrX |
-        v_ripAddrY += ripAddrY |
-        v_ripAddrZ += ripAddrZ |
-        v_ripAddr4 += ripAddr4 |
-        v_ripAddr5 += ripAddr5 |
-        v_shiftOpX += shiftOpX |
-        v_shiftOpY += shiftOpY |
-        v_shiftOpZ += shiftOpZ |
-        v_shiftOp4 += shiftOp4 |
-        v_shiftOp5 += shiftOp5 |
-        v_srcAddrX += srcAddrX |
-        v_srcAddrY += srcAddrY |
-        v_srcAddrZ += srcAddrZ |
-        v_srcAddr4 += srcAddr4 |
-        v_srcAddr5 += srcAddr5
+        v_ripAddrW = ripAddrW |
+        v_ripAddrX = ripAddrX |
+        v_ripAddrY = ripAddrY |
+        v_ripAddrZ = ripAddrZ |
+        v_ripAddr4 = ripAddr4 |
+        v_ripAddr5 = ripAddr5 |
+        v_shiftOpX = shiftOpX |
+        v_shiftOpY = shiftOpY |
+        v_shiftOpZ = shiftOpZ |
+        v_shiftOp4 = shiftOp4 |
+        v_shiftOp5 = shiftOp5 |
+        v_srcAddrX = srcAddrX |
+        v_srcAddrY = srcAddrY |
+        v_srcAddrZ = srcAddrZ |
+        v_srcAddr4 = srcAddr4 |
+        v_srcAddr5 = srcAddr5
     )*
     END 'RECORD_LAYOUT'
     ;
@@ -1517,7 +1522,7 @@ userRights:
     /* optional part */
 
     (
-        v_readOnly += readOnly |
+        v_readOnly = readOnly |
         v_refGroup += refGroup
     )*
     END 'USER_RIGHTS'
@@ -1537,8 +1542,8 @@ variantCoding:
         v_varCharacteristic += varCharacteristic |
         v_varCriterion += varCriterion |
         v_varForbiddenComb += varForbiddenComb |
-        v_varNaming += varNaming |
-        v_varSeparator += varSeparator
+        v_varNaming = varNaming |
+        v_varSeparator = varSeparator
     )*
     END 'VARIANT_CODING'
     ;
@@ -1550,7 +1555,7 @@ varCharacteristic:
     /* optional part */
 
     (
-        v_varAddress += varAddress
+        v_varAddress = varAddress
     )*
     END 'VAR_CHARACTERISTIC'
     ;
@@ -1569,8 +1574,8 @@ varCriterion:
     /* optional part */
 
     (
-        v_varMeasurement += varMeasurement |
-        v_varSelectionCharacteristic += varSelectionCharacteristic
+        v_varMeasurement = varMeasurement |
+        v_varSelectionCharacteristic = varSelectionCharacteristic
     )*
     END 'VAR_CRITERION'
     ;
@@ -1594,14 +1599,13 @@ varForbiddenComb:
 varNaming:
      'VAR_NAMING'
 
-    /* ALPHA is reserved for a future extension of the standard (ASAM MCD-2 MC 1.6.1,
-       chapter 3.5.134); its use is reported by the version check */
-    tag =
-    (
-        'NUMERIC' |
-        'ALPHA'
-    )
-
+    /* NUMERIC is the only value the standard defines. The tag is matched as an identifier rather
+       than as a fixed alternation, so that ALPHA stays usable as an ordinary identifier: chapter
+       3.5.134 merely reserves it for a future extension, and the index of keywords and enum
+       values, which chapter 3.2 declares to be the list an identifier must not match, does not
+       contain it. Chapter 3.5.29 even uses ALPHA as an identifier in its own example. The value
+       is validated while the tree is built, so an unknown tag is still rejected */
+    tag = ('NUMERIC' | IDENT)
     ;
 
 varSeparator:
@@ -1619,8 +1623,12 @@ numericValue:
     f = FLOAT | i = INT | h = HEX
     ;
 
-/* per chapter 6.2 of the specification the hexadecimal notation is reserved to the int and long
-   data types, a float parameter must not use it */
+/* neither version states the restriction explicitly, but both attach the note "the notation of
+   hexadecimal values is fixed, e.g. 0xE0, 0xFF" to the integer data types only: in the two column
+   table of ASAP2 1.51 (chapter 6.2) it sits between the descriptions of int and long, never under
+   float. ASAM MCD-2 MC 1.6.1 (chapter 3.2) repeats the same wording. HEX is therefore excluded
+   here, on that reading, while a float written without a dot stays valid ("numbers without dot
+   are accepted as well") */
 floatValue:
     f = FLOAT | i = INT
     ;
@@ -1670,7 +1678,12 @@ END:
     '/end'
     ;
 
-IDENT: [a-zA-Z_][a-zA-Z_0-9.]*;
+/* one partial identifier. Chapter 3.2 describes an identifier as a "hierarchical concatenation of
+   partial strings separated by points" whose first character "must be a letter or an underscore".
+   The separating point is therefore matched by identifierValue rather than swallowed here, so that
+   the decomposition is real and a malformed partial string, e.g. an empty one in "a..b" or a
+   trailing one in "a.", is rejected instead of being accepted as a single identifier */
+IDENT: [a-zA-Z_][a-zA-Z_0-9]*;
 
 fragment
 EXPONENT : ('e'|'E') ('+'|'-')? ('0'..'9')+ ;
@@ -1699,10 +1712,11 @@ COMMENT:
 WS  :   (' ' | '\t' | '\r' | '\n') -> skip
     ;
 
-/* chapter 6.2 of the specification allows a double inverted comma inside a string to be escaped
-   either with a backslash or by doubling it (compatibility with ASAP2 V1.2 and prior) */
+/* ASAP2 1.51 (chapter 6.2) and ASAM MCD-2 MC 1.6.1 (chapter 3.2) both allow a double inverted
+   comma inside a string to be escaped either with a backslash or by doubling it (compatibility
+   with ASAP2 V1.2 and prior) */
 STRING:
-    '"' ( ESC_SEQ | '""' | ~('\\'|'"') )* '"'
+    '"' ( ESC_SEQ | '""' | ~('\\'|'"') | BAD_ESC_SEQ )* '"'
     ;
 
 /* ASAM MCD-2 MC 1.6.1 (chapter 3.2) allows the escape sequences \", \', \\, \n, \r and \t;
@@ -1710,4 +1724,14 @@ STRING:
 fragment
 ESC_SEQ
     :   '\\' ('r' | 'n' | 't' | '"' | '\'' | '\\')
+    ;
+
+/* any other backslash sequence, e.g. the "\d" of an unescaped Windows path. It is consumed so
+   that the literal still lexes as a single STRING: when it did not, the lexer resumed inside the
+   string content, the closing quote opened a new string which swallowed the rest of the file, and
+   a single malformed escape produced a pile of errors far from its cause. The sequence itself is
+   rejected while the tree is built, so the specification is still enforced */
+fragment
+BAD_ESC_SEQ
+    :   '\\' .
     ;

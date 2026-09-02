@@ -218,7 +218,7 @@ message BitOperationType {
 }
 
 message BitMaskType {
-  LongType Mask = 1 [json_name = "Mask"];
+  ULongType Mask = 1 [json_name = "Mask"];
 }
 
 message ByteOrderType {
@@ -448,7 +448,7 @@ message EpkType {
 }
 
 message ErrorMaskType {
-  LongType Mask = 1 [json_name = "Mask"];
+  ULongType Mask = 1 [json_name = "Mask"];
 }
 
 message ExtendedLimitsType {

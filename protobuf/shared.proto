@@ -14,6 +14,15 @@ message LongType {
   uint32 Size = 3;
 }
 
+// ULongType carries the parameters which ASAM MCD-2 MC 1.6.1 declares as uint64, i.e. BIT_MASK
+// and ERROR_MASK (chapter 1.4.4: "The keyword parameters from BIT_MASK and ERROR_MASK are
+// extended from ulong to uint64"). LongType cannot hold them, its value is signed.
+message ULongType {
+  uint64 Value = 1;
+  uint32 Base = 2;
+  uint32 Size = 3;
+}
+
 message FloatType {
   // 2 to 6 described the layout of the value (sign, number of digits, exponent); they are
   // replaced by Source, which holds the value as written

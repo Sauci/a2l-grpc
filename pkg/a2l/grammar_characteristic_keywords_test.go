@@ -13,7 +13,7 @@ func TestGrammar_BIT_MASK(t *testing.T) {
 			return
 		}
 
-		equalNode(t, &BitMaskType{Mask: longVal("0x40")}, characteristic.BIT_MASK)
+		equalNode(t, &BitMaskType{Mask: uLongVal("0x40")}, characteristic.BIT_MASK)
 	})
 
 	t.Run("mandatory parameters/in MEASUREMENT", func(t *testing.T) {
@@ -22,7 +22,20 @@ func TestGrammar_BIT_MASK(t *testing.T) {
 			return
 		}
 
-		equalNode(t, &BitMaskType{Mask: longVal("0x40")}, measurement.BIT_MASK)
+		equalNode(t, &BitMaskType{Mask: uLongVal("0x40")}, measurement.BIT_MASK)
+	})
+
+	// ASAM MCD-2 MC 1.6.1 chapter 1.4.4: "The keyword parameters from BIT_MASK and ERROR_MASK are
+	// extended from ulong to uint64", and chapter 3.5.22 declares "uint64 Mask". The whole
+	// unsigned 64 bit range therefore has to survive the parse and the round trip.
+	t.Run("mandatory parameters/full 64 bit mask", func(t *testing.T) {
+		measurement, ok := parseMeasurement(t, "BIT_MASK 0xFFFFFFFFFFFFFFFF")
+		if !ok {
+			return
+		}
+
+		equalNode(t, &BitMaskType{Mask: uLongVal("0xFFFFFFFFFFFFFFFF")}, measurement.BIT_MASK)
+		assert.Equal(t, uint64(1<<64-1), measurement.BIT_MASK.Mask.Value)
 	})
 
 	t.Run("reject/missing mask", func(t *testing.T) {
@@ -31,6 +44,10 @@ func TestGrammar_BIT_MASK(t *testing.T) {
 
 	t.Run("reject/float mask", func(t *testing.T) {
 		parseFails(t, characteristicScope("BIT_MASK 1.0"))
+	})
+
+	t.Run("reject/negative mask", func(t *testing.T) {
+		parseFailsWithSyntaxError(t, characteristicScope("BIT_MASK -1"))
 	})
 }
 

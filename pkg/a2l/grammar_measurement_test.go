@@ -70,11 +70,11 @@ ECU_ADDRESS_EXTENSION 1`)
 			READ_WRITE:            &ReadWriteType{Present: true},
 			FORMAT:                &FormatType{FormatString: strVal("%4.2")},
 			ARRAY_SIZE:            &ArraySizeType{Number: intVal("8")},
-			BIT_MASK:              &BitMaskType{Mask: longVal("0xFF")},
+			BIT_MASK:              &BitMaskType{Mask: uLongVal("0xFF")},
 			BYTE_ORDER:            &ByteOrderType{ByteOrder: "MSB_FIRST"},
 			MAX_REFRESH:           &MaxRefreshType{ScalingUnit: intVal("3"), Rate: longVal("10")},
 			ECU_ADDRESS:           &EcuAddressType{Address: longVal("0x1000")},
-			ERROR_MASK:            &ErrorMaskType{Mask: longVal("0x0F")},
+			ERROR_MASK:            &ErrorMaskType{Mask: uLongVal("0x0F")},
 			REF_MEMORY_SEGMENT:    &RefMemorySegmentType{Name: identVal("memory_segment")},
 			MATRIX_DIM:            &MatrixDimType{XDim: intVal("2"), YDim: intVal("3"), ZDim: intVal("4")},
 			ECU_ADDRESS_EXTENSION: &EcuAddressExtensionType{Extension: intVal("1")},
@@ -251,7 +251,7 @@ func TestGrammar_ERROR_MASK(t *testing.T) {
 			return
 		}
 
-		equalNode(t, &ErrorMaskType{Mask: longVal("0x0F")}, measurement.ERROR_MASK)
+		equalNode(t, &ErrorMaskType{Mask: uLongVal("0x0F")}, measurement.ERROR_MASK)
 	})
 
 	t.Run("reject/missing mask", func(t *testing.T) {

@@ -39,6 +39,37 @@ func a2lIntToIntType(integerValue parser.IIntegerValueContext) (result *IntType)
 	return result
 }
 
+// parseUint64Literal splits an integer literal into its base and digits and parses it as an
+// unsigned 64 bit value. It is shared by the tree builder and by the check which reports an out of
+// range literal as a syntax error.
+func parseUint64Literal(literal string) (value uint64, base int, digits string, err error) {
+	base, digits = 10, literal
+
+	if strings.HasPrefix(digits, "0x") || strings.HasPrefix(digits, "0X") {
+		base, digits = 16, digits[2:]
+	}
+
+	value, err = strconv.ParseUint(digits, base, 64)
+
+	return value, base, digits, err
+}
+
+// a2lULongToULongType converts the parameters which ASAM MCD-2 MC 1.6.1 declares as uint64. An
+// out of range literal yields no node: it is already reported as a syntax error, so the tree is
+// discarded anyway, and returning nil keeps the conversion free of panics.
+func a2lULongToULongType(integerValue parser.IIntegerValueContext) (result *ULongType) {
+	if integerValue == nil {
+		return nil
+	}
+
+	value, base, digits, err := parseUint64Literal(integerValue.GetText())
+	if err != nil {
+		return nil
+	}
+
+	return &ULongType{Value: value, Base: uint32(base), Size: uint32(len(digits))}
+}
+
 func a2lLongToLongType(integerValue parser.IIntegerValueContext) (result *LongType) {
 	var err error
 	var tmpResult int64

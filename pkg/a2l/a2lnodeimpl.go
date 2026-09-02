@@ -288,7 +288,7 @@ func (n *Listener) ExitAxisRescaleZ(_ *parser.AxisRescaleZContext) {
 }
 
 func (n *Listener) EnterBitMask(ctx *parser.BitMaskContext) {
-	n.Push(&BitMaskType{Mask: a2lLongToLongType(ctx.GetMask())})
+	n.Push(&BitMaskType{Mask: a2lULongToULongType(ctx.GetMask())})
 }
 
 func (n *Listener) ExitBitMask(_ *parser.BitMaskContext) {
@@ -708,7 +708,7 @@ func (n *Listener) ExitEpk(_ *parser.EpkContext) {
 }
 
 func (n *Listener) EnterErrorMask(ctx *parser.ErrorMaskContext) {
-	n.Push(&ErrorMaskType{Mask: a2lLongToLongType(ctx.GetMask())})
+	n.Push(&ErrorMaskType{Mask: a2lULongToULongType(ctx.GetMask())})
 }
 
 func (n *Listener) ExitErrorMask(_ *parser.ErrorMaskContext) {

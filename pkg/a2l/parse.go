@@ -91,6 +91,21 @@ func GetTreeFromStringWithOptions(a2lString string, options ParseOptions) (resul
 	versionCheck := newVersionCheckListener()
 	antlr.ParseTreeWalkerDefault.Walk(versionCheck, fileTree)
 
+	// Violations which do not depend on the declared version are always reported, the enforcement
+	// option only controls the version warnings.
+	errorListener.Errors = append(errorListener.Errors, versionCheck.errors...)
+
+	// ASAP2_VERSION is mandatory since ASAM MCD-2 MC 1.6.1 (chapters 1.4.4 and 3.5.16). Without it
+	// no construct can be gated, so a caller which asked for the check to be enforced is told that
+	// nothing could be verified instead of taking the empty result for a clean bill of health.
+	if options.EnforceVersionCheck && versionCheck.version == nil {
+		versionCheck.warnings = append(versionCheck.warnings, SyntaxError{
+			Line:   1,
+			Column: 0,
+			Msg:    "ASAP2_VERSION is missing, the version check cannot be performed",
+		})
+	}
+
 	if options.EnforceVersionCheck {
 		errorListener.Errors = append(errorListener.Errors, versionCheck.warnings...)
 	} else {

@@ -15,6 +15,12 @@ func TestGrammar_Terminal_IDENT(t *testing.T) {
 		"array[0]",
 		"array[SYMBOLIC_INDEX]",
 		"instance.element[2].member",
+		// ALPHA is named by chapter 3.5.134 as reserved for a future extension, but it is not an
+		// enum value of any published version and is absent from the index of keywords and enum
+		// values which chapter 3.2 declares to be the list an identifier must not match. Chapter
+		// 3.5.29 uses it as an identifier in its own example:
+		// "/begin DEPENDENT_CHARACTERISTIC "sin(X1)" ALPHA /end DEPENDENT_CHARACTERISTIC".
+		"ALPHA",
 	} {
 		t.Run("accept/"+identifier, func(t *testing.T) {
 			module, ok := parseModule(t,
@@ -40,6 +46,38 @@ func TestGrammar_Terminal_IDENT(t *testing.T) {
 		assert.Equal(t, "X", module.CHARACTERISTIC[1].Name.Value)
 	})
 
+	// Chapter 3.2 describes an identifier as a "hierarchical concatenation of partial strings
+	// separated by points", each of which has to obey the identifier laws of C: "the first
+	// character must be a letter or an underscore". An empty or digit-initial partial string
+	// satisfies neither.
+	for _, identifier := range []string{
+		"trailing.",
+		"empty..partial",
+		"digit.0partial",
+	} {
+		t.Run("reject/malformed partial identifier "+identifier, func(t *testing.T) {
+			parseFails(t, moduleScope(
+				"/begin CHARACTERISTIC "+identifier+" \"\" VALUE 0x0 record_layout 0 compu_method 0 0\n"+
+					"/end CHARACTERISTIC"))
+		})
+	}
+
+	// Chapter 3.2: the brackets at the end of a partial identifier "must contain a number or an
+	// alphabetic string (description of the index of an array element)", and the symbolic form is
+	// "a symbolic string which is defined as an enumerator of an ENUM definition of the C
+	// program". A signed literal is not such a number, and a C enumerator contains no point.
+	for _, identifier := range []string{
+		"array[-1]",
+		"array[+1]",
+		"array[symbolic.index]",
+	} {
+		t.Run("reject/malformed array index "+identifier, func(t *testing.T) {
+			parseFails(t, moduleScope(
+				"/begin CHARACTERISTIC "+identifier+" \"\" VALUE 0x0 record_layout 0 compu_method 0 0\n"+
+					"/end CHARACTERISTIC"))
+		})
+	}
+
 	t.Run("reject/leading digit", func(t *testing.T) {
 		parseFails(t, moduleScope(
 			"/begin CHARACTERISTIC 0identifier \"\" VALUE 0x0 record_layout 0 compu_method 0 0\n/end CHARACTERISTIC"))
@@ -59,9 +97,9 @@ func TestGrammar_Terminal_STRING(t *testing.T) {
 		value   string
 	}
 
-	// Note: the tree stores the source form of a string, the escape sequences allowed by chapter
-	// 6.2 (\r\n and \") are not decoded. The expected values below therefore contain the
-	// backslashes literally.
+	// Note: the tree stores the source form of a string, the escape sequences allowed by ASAP2
+	// 1.51 (chapter 6.2) and ASAM MCD-2 MC 1.6.1 (chapter 3.2) are not decoded. The expected
+	// values below therefore contain the backslashes literally.
 	for _, testCase := range []testCaseType{
 		{name: "accept/empty", literal: `""`, value: ""},
 		{name: "accept/spaces", literal: `"with spaces"`, value: "with spaces"},
@@ -79,7 +117,7 @@ func TestGrammar_Terminal_STRING(t *testing.T) {
 		})
 	}
 
-	// Chapter 6.2 allows a double inverted comma inside a string to be escaped by doubling it,
+	// Both versions allow a double inverted comma inside a string to be escaped by doubling it,
 	// as an alternative to the backslash notation (compatibility with ASAP2 V1.2 and prior).
 	t.Run("accept/doubled quote", func(t *testing.T) {
 		module, ok := parseModule(t, "/begin MOD_COMMON \"doubled \"\"quote\"\"\"\n/end MOD_COMMON")
@@ -103,6 +141,26 @@ func TestGrammar_Terminal_STRING(t *testing.T) {
 
 	t.Run("reject/escape sequence not allowed by the specification", func(t *testing.T) {
 		parseFails(t, moduleScope("/begin MOD_COMMON \"invalid \\q escape\"\n/end MOD_COMMON"))
+	})
+
+	// A malformed escape must not desynchronize the lexer. When the string does not lex as one
+	// token, the lexer resumes inside its content, the closing quote opens a new string which
+	// swallows the rest of the file, and the reported errors end up far away from the real fault.
+	// The whole literal is therefore consumed and the offending sequence reported on its own.
+	t.Run("reject/invalid escape is reported at the string, without a cascade", func(t *testing.T) {
+		_, err := GetTreeFromString(moduleScope(
+			"/begin MOD_COMMON \"a path C:\\data\\x\"\n/end MOD_COMMON\n" +
+				"/begin MOD_PAR \"unrelated\"\n/end MOD_PAR"))
+		if !assert.Error(t, err, "the invalid escape sequence should be rejected") {
+			return
+		}
+
+		assert.Contains(t, err.Error(), "escape sequence",
+			"the error should name the offending escape sequence")
+		assert.NotContains(t, err.Error(), "token recognition error",
+			"the string should lex as a single token instead of desynchronizing the lexer")
+		assert.NotContains(t, err.Error(), "error while building A2L tree",
+			"the parser should report a syntax error instead of an internal error")
 	})
 
 	t.Run("reject/unterminated string", func(t *testing.T) {
@@ -227,7 +285,9 @@ func TestGrammar_Terminal_FLOAT(t *testing.T) {
 		})
 	}
 
-	// Chapter 6.2 reserves the hexadecimal notation to the int and long data types.
+	// Both versions attach the note about the hexadecimal notation to the integer data types only
+	// (ASAP2 1.51 chapter 6.2, ASAM MCD-2 MC 1.6.1 chapter 3.2); neither states the restriction
+	// explicitly, so this is the reading the grammar implements, see floatValue.
 	t.Run("reject/hexadecimal value", func(t *testing.T) {
 		_, err := GetTreeFromString(axisDescrScope("MAX_GRAD 0x10"))
 		if assert.Error(t, err, "a hexadecimal value should not be accepted as a float") {

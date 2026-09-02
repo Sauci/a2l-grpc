@@ -3,7 +3,8 @@ package a2l
 // Version gating: the grammar accepts a superset of ASAP2 1.51. When the parsed file declares its
 // version with ASAP2_VERSION, every construct which requires a newer version of the standard than
 // the declared one is reported as a warning; with ParseOptions.EnforceVersionCheck the file is
-// rejected instead. A file which does not declare a version is not gated.
+// rejected instead. A file which does not declare a version is not gated; when the check is
+// enforced, the missing ASAP2_VERSION is reported instead.
 
 import (
 	"testing"
@@ -140,7 +141,25 @@ func TestGrammar_VersionCheck(t *testing.T) {
 
 	t.Run("no declared version is not gated", func(t *testing.T) {
 		_, warnings, err := GetTreeFromStringWithOptions(characteristicScope("STEP_SIZE 0.5"),
+			ParseOptions{})
+		assert.NoError(t, err)
+		assert.Empty(t, warnings)
+	})
+
+	// ASAP2_VERSION is mandatory since ASAM MCD-2 MC 1.6.1 (chapters 1.4.4 and 3.5.16). A file
+	// which does not declare it cannot be gated at all, so a caller which asked for the check to
+	// be enforced is told about it instead of silently getting no verification at all.
+	t.Run("missing ASAP2_VERSION is reported when the check is enforced", func(t *testing.T) {
+		_, _, err := GetTreeFromStringWithOptions(characteristicScope("STEP_SIZE 0.5"),
 			ParseOptions{EnforceVersionCheck: true})
+		if assert.Error(t, err, "the enforced check should report that it cannot verify anything") {
+			assert.Contains(t, err.Error(), "ASAP2_VERSION is missing")
+		}
+	})
+
+	t.Run("a declared version is not reported as missing", func(t *testing.T) {
+		_, warnings, err := GetTreeFromStringWithOptions("ASAP2_VERSION 1 61\n"+
+			characteristicScope("STEP_SIZE 0.5"), ParseOptions{EnforceVersionCheck: true})
 		assert.NoError(t, err)
 		assert.Empty(t, warnings)
 	})
@@ -189,5 +208,112 @@ func TestGrammar_VersionCheck(t *testing.T) {
 			characteristicScope("STEP_SIZE 0.5\nDISCRETE\nPHYS_UNIT \"km/h\""), ParseOptions{})
 		assert.NoError(t, err)
 		assert.Len(t, warnings, 3)
+	})
+}
+
+// Chapter 3.5.1 fixes the notation of the keyword prototypes: "Optional keywords are shown with
+// help of square brackets, which include an arrow followed by the keyword. If the keyword can be
+// used multiple times this is shown with help of asterisk after the closing bracket, e.g.
+// [-> keyword]*." A keyword written without the asterisk may appear at most once. The grammar
+// cannot express that, every optional element sits in a "( a | b | c )*" loop, so a repeat parses
+// and the tree builder keeps only the last occurrence: without this check the earlier ones are
+// dropped without a word.
+func TestGrammar_DuplicateSingleOccurrenceKeyword(t *testing.T) {
+	t.Run("a repeated single occurrence keyword is reported", func(t *testing.T) {
+		_, warnings, err := GetTreeFromStringWithOptions(
+			characteristicScope("BYTE_ORDER MSB_LAST\nBYTE_ORDER MSB_FIRST"), ParseOptions{})
+		if !assert.NoError(t, err, "without enforcement the file should still parse") {
+			return
+		}
+
+		if assert.NotEmpty(t, warnings, "the repeated keyword should have been reported") {
+			assert.Contains(t, warnings[0].String(), "BYTE_ORDER")
+			assert.Contains(t, warnings[0].String(), "at most once")
+		}
+	})
+
+	// The elements the specification marks with an asterisk must stay silent.
+	t.Run("a repeatable keyword is not reported", func(t *testing.T) {
+		_, warnings, err := GetTreeFromStringWithOptions(characteristicScope(
+			"/begin ANNOTATION\n/end ANNOTATION\n/begin ANNOTATION\n/end ANNOTATION"), ParseOptions{})
+		assert.NoError(t, err)
+		assert.Empty(t, warnings)
+	})
+
+	t.Run("a single occurrence keyword used once is not reported", func(t *testing.T) {
+		_, warnings, err := GetTreeFromStringWithOptions(
+			characteristicScope("BYTE_ORDER MSB_LAST"), ParseOptions{})
+		assert.NoError(t, err)
+		assert.Empty(t, warnings)
+	})
+
+	t.Run("rejected when the check is enforced", func(t *testing.T) {
+		_, _, err := GetTreeFromStringWithOptions(
+			"ASAP2_VERSION 1 61\n"+characteristicScope("BYTE_ORDER MSB_LAST\nBYTE_ORDER MSB_FIRST"),
+			ParseOptions{EnforceVersionCheck: true})
+		if assert.Error(t, err) {
+			assert.Contains(t, err.Error(), "BYTE_ORDER")
+		}
+	})
+}
+
+// ASAM MCD-2 MC 1.6.1 chapter 1.4.4: "The current version ASAM MCD-2 MC V 1.6.1 defined in this
+// document does not support the following not usable keywords anymore: - S_REC_LAYOUT -
+// NO_RESCALE_Y / _Z / _4 / _5 (reduced to NO_RESCALE_X) - AXIS_RESCALE_Y / _Z / _4 / _5 (reduced
+// to AXIS_RESCALE_X)". They stay accepted, because the grammar covers ASAP2 1.51 as well, and are
+// reported when the file declares the version which withdrew them.
+func TestGrammar_VersionCheck_WithdrawnKeywords(t *testing.T) {
+	type removalType struct {
+		construct string
+		body      string
+	}
+
+	for _, removal := range []removalType{
+		{construct: "S_REC_LAYOUT", body: modCommonScope("S_REC_LAYOUT record_layout")},
+		{construct: "AXIS_RESCALE_Y", body: recordLayoutScope("AXIS_RESCALE_Y 1 UWORD 4 INDEX_INCR DIRECT")},
+		{construct: "AXIS_RESCALE_Z", body: recordLayoutScope("AXIS_RESCALE_Z 1 UWORD 4 INDEX_INCR DIRECT")},
+		{construct: "AXIS_RESCALE_4", body: recordLayoutScope("AXIS_RESCALE_4 1 UWORD 4 INDEX_INCR DIRECT")},
+		{construct: "AXIS_RESCALE_5", body: recordLayoutScope("AXIS_RESCALE_5 1 UWORD 4 INDEX_INCR DIRECT")},
+		{construct: "NO_RESCALE_Y", body: recordLayoutScope("NO_RESCALE_Y 1 UWORD")},
+		{construct: "NO_RESCALE_Z", body: recordLayoutScope("NO_RESCALE_Z 1 UWORD")},
+		{construct: "NO_RESCALE_4", body: recordLayoutScope("NO_RESCALE_4 1 UWORD")},
+		{construct: "NO_RESCALE_5", body: recordLayoutScope("NO_RESCALE_5 1 UWORD")},
+	} {
+		t.Run(removal.construct+"/warned when the file declares 1.61", func(t *testing.T) {
+			_, warnings, err := GetTreeFromStringWithOptions("ASAP2_VERSION 1 61\n"+removal.body,
+				ParseOptions{})
+			if !assert.NoError(t, err, "without enforcement the file should still parse") {
+				return
+			}
+
+			if assert.NotEmpty(t, warnings, "the withdrawn keyword should have been warned about") {
+				assert.Contains(t, warnings[0].String(), removal.construct)
+				assert.Contains(t, warnings[0].String(), "was removed in ASAP2 version 1.61")
+			}
+		})
+
+		t.Run(removal.construct+"/rejected when the check is enforced", func(t *testing.T) {
+			_, _, err := GetTreeFromStringWithOptions("ASAP2_VERSION 1 61\n"+removal.body,
+				ParseOptions{EnforceVersionCheck: true})
+			if assert.Error(t, err) {
+				assert.Contains(t, err.Error(), removal.construct)
+			}
+		})
+
+		t.Run(removal.construct+"/still accepted when the file declares 1.60", func(t *testing.T) {
+			_, warnings, err := GetTreeFromStringWithOptions("ASAP2_VERSION 1 60\n"+removal.body,
+				ParseOptions{EnforceVersionCheck: true})
+			assert.NoError(t, err)
+			assert.Empty(t, warnings)
+		})
+	}
+
+	// The X variants of both families survived, they must never be reported.
+	t.Run("the surviving X variants are not reported", func(t *testing.T) {
+		_, warnings, err := GetTreeFromStringWithOptions("ASAP2_VERSION 1 61\n"+
+			recordLayoutScope("AXIS_RESCALE_X 1 UWORD 4 INDEX_INCR DIRECT\nNO_RESCALE_X 2 UWORD"),
+			ParseOptions{EnforceVersionCheck: true})
+		assert.NoError(t, err)
+		assert.Empty(t, warnings)
 	})
 }

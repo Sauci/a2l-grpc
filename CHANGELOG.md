@@ -11,11 +11,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Windows ARM64 shared library (`a2l_grpc_windows_arm64.dll`), built and tested natively in CI.
 
+### Added
+
+- Report of the keywords which ASAM MCD-2 MC 1.6.1 withdrew (chapter 1.4.4): `S_REC_LAYOUT`,
+  `NO_RESCALE_Y/_Z/_4/_5` and `AXIS_RESCALE_Y/_Z/_4/_5`. They stay accepted, the grammar also
+  covers ASAP2 1.51, but a file declaring 1.61 or newer is now warned about them.
+- Report of a keyword used more than once where the specification allows a single occurrence
+  (chapter 3.5.1). Such a repeat parsed silently before and only the last occurrence was kept.
+- Report of a missing `ASAP2_VERSION` when `EnforceVersionCheck` is set. The keyword is mandatory
+  since 1.6.1 (chapters 1.4.4 and 3.5.16), and without it no version gate can run at all.
+
 ### Fixed
 
 - A2L files starting with a UTF-8 byte-order mark are now parsed instead of being rejected on
   their first character. The mark declares the encoding of the file (ASAM MCD-2 MC 1.6.1,
   chapter 1.5.2) and is not part of its content.
+- `ALPHA` is usable as an identifier again. Making it a `VAR_NAMING` keyword reserved the word
+  everywhere, which rejected files the specification itself shows: chapter 3.5.29 uses `ALPHA` as
+  an identifier in its own example. `VAR_NAMING ALPHA` is still accepted and still warned about.
+- `BIT_MASK` and `ERROR_MASK` accept the whole unsigned 64 bit range, as required since 1.6.1
+  (chapter 1.4.4). A mask above the signed range previously failed to parse.
+- A string containing an escape sequence the specification does not define is reported on its own
+  instead of desynchronizing the lexer. A single unescaped Windows path used to produce a cascade
+  of unrelated errors, the last of which swallowed the remainder of the file.
+- `HEADER` may appear anywhere among the `MODULE` blocks of a `PROJECT`. Neither version
+  prescribes an order for the optional elements; at most one `HEADER` is still enforced.
+- An identifier is decomposed into its partial identifiers as chapter 3.2 describes, so a
+  malformed one such as `a.`, `a..b` or `a.0b` is rejected instead of being taken as a single
+  identifier. A signed or dotted array index, e.g. `a[-1]` or `a[x.y]`, is rejected as well.
+
+### Changed
+
+- The `Mask` of `BIT_MASK` and `ERROR_MASK` is a `ULongType` instead of a `LongType`, so that it
+  can carry the unsigned 64 bit range. **This changes the protobuf message shape.**
+- The labels of the grammar now match the cardinality of the specification, and the parser uses
+  them to detect a repeated single occurrence keyword.
 
 ## [0.2.0] - 2026-07-31
 
@@ -26,14 +56,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Aligned the A2L grammar with the ASAP2 1.6.1 specification: added `CALIBRATION_HANDLE_TEXT`,
-  made `MATRIX_DIM` require all three dimensions, and used floating point values for
-  `EXTENDED_LIMITS` and `STEP_SIZE`.
+  allowed `IF_DATA` in `GROUP`, made `MATRIX_DIM` require all three dimensions, and anchored the
+  end of the file so that content behind `/end PROJECT` is no longer ignored.
+- Every parameter declared as `float` by the specification now accepts a floating point value:
+  `EXTENDED_LIMITS`, `STEP_SIZE`, `MAX_GRAD`, `COEFFS`, `COEFFS_LINEAR`, `UNIT_CONVERSION`,
+  `DEFAULT_VALUE_NUMERIC`, the `FIX_AXIS_PAR`, `FIX_AXIS_PAR_DIST` and `FIX_AXIS_PAR_LIST`
+  parameters, the value lists of `COMPU_TAB`, `COMPU_VTAB` and `COMPU_VTAB_RANGE`, the limits and
+  `MaxDiff` of `AXIS_PTS`, `CHARACTERISTIC` and `AXIS_DESCR`, and the accuracy and limits of
+  `MEASUREMENT`. A hexadecimal value is no longer accepted for such a parameter.
+- **Breaking:** only the escape sequences listed by the specification (`\"`, `\'`, `\\`, `\n`,
+  `\r` and `\t`, plus a doubled `""`) are accepted inside a string. A backslash followed by any
+  other character, e.g. an unescaped Windows path such as `"C:\data\file"`, is now rejected.
+- **Breaking:** `A2ML` must be declared directly after the long identifier of `MODULE`, as
+  required by chapter 3.5.89, and may appear only once.
+- **Breaking:** `MATRIX_DIM` now reports all three dimensions in the tree, so consumers reading
+  only `XDim` see a changed message shape.
 
 ### Removed
 
 - Keywords which are not part of the ASAP2 1.6.1 specification: `INSTANCE`, `TYPEDEF_CHARACTERISTIC`,
   `TYPEDEF_MEASUREMENT`, `TYPEDEF_STRUCTURE`, `STRUCTURE_COMPONENT`, `LINK_TYPE` and
   `ALIGNMENT_FLOAT16_IEEE`.
+- The `FLOAT16_IEEE` data type, and the `int64` and `uint64` predefined type names of the A2ML
+  metalanguage. All three were introduced by ASAM MCD-2 MC 1.7 and appear in neither ASAP2 1.51
+  nor 1.6.1.
 
 ## [0.1.22] - 2026-07-30
 
