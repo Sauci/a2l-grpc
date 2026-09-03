@@ -44,6 +44,47 @@ type ParseOptions struct {
 	EnforceVersionCheck bool
 }
 
+// failureFlag records that the parser reported an error, without keeping what it reported.
+type failureFlag struct {
+	*antlr.DefaultErrorListener
+	failed bool
+}
+
+func (f *failureFlag) SyntaxError(_ antlr.Recognizer, _ interface{}, _, _ int, _ string, _ antlr.RecognitionException) {
+	f.failed = true
+}
+
+// parseA2lFile parses the token stream in the two stages ANTLR recommends. The first one predicts
+// with SLL, which is many times faster than full LL but may report an error on a valid file, for
+// lack of the full context; it bails out at the first error instead of recovering. Only when it
+// reported anything is the file parsed again, with full LL prediction and error recovery, and that
+// second parse is the one whose errors reach the caller. A valid file is thus parsed once, in the
+// fast mode, and an invalid one twice, with exactly the errors the slow mode reports on its own;
+// the errors of the lexer are recorded once either way, since the tokens are read once.
+func parseA2lFile(tokenStream *antlr.CommonTokenStream, errorListener antlr.ErrorListener) parser.IA2lFileContext {
+	flag := &failureFlag{DefaultErrorListener: antlr.NewDefaultErrorListener()}
+
+	first := parser.NewA2LParser(tokenStream)
+	first.RemoveErrorListeners()
+	first.AddErrorListener(flag)
+	first.GetInterpreter().SetPredictionMode(antlr.PredictionModeSLL)
+	first.SetErrorHandler(antlr.NewBailErrorStrategy())
+	first.BuildParseTrees = true
+
+	if fileTree := first.A2lFile(); !flag.failed {
+		return fileTree
+	}
+
+	tokenStream.Seek(0)
+
+	second := parser.NewA2LParser(tokenStream)
+	second.RemoveErrorListeners()
+	second.AddErrorListener(errorListener)
+	second.BuildParseTrees = true
+
+	return second.A2lFile()
+}
+
 // unresolvedIncludes reports every /include statement of the file. The include mechanism of ASAM
 // MCD-2 MC 1.6.1 chapter 4 is a text replacement, which needs the file system the file was read
 // from; this parser is given the content of a single file, so it can only name the references it
@@ -104,14 +145,10 @@ func GetTreeFromStringWithOptions(a2lString string, options ParseOptions) (resul
 	lexer.RemoveErrorListeners()
 	lexer.AddErrorListener(&errorListener)
 	tokenStream := antlr.NewCommonTokenStream(lexer, 0)
-	p := parser.NewA2LParser(tokenStream)
-	p.RemoveErrorListeners()
-	p.AddErrorListener(&errorListener)
-	p.BuildParseTrees = true
 
 	listener := NewListener()
 
-	fileTree := p.A2lFile()
+	fileTree := parseA2lFile(tokenStream, &errorListener)
 
 	errorListener.Errors = append(errorListener.Errors, unresolvedIncludes(tokenStream)...)
 
