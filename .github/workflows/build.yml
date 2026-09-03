@@ -56,11 +56,14 @@ jobs:
           name: grpc
           path: pkg/a2l
       # bash everywhere: the PowerShell default of the Windows runners only checks the exit code
-      # of the last command, which silently discarded a failing vet. pkg/a2l/parser stays out of
-      # vet, ANTLR emits an unreachable "goto errorExit" there on purpose.
+      # of the last command, which silently discarded a failing vet.
+      # the unreachable analyzer is turned off: ANTLR emits an unreachable "goto errorExit" in the
+      # generated parser on purpose, to keep the compiler from rejecting a label it does not always
+      # use. It is disabled by name rather than by leaving the generated package out of the
+      # pattern, which the Windows runners did not honour.
       - shell: bash
         run: |
-          go vet ./cmd/a2l/... ./pkg/a2l
+          go vet -unreachable=false ./cmd/a2l/... ./pkg/a2l/...
           go test ./cmd/a2l/... ./pkg/a2l/...
   test-windows:
     runs-on: windows-latest
@@ -83,11 +86,14 @@ jobs:
           name: grpc
           path: pkg/a2l
       # bash everywhere: the PowerShell default of the Windows runners only checks the exit code
-      # of the last command, which silently discarded a failing vet. pkg/a2l/parser stays out of
-      # vet, ANTLR emits an unreachable "goto errorExit" there on purpose.
+      # of the last command, which silently discarded a failing vet.
+      # the unreachable analyzer is turned off: ANTLR emits an unreachable "goto errorExit" in the
+      # generated parser on purpose, to keep the compiler from rejecting a label it does not always
+      # use. It is disabled by name rather than by leaving the generated package out of the
+      # pattern, which the Windows runners did not honour.
       - shell: bash
         run: |
-          go vet ./cmd/a2l/... ./pkg/a2l
+          go vet -unreachable=false ./cmd/a2l/... ./pkg/a2l/...
           go test ./cmd/a2l/... ./pkg/a2l/...
   test-windows-arm64:
     runs-on: windows-11-arm
@@ -121,11 +127,14 @@ jobs:
           "$env:RUNNER_TEMP\$name\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           "CC=aarch64-w64-mingw32-gcc" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       # bash everywhere: the PowerShell default of the Windows runners only checks the exit code
-      # of the last command, which silently discarded a failing vet. pkg/a2l/parser stays out of
-      # vet, ANTLR emits an unreachable "goto errorExit" there on purpose.
+      # of the last command, which silently discarded a failing vet.
+      # the unreachable analyzer is turned off: ANTLR emits an unreachable "goto errorExit" in the
+      # generated parser on purpose, to keep the compiler from rejecting a label it does not always
+      # use. It is disabled by name rather than by leaving the generated package out of the
+      # pattern, which the Windows runners did not honour.
       - shell: bash
         run: |
-          go vet ./cmd/a2l/... ./pkg/a2l
+          go vet -unreachable=false ./cmd/a2l/... ./pkg/a2l/...
           go test ./cmd/a2l/... ./pkg/a2l/...
   test-mac:
     runs-on: macos-latest-xlarge
@@ -148,11 +157,14 @@ jobs:
           go-version-file: go.mod
           cache: true
       # bash everywhere: the PowerShell default of the Windows runners only checks the exit code
-      # of the last command, which silently discarded a failing vet. pkg/a2l/parser stays out of
-      # vet, ANTLR emits an unreachable "goto errorExit" there on purpose.
+      # of the last command, which silently discarded a failing vet.
+      # the unreachable analyzer is turned off: ANTLR emits an unreachable "goto errorExit" in the
+      # generated parser on purpose, to keep the compiler from rejecting a label it does not always
+      # use. It is disabled by name rather than by leaving the generated package out of the
+      # pattern, which the Windows runners did not honour.
       - shell: bash
         run: |
-          go vet ./cmd/a2l/... ./pkg/a2l
+          go vet -unreachable=false ./cmd/a2l/... ./pkg/a2l/...
           go test ./cmd/a2l/... ./pkg/a2l/...
   build-linux:
     runs-on: ubuntu-22.04
