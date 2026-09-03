@@ -220,6 +220,32 @@ func (l *versionCheckListener) removedIn(removed asap2Version, construct string,
 		construct, removed, l.version.versionNo, l.version.upgradeNo), at)
 }
 
+// reducedIn reports a construct which the standard reduced to a single occurrence with version
+// reduced. The grammar keeps a repeatable label, because it covers the older versions as well, so
+// the generic check of EnterEveryRule, which reads the cardinality from the labels, cannot see it.
+func (l *versionCheckListener) reducedIn(reduced asap2Version, construct string, at antlr.Token) {
+	if l.version == nil || !l.version.atLeast(reduced) {
+		return
+	}
+
+	l.warn(fmt.Sprintf(
+		"%s may be used at most once since ASAP2 version %s, but the file declares ASAP2_VERSION %d %d",
+		construct, reduced, l.version.versionNo, l.version.upgradeNo), at)
+}
+
+// ASAP2 1.51 (chapter 6.3.26) declares CALIBRATION_HANDLE as "{-> CALIBRATION_HANDLE}*", ASAM
+// MCD-2 MC 1.6.1 (chapter 3.5.28) reduced it to "[-> CALIBRATION_HANDLE]".
+func (l *versionCheckListener) EnterCalibrationMethod(ctx *parser.CalibrationMethodContext) {
+	handles := ctx.GetV_calibrationHandle()
+	if len(handles) < 2 {
+		return
+	}
+
+	for _, handle := range handles[1:] {
+		l.reducedIn(asap2Version161, "CALIBRATION_HANDLE", handle.GetStart())
+	}
+}
+
 func (l *versionCheckListener) requireValue(min asap2Version, keyword string, value antlr.Token, gated ...string) {
 	if value == nil {
 		return
@@ -492,18 +518,50 @@ func (l *versionCheckListener) EnterErrorMask(ctx *parser.ErrorMaskContext) {
 	l.checkUint64("ERROR_MASK", ctx.GetMask())
 }
 
-// EnterArraySpecifier rejects a signed array index. Chapter 3.2 requires the brackets at the end
-// of a partial identifier to "contain a number or an alphabetic string (description of the index
-// of an array element)"; a signed literal is neither. The sign belongs to the INT token, so the
-// grammar cannot express the restriction on its own.
-func (l *versionCheckListener) EnterArraySpecifier(ctx *parser.ArraySpecifierContext) {
-	index := ctx.GetI()
-	if index == nil {
+// EnterPartialIdentifier rejects an empty partial identifier. Chapter 3.2 describes an identifier
+// as a "hierarchical concatenation of partial strings separated by points", so "a." and "a..b"
+// name a partial string which is not there. A partial string beginning with a digit is valid: the
+// chapter requires a letter or an underscore for the first character of the identifier only, and
+// names the partial string explicitly where it means one. The point is part of the IDENT token,
+// for the reason the grammar gives, so the grammar cannot express the restriction on its own.
+func (l *versionCheckListener) EnterPartialIdentifier(ctx *parser.PartialIdentifierContext) {
+	identifier := ctx.GetI()
+	if identifier == nil {
 		return
 	}
 
-	if text := index.GetText(); strings.HasPrefix(text, "-") || strings.HasPrefix(text, "+") {
-		l.fail(fmt.Sprintf("%s is not a valid array index, it must be unsigned", text), index)
+	text := identifier.GetText()
+
+	for _, partial := range strings.Split(text, ".") {
+		if partial == "" {
+			l.fail(fmt.Sprintf(
+				"%s is not a valid identifier, a partial identifier must not be empty", text), identifier)
+
+			return
+		}
+	}
+}
+
+// EnterArraySpecifier rejects a malformed array index. Chapter 3.2 requires the brackets at the
+// end of a partial identifier to "contain a number or an alphabetic string (description of the
+// index of an array element)", the latter being "a symbolic string which is defined as an
+// enumerator of an ENUM definition of the C program". A signed literal is not such a number and an
+// enumerator of C contains no point; the sign belongs to the INT token and the point to the IDENT
+// token, so the grammar cannot express either restriction on its own.
+func (l *versionCheckListener) EnterArraySpecifier(ctx *parser.ArraySpecifierContext) {
+	if index := ctx.GetI(); index != nil {
+		if text := index.GetText(); strings.HasPrefix(text, "-") || strings.HasPrefix(text, "+") {
+			l.fail(fmt.Sprintf("%s is not a valid array index, it must be unsigned", text), index)
+		}
+
+		return
+	}
+
+	if name := ctx.GetN(); name != nil {
+		if text := name.GetText(); strings.Contains(text, ".") {
+			l.fail(fmt.Sprintf(
+				"%s is not a valid array index, a symbolic index is a single enumerator", text), name)
+		}
 	}
 }
 

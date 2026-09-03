@@ -1,3 +1,9 @@
+#!/bin/sh
+set -eu
+
+# Generates the protobuf and gRPC sources into ./pkg/a2l. Every tool it uses is pinned, so that
+# the generated sources do not change without a change in this repository.
+
 wget https://golang.org/dl/go1.22.11.linux-amd64.tar.gz
 sudo tar -xf go1.22.11.linux-amd64.tar.gz -C /usr/local
 

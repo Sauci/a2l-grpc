@@ -10,6 +10,10 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v7
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
       - run: ./generate_antlr.sh
       - uses: actions/upload-artifact@v7
         with:
@@ -42,7 +46,7 @@ jobs:
           name: grpc
           path: pkg/a2l
       - run: |
-          go get github.com/antlr4-go/antlr/v4
+          go vet ./cmd/a2l/... ./pkg/a2l/...
           go test ./cmd/a2l/... ./pkg/a2l/...
   test-windows:
     runs-on: windows-latest
@@ -60,7 +64,7 @@ jobs:
           name: grpc
           path: pkg/a2l
       - run: |
-          go get github.com/antlr4-go/antlr/v4
+          go vet ./cmd/a2l/... ./pkg/a2l/...
           go test ./cmd/a2l/... ./pkg/a2l/...
   test-windows-arm64:
     runs-on: windows-11-arm
@@ -94,7 +98,7 @@ jobs:
           "$env:RUNNER_TEMP\$name\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           "CC=aarch64-w64-mingw32-gcc" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       - run: |
-          go get github.com/antlr4-go/antlr/v4
+          go vet ./cmd/a2l/... ./pkg/a2l/...
           go test ./cmd/a2l/... ./pkg/a2l/...
   test-mac:
     runs-on: macos-latest-xlarge
@@ -117,7 +121,7 @@ jobs:
           go-version: stable
           cache: true
       - run: |
-          go get github.com/antlr4-go/antlr/v4
+          go vet ./cmd/a2l/... ./pkg/a2l/...
           go test ./cmd/a2l/... ./pkg/a2l/...
   build-linux:
     runs-on: ubuntu-22.04
@@ -176,7 +180,6 @@ jobs:
           wget ${{ matrix.toolchain_source }}
           ${{ matrix.toolchain_extract }}
       - run: |
-          go get github.com/antlr4-go/antlr/v4
           go build --buildmode=c-shared -o a2l_grpc_$(go env GOOS)_$(go env GOARCH).so ./cmd/a2l/a2l.go
       - uses: actions/upload-artifact@v7
         with:
@@ -223,7 +226,6 @@ jobs:
           C:\msys64\usr\bin\pacman.exe -Sy --noconfirm mingw-w64-i686-gcc
       - shell: powershell
         run: |
-          go get github.com/antlr4-go/antlr/v4
           $env:PATH="${{ matrix.path }};$env:PATH" ;go build --buildmode=c-shared -o a2l_grpc_$(go env GOOS)_${{ matrix.GOARCH }}.dll ./cmd/a2l/a2l.go
       - uses: actions/upload-artifact@v7
         with:
@@ -263,7 +265,6 @@ jobs:
           "CC=aarch64-w64-mingw32-gcc" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       - shell: powershell
         run: |
-          go get github.com/antlr4-go/antlr/v4
           go build --buildmode=c-shared -o a2l_grpc_$(go env GOOS)_$(go env GOARCH).dll ./cmd/a2l/a2l.go
       - uses: actions/upload-artifact@v7
         with:
@@ -291,7 +292,6 @@ jobs:
           go-version: stable
           cache: true
       - run: |
-          go get github.com/antlr4-go/antlr/v4
           go build --buildmode=c-shared -o a2l_grpc_$(go env GOOS)_$(go env GOARCH).dylib ./cmd/a2l/a2l.go
       - uses: actions/upload-artifact@v7
         with:
@@ -319,7 +319,6 @@ jobs:
           go-version: stable
           cache: true
       - run: |
-          go get github.com/antlr4-go/antlr/v4
           go build --buildmode=c-shared -o a2l_grpc_$(go env GOOS)_$(go env GOARCH).dylib ./cmd/a2l/a2l.go
       - uses: actions/upload-artifact@v7
         with:

@@ -70,14 +70,52 @@ func TestGrammar_IF_DATA(t *testing.T) {
 		}}, module.IF_DATA)
 	})
 
-	t.Run("blob/A2L keyword used as a blob element", func(t *testing.T) {
-		// The blob may contain any identifier, including one which is an A2L keyword elsewhere.
+	t.Run("blob/interface specific element", func(t *testing.T) {
 		module, ok := parseModule(t, "/begin IF_DATA XCP\n/begin DAQ EVENT 1\n/end DAQ\n/end IF_DATA")
 		if !ok || !assert.Len(t, module.IF_DATA, 1) {
 			return
 		}
 
 		assert.Len(t, module.IF_DATA[0].Blob, 1)
+	})
+
+	// Chapter 5.2: "Within the AML own name spaces are used. In this case it is allowed to reuse
+	// ASAM MCD-2 MC keyword names. The definitions from the AML are exclusively valid in IF_DATA."
+	// The lexer is shared by the A2L and IF_DATA grammars, so a blob element spelled like an A2L
+	// keyword arrives here as that keyword and must be accepted as an identifier again.
+	t.Run("blob/A2L keyword used as a blob element", func(t *testing.T) {
+		for _, keyword := range []string{"VERSION", "RESERVED", "UNIT", "ECU", "IDENTIFICATION"} {
+			module, ok := parseModule(t, "/begin IF_DATA XCP "+keyword+" 1\n/end IF_DATA")
+			if !ok || !assert.Len(t, module.IF_DATA, 1, "keyword %s", keyword) {
+				continue
+			}
+
+			if assert.Len(t, module.IF_DATA[0].Blob, 2, "keyword %s", keyword) {
+				equalNode(t, identVal(keyword), module.IF_DATA[0].Blob[0].GetIdentifier())
+			}
+		}
+	})
+
+	t.Run("blob/A2L keyword used as the name of a nested block", func(t *testing.T) {
+		module, ok := parseModule(t,
+			"/begin IF_DATA ASAP1B_CAN\n/begin CHECKSUM \"checksum.dll\"\n/end CHECKSUM\n/end IF_DATA")
+		if !ok || !assert.Len(t, module.IF_DATA, 1) {
+			return
+		}
+
+		if assert.Len(t, module.IF_DATA[0].Blob, 1) {
+			equalNode(t, identVal("CHECKSUM"), module.IF_DATA[0].Blob[0].GetGeneric().GetName())
+		}
+	})
+
+	// The name of the IF_DATA block itself is an identifier of the same namespace.
+	t.Run("A2L keyword used as the name of the IF_DATA block", func(t *testing.T) {
+		module, ok := parseModule(t, "/begin IF_DATA UNIT\n/end IF_DATA")
+		if !ok || !assert.Len(t, module.IF_DATA, 1) {
+			return
+		}
+
+		equalNode(t, identVal("UNIT"), module.IF_DATA[0].Name)
 	})
 
 	// The following cases reproduce the canonical IF_DATA forms defined by ASAP2 1.51: the

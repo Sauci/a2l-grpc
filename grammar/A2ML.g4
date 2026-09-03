@@ -38,15 +38,17 @@ predefinedTypeName:
    )
    ;
 
+/* chapter 5.2: block_definition "block" tag type_name. A tag is "a character sequence enclosed
+   within double inverted commas", i.e. the STRING token of the A2L lexer; the third alternative
+   is not part of the metalanguage, it is owed to Vector Informatik */
 blockDefinition:
-   'block' tag0 = tagValue tn = a2mlTypeName
-   | 'block' tag1 = stringValue tn = a2mlTypeName
-   | 'block' tag1 = stringValue '(' mem = member ')' (mult = '*')? /* Owed to Vector Informatik... */
+   'block' tag = stringValue tn = a2mlTypeName
+   | 'block' tag = stringValue '(' mem = member ')' (mult = '*')?
    ;
 
 enumTypeName:
-    ('enum' identifier = identifierValue? '{' enumerators = enumeratorList '}' )
-    | ('enum' identifier = identifierValue)
+    ('enum' identifier = a2mlIdentifier? '{' enumerators = enumeratorList '}' )
+    | ('enum' identifier = a2mlIdentifier)
     ;
 
 enumeratorList:
@@ -54,13 +56,12 @@ enumeratorList:
    ;
 
 enumerator:
-   tag0 = tagValue ('=' constant = numericValue)? |
-   tag1 = stringValue ('=' constant = numericValue)?
+   keyword = stringValue ('=' constant = numericValue)?
    ;
 
 structTypeName:
-      'struct' identifier = identifierValue? '{' members += structMember* '}'
-    | 'struct' identifier = identifierValue
+      'struct' identifier = a2mlIdentifier? '{' members += structMember* '}'
+    | 'struct' identifier = a2mlIdentifier
     ;
 
 structMember:
@@ -69,16 +70,19 @@ structMember:
    ;
 
 member:
-    typeName = a2mlTypeName (dimension += arraySpecifier)*
+    typeName = a2mlTypeName (dimension += a2mlArraySpecifier)*
     ;
 
-arraySpecifier:
-   '[' value = numericValue ']'
+/* chapter 5.2: array_specifier "[" constant "]". The rule carries its own name, because the
+   arraySpecifier of the A2L grammar describes the index of a partial identifier (chapter 3.2) and
+   also accepts an alphabetic string, which is not a constant */
+a2mlArraySpecifier:
+   '[' value = integerValue ']'
    ;
 
 taggedStructTypeName:
    /* 'taggedstruct' t1 = identifierValue */
-   'taggedstruct' identifier = identifierValue?
+   'taggedstruct' identifier = a2mlIdentifier?
    (
         '{' (members += taggedStructMember)* '}' | (members += taggedStructMember)*
    )
@@ -91,96 +95,29 @@ taggedStructMember:
     | (bl1 = blockDefinition ';')
    ;
 
+/* chapter 5.2: taggedstruct_definition tag [ member ] | tag "(" member ")*;". The tag identifies
+   the element and is mandatory in both forms; the repeated form is listed first, so that its
+   opening parenthesis is matched here rather than left to the enclosing member */
 taggedStructDefinition:
-     tag0 = tagValue? mem = member?
-   | tag1 = tagValue? '(' mem = member ')' '*'
-   | tag2 = stringValue? mem = member?
+     tag = stringValue star = '(' mem = member ')' '*'
+   | tag = stringValue mem = member?
    ;
 
 taggedUnionTypeName:
-    (('taggedunion' identifier = identifierValue? '{' members += taggedUnionMember* '}')
-    | ('taggedunion' identifier = identifierValue))
+    (('taggedunion' identifier = a2mlIdentifier? '{' members += taggedUnionMember* '}')
+    | ('taggedunion' identifier = a2mlIdentifier))
     ;
 
 taggedUnionMember:
    (
-     tag0 = tagValue  m = member?  ';'
-   | tag1 = stringValue  m = member?  ';'
+     tag = stringValue  m = member?  ';'
    | block = blockDefinition ';'
    )
    ;
 
-numericValue:
-     i = INT
-   | h = HEX
-   | f = FLOAT
-   ;
-
-stringValue:
-    s = STRING
-    ;
-
-tagValue:
-    s = TAG
-    ;
-
-identifierValue:
-    i = ID
-    ;
-
-/*
-** Lexer
-*/
-INT : '0'..'9'+
-    ;
-
-HEX:   '0'('x' | 'X') ('a' .. 'f' | 'A' .. 'F' | '0' .. '9')+
-    ;
-
-FLOAT:
-    ('+' | '-')?
-    (
-        ('0'..'9')+ '.' ('0'..'9')* EXPONENT?
-    |   '.' ('0'..'9')+ EXPONENT?
-    |   ('0'..'9')+ EXPONENT
-    )
-    ;
-
-ID  : /* ('a'..'z'|'A'..'Z'|'_') */
-    ('a'..'z'|'A'..'Z'|'0'..'9'|'_')+
-    ;
-
-TAG:  '"' ID '"'  // s. 3.2
-   ;
-
-COMMENT
-    :   ('//' ~('\n'|'\r')* '\r'? '\n'
-    |   '/*' .*? '*/')
-        -> channel(HIDDEN)
-    ;
-
-WS  :   (' ' | '\t' | '\r' | '\n') -> skip
-    ;
-
-STRING
-    :  '"' ( ESC_SEQ | ~('\\'|'"') )* '"'
-    ;
-
-fragment
-EXPONENT : ('e'|'E') ('+'|'-')? ('0'..'9')+ ;
-
-fragment
-HEX_DIGIT : ('0'..'9'|'a'..'f'|'A'..'F') ;
-
-fragment
-ESC_SEQ
-    :   '\\' ('b'|'t'|'n'|'f'|'r'|'\u0022'|'\''|'\\')
-    |   OCTAL_ESC
-    ;
-
-fragment
-OCTAL_ESC
-    :   '\\' ('0'..'3') ('0'..'7') ('0'..'7')
-    |   '\\' ('0'..'7') ('0'..'7')
-    |   '\\' ('0'..'7')
-    ;
+/* This grammar is imported by A2L.g4 and is never generated on its own, so it declares no token
+   of its own: integerValue, numericValue, stringValue and identifierValue, and the tokens they
+   are built from, are the ones of the importing grammar. Declaring them here again only hid the
+   fact that the importing grammar overrides them, and with it the fact that its STRING rule
+   precedes the TAG rule declared here, so that a tag was always matched as a STRING and every
+   alternative expecting a TAG was dead. The tags above are therefore stringValue. */

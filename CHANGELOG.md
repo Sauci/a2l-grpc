@@ -10,9 +10,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Windows ARM64 shared library (`a2l_grpc_windows_arm64.dll`), built and tested natively in CI.
-
-### Added
-
+- Report of an `/include` statement, naming the file it refers to. The mechanism is a text
+  replacement which needs the file system the file was read from (chapter 4), so a parser working
+  on the content of a single file cannot resolve it; substituting the included files is left to the
+  caller. Such a file used to be rejected with a syntax error naming neither the statement nor the
+  file, and chapter 4 places no restriction on where the statement may appear.
+- Report of a second `CALIBRATION_HANDLE` in a `CALIBRATION_METHOD` when the file declares 1.61 or
+  newer, which reduced it to a single occurrence (chapter 3.5.28). ASAP2 1.51 (chapter 6.3.26)
+  allows several, so the grammar keeps accepting them.
+- `go vet` runs in CI.
 - Report of the keywords which ASAM MCD-2 MC 1.6.1 withdrew (chapter 1.4.4): `S_REC_LAYOUT`,
   `NO_RESCALE_Y/_Z/_4/_5` and `AXIS_RESCALE_Y/_Z/_4/_5`. They stay accepted, the grammar also
   covers ASAP2 1.51, but a file declaring 1.61 or newer is now warned about them.
@@ -23,6 +29,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- A partial identifier may begin with a digit, e.g. `SFB_R_FFO_DE.Properties.1.Qly`. Chapter 3.2
+  lists two limitations for an identifier: "the first character must be a letter or an underscore,
+  brackets must occur in pairs at the end of a partial string". The first one is about the first
+  character of the identifier, not of every partial string; where the chapter means a partial
+  string it says so, as the second limitation does. Such identifiers occur in the wild
+  ([pya2l#17](https://github.com/Sauci/pya2l/issues/17)) and were rejected. An empty partial
+  string, as in `a.` or `a..b`, is still rejected, and so is a symbolic array index containing a
+  point, which chapter 3.2 describes as a single enumerator of the C program.
+- The dimension of an A2ML member of a named type, e.g. `struct my_type[4];`, is reported. The
+  brackets were consumed as the array index of the identifier, which left the member without its
+  `ArraySpecifier`.
+- An identifier of the metalanguage may be spelled like an A2L keyword, as chapter 5.2 requires:
+  "Within the AML own name spaces are used. In this case it is allowed to reuse ASAM MCD-2 MC
+  keyword names." The A2L, A2ML and IF_DATA grammars share one lexer, in which every keyword is a
+  token of its own, so such an identifier never reached the rule for an identifier. The reference
+  AML of the specification, which declares `taggedunion IF_DATA`, was rejected; so was an IF_DATA
+  blob containing an element named after an A2L keyword. Chapter 3.2 still forbids them outside of
+  A2ML and IF_DATA.
+- The `tag "(" member ")*;"` form of a taggedstruct member (chapter 5.2) is accepted. Its tag was
+  matched against a token which the shared lexer can never produce, so the form was unparsable.
+- An `int` or `uint` parameter whose value does not fit is reported, with its position, instead of
+  being truncated. `ALIGNMENT_BYTE 0xFFFFFFFF` used to be kept as `-1` and dumped as
+  `0x-0000001`, which no longer parses.
+- The messages of the parser are no longer used as a format string, so a per cent sign in the
+  parsed content does not reach the caller as `%!'(NOVERB)` any more.
+- `Create` returns 1 when the server could not be started. It used to return 0 whenever no server
+  was running yet, the port could not be bound included, so a caller checking the result went on to
+  connect to a port nothing was listening on.
+- `Create` rejects a maximum message size which leaves no room for a chunk of tree. A size below
+  the protocol margin used to make the response loop spin forever or slice backwards.
+- `GetA2LFromTree` reports a tree it cannot serialize through the `error` field of the response,
+  like the other methods, instead of losing the stream to an internal error. A tree which lacks an
+  element the parser always fills, but which a client building a tree by hand may leave out, made
+  the serializer dereference a nil node.
+- Nodes which share a sort key keep the order of the file, instead of being shuffled from one run
+  to the next.
 - A2L files starting with a UTF-8 byte-order mark are now parsed instead of being rejected on
   their first character. The mark declares the encoding of the file (ASAM MCD-2 MC 1.6.1,
   chapter 1.5.2) and is not part of its content.
@@ -42,10 +84,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Breaking:** the gRPC server is bound to the loopback interface instead of every interface. It
+  is an unauthenticated endpoint serving the process which loaded the library, and the documented
+  usage connects to `localhost`; it used to be reachable from the whole network.
+- **Breaking:** a taggedstruct member must carry its tag, which chapter 5.2 makes mandatory in both
+  forms of `taggedstruct_definition`. A tagless member parsed before and then made the serializer
+  dereference a nil tag.
+- **Breaking:** the array specifier of A2ML takes a constant, as chapter 5.2 declares it. It used
+  to share the rule of the A2L grammar, which also accepts an alphabetic string, because chapter
+  3.2 allows one as the index of a partial identifier; a symbolic size reached an unimplemented
+  conversion and was reported as an internal error.
 - The `Mask` of `BIT_MASK` and `ERROR_MASK` is a `ULongType` instead of a `LongType`, so that it
   can carry the unsigned 64 bit range. **This changes the protobuf message shape.**
 - The labels of the grammar now match the cardinality of the specification, and the parser uses
   them to detect a repeated single occurrence keyword.
+- `StringType` documents that it carries the string as written in the file: the escape sequences of
+  chapter 3.2 are left in place, so that the value is reproduced verbatim when the tree is
+  serialized back to A2L.
+- The ANTLR generator is pinned to 4.13.1 and verified against its checksum, instead of being built
+  from a clone of the default branch of the upstream repository on every run.
+- CI no longer runs `go get`, which resolved the ANTLR runtime to its latest version and rewrote
+  `go.mod`, so the dependency versions the module declares are the ones tested and released.
 
 ## [0.2.0] - 2026-07-31
 

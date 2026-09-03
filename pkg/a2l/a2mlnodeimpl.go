@@ -65,11 +65,7 @@ func (n *Listener) ExitPredefinedTypeName(_ *parser.PredefinedTypeNameContext) {
 func (n *Listener) EnterBlockDefinition(ctx *parser.BlockDefinitionContext) {
 	blockDefinition := &BlockDefinition{}
 
-	if ctx.GetTag0() != nil {
-		blockDefinition.Tag = tagToTagType(ctx.GetTag0())
-	} else {
-		blockDefinition.Tag = stringToTagType(ctx.GetTag1())
-	}
+	blockDefinition.Tag = stringToTagType(ctx.GetTag())
 
 	n.Push(blockDefinition)
 }
@@ -84,7 +80,7 @@ func (n *Listener) EnterEnumTypeName(ctx *parser.EnumTypeNameContext) {
 	enumTypeName := &TypeName_EnumTypeName{EnumTypeName: &EnumTypeName{}}
 
 	if ctx.GetIdentifier() != nil {
-		enumTypeName.EnumTypeName.Identifier = identifierToIdentType(ctx.GetIdentifier())
+		enumTypeName.EnumTypeName.Identifier = a2mlIdentifierToIdentType(ctx.GetIdentifier())
 	}
 
 	n.Push(enumTypeName)
@@ -99,11 +95,7 @@ func (n *Listener) ExitEnumTypeName(_ *parser.EnumTypeNameContext) {
 func (n *Listener) EnterEnumerator(ctx *parser.EnumeratorContext) {
 	enumerator := &Enumerator{}
 
-	if ctx.GetTag0() != nil {
-		enumerator.Keyword = &StringType{Value: ctx.GetTag0().GetText()}
-	} else {
-		enumerator.Keyword = a2lStringToStringType(ctx.GetTag1())
-	}
+	enumerator.Keyword = a2lStringToStringType(ctx.GetKeyword())
 
 	if ctx.GetConstant() != nil {
 		enumerator.Constant = numericToLongType(ctx.GetConstant())
@@ -122,7 +114,7 @@ func (n *Listener) EnterStructTypeName(ctx *parser.StructTypeNameContext) {
 	structTypeName := &TypeName_StructTypeName{StructTypeName: &StructTypeName{}}
 
 	if ctx.GetIdentifier() != nil {
-		structTypeName.StructTypeName.Identifier = identifierToIdentType(ctx.GetIdentifier())
+		structTypeName.StructTypeName.Identifier = a2mlIdentifierToIdentType(ctx.GetIdentifier())
 	}
 
 	n.Push(structTypeName)
@@ -173,7 +165,7 @@ func (n *Listener) EnterTaggedStructTypeName(ctx *parser.TaggedStructTypeNameCon
 	taggedStructTypeName := &TypeName_TaggedstructTypeName{TaggedstructTypeName: &TaggedstructTypeName{}}
 
 	if ctx.GetIdentifier() != nil {
-		taggedStructTypeName.TaggedstructTypeName.Identifier = identifierToIdentType(ctx.GetIdentifier())
+		taggedStructTypeName.TaggedstructTypeName.Identifier = a2mlIdentifierToIdentType(ctx.GetIdentifier())
 	}
 
 	n.Push(taggedStructTypeName)
@@ -210,14 +202,8 @@ func (n *Listener) ExitTaggedStructMember(_ *parser.TaggedStructMemberContext) {
 func (n *Listener) EnterTaggedStructDefinition(ctx *parser.TaggedStructDefinitionContext) {
 	taggedStructDefinition := &TaggedstructDefinition{}
 
-	if ctx.GetTag0() != nil {
-		taggedStructDefinition.Tag = tagToTagType(ctx.GetTag0())
-	} else if ctx.GetTag1() != nil {
-		taggedStructDefinition.Tag = tagToTagType(ctx.GetTag1())
-		taggedStructDefinition.Star = true
-	} else if ctx.GetTag2() != nil {
-		taggedStructDefinition.Tag = stringToTagType(ctx.GetTag2())
-	}
+	taggedStructDefinition.Tag = stringToTagType(ctx.GetTag())
+	taggedStructDefinition.Star = ctx.GetStar() != nil
 
 	n.Push(taggedStructDefinition)
 }
@@ -234,7 +220,7 @@ func (n *Listener) EnterTaggedUnionTypeName(ctx *parser.TaggedUnionTypeNameConte
 	}
 
 	if ctx.GetIdentifier() != nil {
-		taggedUnionTypeName.TaggedunionTypeName.Identifier = identifierToIdentType(ctx.GetIdentifier())
+		taggedUnionTypeName.TaggedunionTypeName.Identifier = a2mlIdentifierToIdentType(ctx.GetIdentifier())
 	}
 
 	n.Push(taggedUnionTypeName)
@@ -248,13 +234,9 @@ func (n *Listener) ExitTaggedUnionTypeName(_ *parser.TaggedUnionTypeNameContext)
 
 func (n *Listener) EnterTaggedUnionMember(ctx *parser.TaggedUnionMemberContext) {
 
-	if ctx.GetTag0() != nil {
+	if ctx.GetTag() != nil {
 		tagMember := &TaggedunionMember_TagMember{TagMember: &TagMember{}}
-		tagMember.TagMember.Tag = tagToTagType(ctx.GetTag0())
-		n.Push(tagMember)
-	} else if ctx.GetTag1() != nil {
-		tagMember := &TaggedunionMember_TagMember{TagMember: &TagMember{}}
-		tagMember.TagMember.Tag = stringToTagType(ctx.GetTag1())
+		tagMember.TagMember.Tag = stringToTagType(ctx.GetTag())
 		n.Push(tagMember)
 	} else {
 		taggedUnionMember := &TaggedunionMember{}

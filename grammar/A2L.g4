@@ -1641,6 +1641,105 @@ identifierValue:
     i += partialIdentifier ('.' i += partialIdentifier)*
     ;
 
+/* ASAM MCD-2 MC 1.6.1 chapter 5.2: "Within the AML own name spaces are used. In this case it is
+   allowed to reuse ASAM MCD-2 MC keyword names. The definitions from the AML are exclusively valid
+   in IF_DATA. Outside IF_DATA only the keywords according to chapter 3.5 are valid." The A2L, A2ML
+   and IF_DATA grammars share one lexer, in which every keyword of chapter 3.5 is a token of its
+   own, so an identifier of the metalanguage which happens to be spelled like one of them would
+   never reach the IDENT rule. This rule gives those tokens back to the two grammars which are
+   allowed to reuse them; chapter 3.2 still forbids them everywhere else, so identifierValue is
+   left alone. The keywords of the metalanguage itself ("struct", "enum", "block", the predefined
+   type names, ...) are not listed: they are reserved inside the AML.
+
+   The list is the set of the keyword and enum value literals of A2L.g4 which are shaped like an
+   identifier. */
+a2lKeyword:
+    k =
+    (
+    'A2ML' | 'A2ML_VERSION' | 'ABSOLUTE' | 'ADDR_EPK' |
+    'ALIGNMENT_BYTE' | 'ALIGNMENT_FLOAT32_IEEE' | 'ALIGNMENT_FLOAT64_IEEE' | 'ALIGNMENT_INT64' |
+    'ALIGNMENT_LONG' | 'ALIGNMENT_WORD' | 'ALTERNATE_CURVES' | 'ALTERNATE_WITH_X' |
+    'ALTERNATE_WITH_Y' | 'ANNOTATION' | 'ANNOTATION_LABEL' | 'ANNOTATION_ORIGIN' |
+    'ANNOTATION_TEXT' | 'ARRAY_SIZE' | 'ASAP2_VERSION' | 'ASCII' |
+    'AXIS_DESCR' | 'AXIS_PTS' | 'AXIS_PTS_4' | 'AXIS_PTS_5' |
+    'AXIS_PTS_REF' | 'AXIS_PTS_X' | 'AXIS_PTS_Y' | 'AXIS_PTS_Z' |
+    'AXIS_RESCALE_4' | 'AXIS_RESCALE_5' | 'AXIS_RESCALE_X' | 'AXIS_RESCALE_Y' |
+    'AXIS_RESCALE_Z' | 'A_INT64' | 'A_UINT64' | 'BIG_ENDIAN' |
+    'BIT_MASK' | 'BIT_OPERATION' | 'BYTE' | 'BYTE_ORDER' |
+    'CALIBRATION' | 'CALIBRATION_ACCESS' | 'CALIBRATION_HANDLE' | 'CALIBRATION_HANDLE_TEXT' |
+    'CALIBRATION_METHOD' | 'CALIBRATION_VARIABLES' | 'CHARACTERISTIC' | 'CODE' |
+    'COEFFS' | 'COEFFS_LINEAR' | 'COLUMN_DIR' | 'COMPARISON_QUANTITY' |
+    'COMPU_METHOD' | 'COMPU_TAB' | 'COMPU_TAB_REF' | 'COMPU_VTAB' |
+    'COMPU_VTAB_RANGE' | 'COM_AXIS' | 'CPU_TYPE' | 'CUBE_4' |
+    'CUBE_5' | 'CUBOID' | 'CURVE' | 'CURVE_AXIS' |
+    'CURVE_AXIS_REF' | 'CUSTOMER' | 'CUSTOMER_NO' | 'DATA' |
+    'DATA_SIZE' | 'DEFAULT_VALUE' | 'DEFAULT_VALUE_NUMERIC' | 'DEF_CHARACTERISTIC' |
+    'DEPENDENT_CHARACTERISTIC' | 'DEPOSIT' | 'DERIVED' | 'DIFFERENCE' |
+    'DIRECT' | 'DISCRETE' | 'DISPLAY_IDENTIFIER' | 'DIST_OP_4' |
+    'DIST_OP_5' | 'DIST_OP_X' | 'DIST_OP_Y' | 'DIST_OP_Z' |
+    'ECU' | 'ECU_ADDRESS' | 'ECU_ADDRESS_EXTENSION' | 'ECU_CALIBRATION_OFFSET' |
+    'EEPROM' | 'EPK' | 'EPROM' | 'ERROR_MASK' |
+    'EXCLUDE_FROM_FLASH' | 'EXTENDED_LIMITS' | 'EXTENDED_SI' | 'EXTERN' |
+    'FIX_AXIS' | 'FIX_AXIS_PAR' | 'FIX_AXIS_PAR_DIST' | 'FIX_AXIS_PAR_LIST' |
+    'FIX_NO_AXIS_PTS_4' | 'FIX_NO_AXIS_PTS_5' | 'FIX_NO_AXIS_PTS_X' | 'FIX_NO_AXIS_PTS_Y' |
+    'FIX_NO_AXIS_PTS_Z' | 'FLASH' | 'FLOAT32_IEEE' | 'FLOAT64_IEEE' |
+    'FNC_VALUES' | 'FORM' | 'FORMAT' | 'FORMULA' |
+    'FORMULA_INV' | 'FRAME' | 'FRAME_MEASUREMENT' | 'FUNCTION' |
+    'FUNCTION_LIST' | 'FUNCTION_VERSION' | 'GROUP' | 'GUARD_RAILS' |
+    'HEADER' | 'IDENTICAL' | 'IDENTIFICATION' | 'IF_DATA' |
+    'INDEX_DECR' | 'INDEX_INCR' | 'INTERN' | 'IN_MEASUREMENT' |
+    'LAYOUT' | 'LEFT_SHIFT' | 'LINEAR' | 'LITTLE_ENDIAN' |
+    'LOC_MEASUREMENT' | 'LONG' | 'MAP' | 'MAP_LIST' |
+    'MATRIX_DIM' | 'MAX_GRAD' | 'MAX_REFRESH' | 'MEASUREMENT' |
+    'MEMORY_LAYOUT' | 'MEMORY_SEGMENT' | 'MODULE' | 'MOD_COMMON' |
+    'MOD_PAR' | 'MONOTONOUS' | 'MONOTONY' | 'MON_DECREASE' |
+    'MON_INCREASE' | 'MSB_FIRST' | 'MSB_LAST' | 'NOT_IN_MCD_SYSTEM' |
+    'NOT_MON' | 'NO_AXIS_PTS_4' | 'NO_AXIS_PTS_5' | 'NO_AXIS_PTS_X' |
+    'NO_AXIS_PTS_Y' | 'NO_AXIS_PTS_Z' | 'NO_CALIBRATION' | 'NO_OF_INTERFACES' |
+    'NO_RESCALE_4' | 'NO_RESCALE_5' | 'NO_RESCALE_X' | 'NO_RESCALE_Y' |
+    'NO_RESCALE_Z' | 'NUMBER' | 'NUMERIC' | 'OFFLINE_CALIBRATION' |
+    'OFFLINE_DATA' | 'OFFSET_4' | 'OFFSET_5' | 'OFFSET_X' |
+    'OFFSET_Y' | 'OFFSET_Z' | 'OUT_MEASUREMENT' | 'PBYTE' |
+    'PHONE_NO' | 'PHYS_UNIT' | 'PLONG' | 'PRG_CODE' |
+    'PRG_DATA' | 'PRG_RESERVED' | 'PROJECT' | 'PROJECT_NO' |
+    'PWORD' | 'RAM' | 'RAT_FUNC' | 'READ_ONLY' |
+    'READ_WRITE' | 'RECORD_LAYOUT' | 'REF_CHARACTERISTIC' | 'REF_GROUP' |
+    'REF_MEASUREMENT' | 'REF_MEMORY_SEGMENT' | 'REF_UNIT' | 'REGISTER' |
+    'RESERVED' | 'RES_AXIS' | 'RIGHT_SHIFT' | 'RIP_ADDR_4' |
+    'RIP_ADDR_5' | 'RIP_ADDR_W' | 'RIP_ADDR_X' | 'RIP_ADDR_Y' |
+    'RIP_ADDR_Z' | 'ROM' | 'ROOT' | 'ROW_DIR' |
+    'SBYTE' | 'SERAM' | 'SHIFT_OP_4' | 'SHIFT_OP_5' |
+    'SHIFT_OP_X' | 'SHIFT_OP_Y' | 'SHIFT_OP_Z' | 'SIGN_EXTEND' |
+    'SI_EXPONENTS' | 'SLONG' | 'SRC_ADDR_4' | 'SRC_ADDR_5' |
+    'SRC_ADDR_X' | 'SRC_ADDR_Y' | 'SRC_ADDR_Z' | 'STATIC_RECORD_LAYOUT' |
+    'STATUS_STRING_REF' | 'STD_AXIS' | 'STEP_SIZE' | 'STRICT_DECREASE' |
+    'STRICT_INCREASE' | 'STRICT_MON' | 'SUB_FUNCTION' | 'SUB_GROUP' |
+    'SUPPLIER' | 'SWORD' | 'SYMBOL_LINK' | 'SYSTEM_CONSTANT' |
+    'S_REC_LAYOUT' | 'TAB_INTP' | 'TAB_NOINTP' | 'TAB_VERB' |
+    'UBYTE' | 'ULONG' | 'UNIT' | 'UNIT_CONVERSION' |
+    'USER' | 'USER_RIGHTS' | 'UWORD' | 'VALUE' |
+    'VAL_BLK' | 'VARIABLES' | 'VARIANT_CODING' | 'VAR_ADDRESS' |
+    'VAR_CHARACTERISTIC' | 'VAR_CRITERION' | 'VAR_FORBIDDEN_COMB' | 'VAR_MEASUREMENT' |
+    'VAR_NAMING' | 'VAR_SELECTION_CHARACTERISTIC' | 'VAR_SEPARATOR' | 'VERSION' |
+    'VIRTUAL' | 'VIRTUAL_CHARACTERISTIC' | 'WORD'
+    )
+    ;
+
+/* an identifier of the metalanguage, chapter 5.2: "identifier: identifier for the definition of
+   data structures". It names a type and carries no array index: the dimension of a member is an
+   array_specifier of its own, so the brackets must not be consumed here. It may be a keyword of
+   the A2L grammar, reused inside the own name space of the AML. */
+a2mlIdentifier:
+    i = IDENT | k = a2lKeyword
+    ;
+
+/* an identifier inside an IF_DATA block. Its content is described by the A2ML of the module rather
+   than by this grammar, so it may be anything an A2L identifier may be, an array index included,
+   as well as a keyword of the A2L grammar reused in the name space of the AML. */
+ifDataIdentifier:
+    v = identifierValue | k = a2lKeyword
+    ;
+
 partialIdentifier:
     i = IDENT (a += arraySpecifier)*
     ;
@@ -1678,12 +1777,36 @@ END:
     '/end'
     ;
 
-/* one partial identifier. Chapter 3.2 describes an identifier as a "hierarchical concatenation of
-   partial strings separated by points" whose first character "must be a letter or an underscore".
-   The separating point is therefore matched by identifierValue rather than swallowed here, so that
-   the decomposition is real and a malformed partial string, e.g. an empty one in "a..b" or a
-   trailing one in "a.", is rejected instead of being accepted as a single identifier */
-IDENT: [a-zA-Z_][a-zA-Z_0-9]*;
+/* ASAM MCD-2 MC 1.6.1 chapter 4 (ASAP2 1.51 chapter 5): "/include <filename>". It is a text
+   replacement mechanism, and "there is no restriction where to use include", so it cannot be
+   placed among the parser rules; it is matched here as one token and put on the hidden channel,
+   so that it does not desynchronize the parser. The filename may be quoted, which is required
+   when it contains spaces or path information, and "the relative path uses backslashes without
+   escape sequences", so the escape sequences of STRING do not apply to it.
+
+   Resolving the reference needs a file system, which this parser, working on the content of a
+   single file, does not have. Every occurrence is therefore reported by the parser, with the name
+   of the file it refers to, instead of being dropped silently: substituting the included files is
+   left to the caller. */
+INCLUDE:
+    '/include' [ \t]+ ('"' ~["\r\n]* '"' | ~[ \t\r\n]+)
+    -> channel(HIDDEN)
+    ;
+
+/* Chapter 3.2 describes an identifier as a "hierarchical concatenation of partial strings
+   separated by points" and lists two limitations: "the first character must be a letter or an
+   underscore, brackets must occur in pairs at the end of a partial string". The first one is about
+   the first character of the identifier, not of every partial string: where the chapter means a
+   partial string it says so, as the second limitation does. A partial string may therefore begin
+   with a digit, e.g. the "1" of "a.Properties.1.Qly".
+
+   A point starting a digit-initial partial string cannot be told apart from a decimal point by the
+   lexer ("a.1" would lex as an identifier followed by the float ".1"), so the point is consumed
+   here. That also lets a malformed identifier lex as one token instead of desynchronizing the
+   parser; the empty partial string of "a." or "a..b" is rejected while the tree is built. The
+   brackets stay out, so that an array index remains a rule of the parser and the array dimension
+   of an A2ML member is not swallowed. */
+IDENT: [a-zA-Z_][a-zA-Z_0-9.]*;
 
 fragment
 EXPONENT : ('e'|'E') ('+'|'-')? ('0'..'9')+ ;

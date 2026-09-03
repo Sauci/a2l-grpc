@@ -2,98 +2,29 @@ grammar IF_DATA;
 
 ifData:
    '/begin' 'IF_DATA'
-        name = identifierValue
+        name = ifDataIdentifier
         (
             blob += genericParameter
         )*
    '/end' 'IF_DATA'
    ;
 
+/* the content of an IF_DATA block is described by the A2ML of the module, so it is collected as a
+   generic blob. A quoted element is matched as a stringValue: the A2L lexer has no separate token
+   for a tag */
 genericParameter:
-    tag = tagValue
-    | sting = stringValue
+    sting = stringValue
     | numeric = numericValue
     | generic = genericNode
-    | identifier = identifierValue
+    | identifier = ifDataIdentifier
     ;
 
 genericNode:
-    '/begin' name = identifierValue
+    '/begin' name = ifDataIdentifier
     (element += genericParameter)*
-    '/end' identifierValue
+    '/end' ifDataIdentifier
     ;
 
-numericValue:
-     i = INT
-   | h = HEX
-   | f = FLOAT
-   ;
-
-stringValue:
-    s = STRING
-    ;
-
-tagValue:
-    s = TAG
-    ;
-
-identifierValue:
-    i = ID
-    ;
-
-/*
-** Lexer
-*/
-INT : '0'..'9'+
-    ;
-
-HEX:   '0'('x' | 'X') ('a' .. 'f' | 'A' .. 'F' | '0' .. '9')+
-    ;
-
-FLOAT:
-    ('+' | '-')?
-    (
-        ('0'..'9')+ '.' ('0'..'9')* EXPONENT?
-    |   '.' ('0'..'9')+ EXPONENT?
-    |   ('0'..'9')+ EXPONENT
-    )
-    ;
-
-ID  : /* ('a'..'z'|'A'..'Z'|'_') */
-    ('a'..'z'|'A'..'Z'|'0'..'9'|'_')+
-    ;
-
-TAG:  '"' ID '"'  // s. 3.2
-   ;
-
-COMMENT
-    :   ('//' ~('\n'|'\r')* '\r'? '\n'
-    |   '/*' .*? '*/')
-        -> channel(HIDDEN)
-    ;
-
-WS  :   (' ' | '\t' | '\r' | '\n') -> skip
-    ;
-
-STRING
-    :  '"' ( ESC_SEQ | ~('\\'|'"') )* '"'
-    ;
-
-fragment
-EXPONENT : ('e'|'E') ('+'|'-')? ('0'..'9')+ ;
-
-fragment
-HEX_DIGIT : ('0'..'9'|'a'..'f'|'A'..'F') ;
-
-fragment
-ESC_SEQ
-    :   '\\' ('b'|'t'|'n'|'f'|'r'|'\u0022'|'\''|'\\')
-    |   OCTAL_ESC
-    ;
-
-fragment
-OCTAL_ESC
-    :   '\\' ('0'..'3') ('0'..'7') ('0'..'7')
-    |   '\\' ('0'..'7') ('0'..'7')
-    |   '\\' ('0'..'7')
-    ;
+/* This grammar is imported by A2L.g4 and is never generated on its own, so it declares no token
+   of its own: numericValue, stringValue and identifierValue, and the tokens they are built from,
+   are the ones of the importing grammar. */

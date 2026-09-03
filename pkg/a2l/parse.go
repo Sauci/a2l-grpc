@@ -1,6 +1,7 @@
 package a2l
 
 import (
+	"errors"
 	"fmt"
 	"github.com/antlr4-go/antlr/v4"
 	"github.com/sauci/a2l-grpc/pkg/a2l/parser"
@@ -41,6 +42,30 @@ type ParseOptions struct {
 	// ASAP2_VERSION and containing keywords which require a newer version of the standard is then
 	// rejected instead of being parsed with warnings.
 	EnforceVersionCheck bool
+}
+
+// unresolvedIncludes reports every /include statement of the file. The include mechanism of ASAM
+// MCD-2 MC 1.6.1 chapter 4 is a text replacement, which needs the file system the file was read
+// from; this parser is given the content of a single file, so it can only name the references it
+// cannot resolve. Reporting them keeps a tree which silently lacks the content of the included
+// files from being taken for a complete one.
+func unresolvedIncludes(tokenStream *antlr.CommonTokenStream) (result []SyntaxError) {
+	tokenStream.Fill()
+
+	for _, token := range tokenStream.GetAllTokens() {
+		if token.GetTokenType() != parser.A2LLexerINCLUDE {
+			continue
+		}
+
+		result = append(result, SyntaxError{
+			Line:   token.GetLine(),
+			Column: token.GetColumn(),
+			Msg: fmt.Sprintf("%s is not resolved by this parser, the content of the included "+
+				"file must be substituted by the caller", strings.TrimSpace(token.GetText())),
+		})
+	}
+
+	return result
 }
 
 // GetTreeFromString parses the passed A2L content and returns the corresponding tree. Keywords
@@ -88,6 +113,8 @@ func GetTreeFromStringWithOptions(a2lString string, options ParseOptions) (resul
 
 	fileTree := p.A2lFile()
 
+	errorListener.Errors = append(errorListener.Errors, unresolvedIncludes(tokenStream)...)
+
 	versionCheck := newVersionCheckListener()
 	antlr.ParseTreeWalkerDefault.Walk(versionCheck, fileTree)
 
@@ -115,7 +142,9 @@ func GetTreeFromStringWithOptions(a2lString string, options ParseOptions) (resul
 	antlr.ParseTreeWalkerDefault.Walk(listener, fileTree)
 
 	if len(errorListener.Errors) != 0 {
-		err = fmt.Errorf(strings.Join(errorListener.GetErrors(), "\n"))
+		// the messages quote the offending part of the file, so they must never be used as a
+		// format string: a per cent sign in the parsed content would be taken for a verb
+		err = errors.New(strings.Join(errorListener.GetErrors(), "\n"))
 	}
 
 	return listener.Tree(), warnings, err

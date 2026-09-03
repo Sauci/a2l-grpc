@@ -15,6 +15,13 @@ func TestGrammar_Terminal_IDENT(t *testing.T) {
 		"array[0]",
 		"array[SYMBOLIC_INDEX]",
 		"instance.element[2].member",
+		// Chapter 3.2 requires a letter or an underscore for the first character of the
+		// identifier; a partial string may begin with a digit, as the chapter names the partial
+		// string explicitly where it means one ("brackets must occur in pairs at the end of a
+		// partial string"). Such identifiers occur in the wild, e.g. "SFB_R_FFO_DE.Properties.1".
+		"digit.1.partial",
+		"digit.0partial",
+		"SFB_R_FFO_DE.Properties.1.Qly",
 		// ALPHA is named by chapter 3.5.134 as reserved for a future extension, but it is not an
 		// enum value of any published version and is absent from the index of keywords and enum
 		// values which chapter 3.2 declares to be the list an identifier must not match. Chapter
@@ -47,13 +54,11 @@ func TestGrammar_Terminal_IDENT(t *testing.T) {
 	})
 
 	// Chapter 3.2 describes an identifier as a "hierarchical concatenation of partial strings
-	// separated by points", each of which has to obey the identifier laws of C: "the first
-	// character must be a letter or an underscore". An empty or digit-initial partial string
-	// satisfies neither.
+	// separated by points", so a partial string which is not there is malformed.
 	for _, identifier := range []string{
 		"trailing.",
 		"empty..partial",
-		"digit.0partial",
+		".leading",
 	} {
 		t.Run("reject/malformed partial identifier "+identifier, func(t *testing.T) {
 			parseFails(t, moduleScope(

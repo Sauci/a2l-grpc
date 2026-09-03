@@ -186,6 +186,13 @@ PROJECT {
 - As shown in the above example, the numerical values are held in the *Value* field. The other fields hold metadata in 
   case the value must be dumped. In the case of the *UpgradeNo* for instance, the *Base* field says that the original 
   value was defined in numerical base 10, and the *Size* field says that it has 2 digits.
+- A string is held in the *Value* field as it is written in the file, without its delimiters: the escape sequences 
+  (`\"`, `\'`, `\\`, `\n`, `\r`, `\t` and a doubled `""`) are left in place, so that the value is reproduced verbatim 
+  when the tree is serialized back to A2L. A client which needs the characters the string stands for, rather than its 
+  source form, has to resolve the sequences itself: `"a \"b\""` is delivered as `a \"b\"`.
+- The parser is given the content of a single file and has no access to a file system, so it cannot resolve an 
+  `/include` statement. Each of them is reported as an error naming the file it refers to; substituting the content of 
+  the included files is up to the caller.
 - `TreeFromA2LRequest` accepts an optional `enforce_version_check` flag. When set, keywords requiring a newer ASAP2 
   version than the one declared by the file are rejected as errors; otherwise they are reported in the `warnings` field 
   of the first response of the stream.

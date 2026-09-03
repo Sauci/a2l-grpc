@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/sauci/a2l-grpc/pkg/a2l"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
@@ -10,7 +11,9 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 	"io"
+	"net"
 	"testing"
+	"time"
 )
 
 type mockStreamBase[R any, S any] struct {
@@ -607,5 +610,107 @@ func TestGrpcA2LImplType_GetA2LFromTree(t *testing.T) {
 				t.Fatal(err)
 			}
 		})
+	}
+}
+
+// The responses carry the serialized tree in chunks of maxMsgSize - protocolSizeMargin bytes. A
+// chunk size which is not positive would make the loop of chunkifyBySize spin forever or slice
+// backwards, so Create rejects such a configuration and the helper itself does not split.
+func Test_ChunkifyBySize(t *testing.T) {
+	data := []byte("0123456789")
+
+	t.Run("splits into chunks of the requested size", func(t *testing.T) {
+		assert.Equal(t, [][]byte{[]byte("0123"), []byte("4567"), []byte("89")},
+			chunkifyBySize(data, 4))
+	})
+
+	t.Run("a chunk size which is not positive does not split", func(t *testing.T) {
+		for _, chunkSize := range []int{0, -1, -256} {
+			assert.Equal(t, [][]byte{data}, chunkifyBySize(data, chunkSize),
+				"chunk size %d", chunkSize)
+		}
+	})
+
+	t.Run("no data yields no chunk", func(t *testing.T) {
+		for _, chunkSize := range []int{4, 0, -1} {
+			assert.Empty(t, chunkifyBySize(nil, chunkSize), "chunk size %d", chunkSize)
+		}
+	})
+}
+
+// createServer returns 0 on success and 1 on failure. It used to report success whenever no
+// server was running yet, even when the port could not be bound, so that a caller checking the
+// result went on to connect to a port nothing was listening on.
+func Test_CreateServer(t *testing.T) {
+	const port = 33331
+	const maxMsgSize = 4 * 1024 * 1024
+
+	t.Run("fails when the message size leaves no room for a chunk", func(t *testing.T) {
+		for _, size := range []int{0, 1, protocolSizeMargin, -1} {
+			assert.Equal(t, 1, createServer(port, size), "maximum message size %d", size)
+			assert.Nil(t, server, "no server should have been started")
+		}
+	})
+
+	t.Run("fails when the port cannot be bound", func(t *testing.T) {
+		listener, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%v", port))
+		if !assert.NoError(t, err) {
+			return
+		}
+		defer func() { _ = listener.Close() }()
+
+		assert.Equal(t, 1, createServer(port, maxMsgSize))
+		assert.Nil(t, server, "no server should have been started")
+	})
+
+	t.Run("serves the loopback interface only", func(t *testing.T) {
+		if !assert.Equal(t, 0, createServer(port, maxMsgSize)) {
+			return
+		}
+		defer func() { assert.Equal(t, 0, closeServer()) }()
+
+		// a second server cannot be started while the first one is running
+		assert.Equal(t, 1, createServer(port+1, maxMsgSize))
+
+		connection, err := net.DialTimeout("tcp", fmt.Sprintf("127.0.0.1:%v", port), time.Second)
+		if assert.NoError(t, err, "the loopback interface should be served") {
+			assert.NoError(t, connection.Close())
+		}
+	})
+
+	t.Run("closeServer reports that no server is running", func(t *testing.T) {
+		assert.Equal(t, 1, closeServer())
+	})
+}
+
+// A tree which lacks an element the parser always fills, but which a client building a tree by
+// hand may leave out, used to make the marshaller dereference a nil node and lose the stream to an
+// internal error. The failure is reported through the error field of the response instead.
+func Test_GetA2LFromTree_MalformedTreeReturnsError(t *testing.T) {
+	tree := &a2l.RootNodeType{PROJECT: &a2l.ProjectType{}}
+
+	serializedTree, err := proto.Marshal(tree)
+	if !assert.NoError(t, err) {
+		return
+	}
+
+	impl := grpcA2LImplType{chunkSize: 4 * 1024 * 1024}
+
+	mockStream := newMockStreamBase[*a2l.A2LFromTreeRequest, *a2l.A2LResponse]()
+	defer mockStream.Close()
+
+	mockStream.SendRequest(&a2l.A2LFromTreeRequest{Tree: serializedTree})
+
+	if !assert.NoError(t, impl.GetA2LFromTree(mockStream)) {
+		return
+	}
+
+	response, err := mockStream.RecvResponse()
+	if !assert.NoError(t, err, "a response should have been sent") {
+		return
+	}
+
+	if assert.NotNil(t, response.Error, "the failure should be reported in the error field") {
+		assert.Contains(t, *response.Error, "serialization of the tree to A2L")
 	}
 }

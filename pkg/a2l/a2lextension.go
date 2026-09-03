@@ -19,8 +19,10 @@ import (
 //	panic("leaf node")
 //}
 
+// sortSortableList orders the nodes by their key. The sort is stable, so that nodes sharing a key
+// keep the order of the file instead of being shuffled from one run to the next.
 func sortSortableList[T SortableNode](list []T) {
-	sort2.Slice(list, func(i, j int) bool {
+	sort2.SliceStable(list, func(i, j int) bool {
 		return natsort.Compare(list[i].UniqueKey(), list[j].UniqueKey())
 	})
 }

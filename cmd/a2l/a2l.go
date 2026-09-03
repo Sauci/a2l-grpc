@@ -17,9 +17,21 @@ import (
 	"sync"
 )
 
-var protocolSizeMargin = 256
+const protocolSizeMargin = 256
 
+// chunkifyBySize splits data into chunks of at most chunkSize bytes. A chunkSize which is not
+// positive would make the loop below spin forever or slice backwards, so it is treated as "do not
+// split": Create rejects such a configuration up front, this guard only keeps a direct caller from
+// hanging the process.
 func chunkifyBySize(data []byte, chunkSize int) [][]byte {
+	if chunkSize <= 0 {
+		if len(data) == 0 {
+			return nil
+		}
+
+		return [][]byte{data}
+	}
+
 	var chunks [][]byte
 	for start := 0; start < len(data); start += chunkSize {
 		end := start + chunkSize
@@ -270,18 +282,40 @@ func (s *grpcA2LImplType) GetA2LFromTree(stream a2l.A2L_GetA2LFromTreeServer) (e
 		buffer.Write(request.Tree)
 	}
 	if err == nil {
-		if err = proto.Unmarshal(buffer.Bytes(), tree); err == nil {
-			a2lDataBytes = []byte(tree.MarshalA2L(0, indent, sorted))
+		var marshalError error
+
+		if marshalError = proto.Unmarshal(buffer.Bytes(), tree); marshalError == nil {
+			a2lDataBytes, marshalError = marshalA2L(tree, indent, sorted)
+		}
+
+		if marshalError == nil {
 			for _, chunk = range chunkifyBySize(a2lDataBytes, s.chunkSize) {
 				response.A2L = chunk
 				if err = stream.Send(response); err != nil {
 					break
 				}
 			}
+		} else {
+			response.Error = proto.String(marshalError.Error())
+			err = stream.Send(response)
 		}
 	}
 
 	return err
+}
+
+// marshalA2L serializes the tree back to A2L. A tree which lacks an element the parser always
+// fills, but which a client building a tree by hand may leave out, makes the marshaller
+// dereference a nil node. The panic is turned into an error here so that the caller is told what
+// happened through the error field of the response, like every other failure of the API.
+func marshalA2L(tree *a2l.RootNodeType, indent string, sorted bool) (result []byte, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			result, err = nil, fmt.Errorf("an error occurred during serialization of the tree to A2L: %v", r)
+		}
+	}()
+
+	return []byte(tree.MarshalA2L(0, indent, sorted)), nil
 }
 
 //export GetJSONByteArrayFromA2LByteArray
@@ -313,61 +347,83 @@ var serverMutex sync.Mutex
 
 var server *grpc.Server
 
-//export Create
-func Create(port C.int, maxMsgSize C.int) (result C.int) {
-	var err error
-	var listener net.Listener
-
+// createServer starts the gRPC server on the passed port and returns 0 on success, 1 on failure.
+// It fails when a server is already running, when maxMsgSize leaves no room for a chunk of tree,
+// and when the port cannot be bound.
+//
+// The server is bound to the loopback interface: it is an unauthenticated endpoint which serves
+// the process which loaded this library, not the network it sits on.
+//
+// The cgo types stay in Create, so that this function can be exercised by the tests, which cannot
+// import "C".
+func createServer(port int, maxMsgSize int) int {
 	serverMutex.Lock()
 	defer serverMutex.Unlock()
 
 	if server != nil {
-		result = 1
-	} else {
-		result = 0
+		return 1
 	}
 
-	if result == 0 {
-		if listener, err = net.Listen("tcp", fmt.Sprintf(":%v", port)); err == nil {
-			server = grpc.NewServer(
-				grpc.MaxRecvMsgSize(int(maxMsgSize)),
-				grpc.MaxSendMsgSize(int(maxMsgSize)),
-				grpc.ChainUnaryInterceptor(recoverUnaryInterceptor),
-				grpc.ChainStreamInterceptor(recoverStreamInterceptor))
-
-			a2l.RegisterA2LServer(server, &grpcA2LImplType{chunkSize: int(maxMsgSize) - protocolSizeMargin})
-
-			go func() {
-				err = server.Serve(listener)
-			}()
-		}
+	// the responses carry the serialized tree in chunks of maxMsgSize - protocolSizeMargin bytes,
+	// which must leave at least one byte of payload
+	if maxMsgSize <= protocolSizeMargin {
+		return 1
 	}
 
-	return result
+	listener, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%v", port))
+	if err != nil {
+		return 1
+	}
+
+	newServer := grpc.NewServer(
+		grpc.MaxRecvMsgSize(maxMsgSize),
+		grpc.MaxSendMsgSize(maxMsgSize),
+		grpc.ChainUnaryInterceptor(recoverUnaryInterceptor),
+		grpc.ChainStreamInterceptor(recoverStreamInterceptor))
+
+	a2l.RegisterA2LServer(newServer, &grpcA2LImplType{chunkSize: maxMsgSize - protocolSizeMargin})
+
+	server = newServer
+
+	go func() {
+		// Serve returns when closeServer stops the server; there is nobody left to report to
+		_ = newServer.Serve(listener)
+	}()
+
+	return 0
 }
 
-//export Close
-func Close() (result C.int) {
+// closeServer stops the running server and returns 0, or 1 when no server is running.
+func closeServer() int {
 	serverMutex.Lock()
 	defer serverMutex.Unlock()
 
 	if server == nil {
-		result = 1
-	} else {
-		server.Stop()
-
-		server = nil
-
-		result = 0
+		return 1
 	}
 
-	return result
+	server.Stop()
+	server = nil
+
+	return 0
+}
+
+//export Create
+func Create(port C.int, maxMsgSize C.int) (result C.int) {
+	return C.int(createServer(int(port), int(maxMsgSize)))
+}
+
+//export Close
+func Close() (result C.int) {
+	return C.int(closeServer())
 }
 
 func main() {
-	Create(3333, 4*1024*1024)
+	if createServer(3333, 4*1024*1024) != 0 {
+		fmt.Println("unable to start the gRPC server")
 
-	for {
-		select {}
+		return
 	}
+
+	select {}
 }

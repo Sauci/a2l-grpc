@@ -5,7 +5,7 @@ import (
 )
 
 func (n *Listener) EnterIfData(ctx *parser.IfDataContext) {
-	ifData := &IfDataType{Name: identifierToIdentType(ctx.GetName())}
+	ifData := &IfDataType{Name: ifDataIdentifierToIdentType(ctx.GetName())}
 
 	n.Push(ifData)
 }
@@ -19,9 +19,7 @@ func (n *Listener) ExitIfData(_ *parser.IfDataContext) {
 func (n *Listener) EnterGenericParameter(ctx *parser.GenericParameterContext) {
 	genericParameter := &GenericParameterType{}
 
-	if ctx.GetTag() != nil {
-		genericParameter.Oneof = &GenericParameterType_Tag{Tag: tagToTagType(ctx.GetTag())}
-	} else if ctx.GetSting() != nil {
+	if ctx.GetSting() != nil {
 		genericParameter.Oneof = &GenericParameterType_String_{String_: a2lStringToStringType(ctx.GetSting())}
 	} else if ctx.GetNumeric() != nil {
 		if ctx.GetNumeric().GetH() != nil {
@@ -34,7 +32,7 @@ func (n *Listener) EnterGenericParameter(ctx *parser.GenericParameterContext) {
 	} else if ctx.GetGeneric() != nil {
 		// let the recursion happening here...
 	} else if ctx.GetIdentifier() != nil {
-		genericParameter.Oneof = &GenericParameterType_Identifier{Identifier: identifierToIdentType(ctx.GetIdentifier())}
+		genericParameter.Oneof = &GenericParameterType_Identifier{Identifier: ifDataIdentifierToIdentType(ctx.GetIdentifier())}
 	} else {
 		panic("runtime...")
 	}
@@ -49,7 +47,7 @@ func (n *Listener) ExitGenericParameter(_ *parser.GenericParameterContext) {
 }
 
 func (n *Listener) EnterGenericNode(ctx *parser.GenericNodeContext) {
-	genericNode := &GenericNodeType{Name: identifierToIdentType(ctx.GetName())}
+	genericNode := &GenericNodeType{Name: ifDataIdentifierToIdentType(ctx.GetName())}
 
 	n.Push(genericNode)
 }

@@ -38,6 +38,11 @@ message IdentType {
   string Value = 1;
 }
 
+// StringType carries a string as it is written in the file, without its delimiters: the escape
+// sequences which ASAM MCD-2 MC 1.6.1 chapter 3.2 defines (\" \' \\ \n \r \t, and a doubled "" for
+// a double inverted comma) are left in place, so that the value is reproduced verbatim when the
+// tree is serialized back to A2L. A consumer which needs the characters the string stands for has
+// to resolve the sequences itself, e.g. "a \"b\"" is delivered as: a \"b\"
 message StringType {
   string Value = 1;
 }

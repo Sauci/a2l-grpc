@@ -257,6 +257,46 @@ func TestGrammar_DuplicateSingleOccurrenceKeyword(t *testing.T) {
 	})
 }
 
+// ASAP2 1.51 (chapter 6.3.26) declares CALIBRATION_HANDLE as "{-> CALIBRATION_HANDLE}*", ASAM
+// MCD-2 MC 1.6.1 (chapter 3.5.28) reduced it to "[-> CALIBRATION_HANDLE]". The grammar accepts
+// several of them, so that a 1.51 file is not rejected, which means the check of the cardinality
+// depends on the declared version and cannot be read from the labels of the grammar.
+func TestGrammar_VersionCheck_ReducedCardinality(t *testing.T) {
+	body := modParScope("/begin CALIBRATION_METHOD \"InCircuit\" 2\n" +
+		"/begin CALIBRATION_HANDLE 0x10\n/end CALIBRATION_HANDLE\n" +
+		"/begin CALIBRATION_HANDLE 0x20\n/end CALIBRATION_HANDLE\n" +
+		"/end CALIBRATION_METHOD")
+
+	t.Run("warned when the file declares 1.61", func(t *testing.T) {
+		_, warnings, err := GetTreeFromStringWithOptions("ASAP2_VERSION 1 61\n"+body, ParseOptions{})
+		if !assert.NoError(t, err, "without enforcement the file should still parse") {
+			return
+		}
+
+		if assert.Len(t, warnings, 1, "only the occurrences beyond the first one are reported") {
+			assert.Contains(t, warnings[0].String(), "CALIBRATION_HANDLE")
+			assert.Contains(t, warnings[0].String(), "at most once since ASAP2 version 1.61")
+		}
+	})
+
+	t.Run("still accepted when the file declares 1.51", func(t *testing.T) {
+		_, warnings, err := GetTreeFromStringWithOptions("ASAP2_VERSION 1 51\n"+body,
+			ParseOptions{EnforceVersionCheck: true})
+		assert.NoError(t, err)
+		assert.Empty(t, warnings)
+	})
+
+	t.Run("a single occurrence is never reported", func(t *testing.T) {
+		_, warnings, err := GetTreeFromStringWithOptions("ASAP2_VERSION 1 61\n"+
+			modParScope("/begin CALIBRATION_METHOD \"InCircuit\" 2\n"+
+				"/begin CALIBRATION_HANDLE 0x10\n/end CALIBRATION_HANDLE\n"+
+				"/end CALIBRATION_METHOD"),
+			ParseOptions{EnforceVersionCheck: true})
+		assert.NoError(t, err)
+		assert.Empty(t, warnings)
+	})
+}
+
 // ASAM MCD-2 MC 1.6.1 chapter 1.4.4: "The current version ASAM MCD-2 MC V 1.6.1 defined in this
 // document does not support the following not usable keywords anymore: - S_REC_LAYOUT -
 // NO_RESCALE_Y / _Z / _4 / _5 (reduced to NO_RESCALE_X) - AXIS_RESCALE_Y / _Z / _4 / _5 (reduced

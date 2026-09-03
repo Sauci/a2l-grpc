@@ -476,7 +476,14 @@ func (t *TaggedstructDefinition) MapChildNodes(node any) {
 }
 
 func (t *TaggedstructDefinition) MarshalA2L(indentLevel int, indentString string, sort bool) (result string) {
-	tmpResult := []string{indentContent(fmt.Sprintf("%s", t.Tag.A2LString()), indentLevel, indentString)}
+	// chapter 5.2 makes the tag mandatory and the parser always fills it, but a tree built by a
+	// client may not
+	tag := ""
+	if t.Tag != nil {
+		tag = t.Tag.A2LString()
+	}
+
+	tmpResult := []string{indentContent(tag, indentLevel, indentString)}
 
 	if t.Star {
 		tmpResult = append(tmpResult, indentContent("(", indentLevel, indentString))
