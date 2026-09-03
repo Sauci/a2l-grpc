@@ -24,6 +24,11 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v7
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
       - run: ./generate_grpc.sh
       - uses: actions/upload-artifact@v7
         with:
@@ -37,6 +42,11 @@ jobs:
       - generate-grpc-sources
     steps:
       - uses: actions/checkout@v7
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
       - uses: actions/download-artifact@v8
         with:
           name: antlr4
@@ -55,6 +65,11 @@ jobs:
       - generate-grpc-sources
     steps:
       - uses: actions/checkout@v7
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
       - uses: actions/download-artifact@v8
         with:
           name: antlr4
@@ -87,7 +102,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v6
         with:
-          go-version: stable
+          go-version-file: go.mod
           cache: true
       - name: Install ARM64 MinGW toolchain
         shell: powershell
@@ -118,7 +133,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v6
         with:
-          go-version: stable
+          go-version-file: go.mod
           cache: true
       - run: |
           go vet ./cmd/a2l/... ./pkg/a2l/...
@@ -163,6 +178,11 @@ jobs:
     name: build-linux-${{ matrix.target }}
     steps:
       - uses: actions/checkout@v7
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
       - uses: actions/download-artifact@v8
         with:
           name: antlr4
@@ -207,6 +227,11 @@ jobs:
     name: MSYS2 ${{ matrix.mingw }}
     steps:
       - uses: actions/checkout@v7
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
       - uses: actions/download-artifact@v8
         with:
           name: antlr4
@@ -253,7 +278,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v6
         with:
-          go-version: stable
+          go-version-file: go.mod
           cache: true
       - name: Install ARM64 MinGW toolchain
         shell: powershell
@@ -289,7 +314,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v6
         with:
-          go-version: stable
+          go-version-file: go.mod
           cache: true
       - run: |
           go build --buildmode=c-shared -o a2l_grpc_$(go env GOOS)_$(go env GOARCH).dylib ./cmd/a2l/a2l.go
@@ -316,7 +341,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v6
         with:
-          go-version: stable
+          go-version-file: go.mod
           cache: true
       - run: |
           go build --buildmode=c-shared -o a2l_grpc_$(go env GOOS)_$(go env GOARCH).dylib ./cmd/a2l/a2l.go

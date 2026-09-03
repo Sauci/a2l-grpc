@@ -232,7 +232,7 @@ func (t *BlockDefinition) MapChildNodes(node any) {
 }
 
 func (t *BlockDefinition) MarshalA2L(indentLevel int, indentString string, sort bool) (result string) {
-	tmpResult := []string{fmt.Sprintf(indentContent("block ", indentLevel, indentString))}
+	tmpResult := []string{indentContent("block ", indentLevel, indentString)}
 
 	if t.Tag != nil {
 		tmpResult[0] += fmt.Sprintf("%s ", t.Tag.A2LString())

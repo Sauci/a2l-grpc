@@ -7,8 +7,8 @@ set -eu
 # (github.com/antlr4-go/antlr/v4 in go.mod), so a floating version would silently produce sources
 # which no longer fit it, or change the parser without a change in this repository. Keep both in
 # step when either of them is updated.
-ANTLR_VERSION=4.13.1
-ANTLR_SHA256=bc13a9c57a8dd7d5196888211e5ede657cb64a3ce968608697e4f668251a8487
+ANTLR_VERSION=4.13.2
+ANTLR_SHA256=eae2dfa119a64327444672aff63e9ec35a20180dc5b8090b7a6ab85125df4d76
 ANTLR_JAR="antlr-${ANTLR_VERSION}-complete.jar"
 
 curl -fsSLo "${ANTLR_JAR}" "https://www.antlr.org/download/${ANTLR_JAR}"

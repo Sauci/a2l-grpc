@@ -53,7 +53,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   being truncated. `ALIGNMENT_BYTE 0xFFFFFFFF` used to be kept as `-1` and dumped as
   `0x-0000001`, which no longer parses.
 - The messages of the parser are no longer used as a format string, so a per cent sign in the
-  parsed content does not reach the caller as `%!'(NOVERB)` any more.
+  parsed content does not reach the caller as `%!'(NOVERB)` any more. The indentation of a `block`
+  of the metalanguage was formatted the same way when a tree was serialized back to A2L.
 - `Create` returns 1 when the server could not be started. It used to return 0 whenever no server
   was running yet, the port could not be bound included, so a caller checking the result went on to
   connect to a port nothing was listening on.
@@ -101,10 +102,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `StringType` documents that it carries the string as written in the file: the escape sequences of
   chapter 3.2 are left in place, so that the value is reproduced verbatim when the tree is
   serialized back to A2L.
-- The ANTLR generator is pinned to 4.13.1 and verified against its checksum, instead of being built
-  from a clone of the default branch of the upstream repository on every run.
+- The ANTLR generator is pinned to 4.13.2 and verified against its checksum, instead of being built
+  from a clone of the default branch of the upstream repository on every run. `protoc` is pinned
+  and verified the same way.
 - CI no longer runs `go get`, which resolved the ANTLR runtime to its latest version and rewrote
-  `go.mod`, so the dependency versions the module declares are the ones tested and released.
+  `go.mod`, so the dependency versions the module declares are the ones tested and released. Every
+  job which runs Go now installs the toolchain `go.mod` declares, instead of taking the one which
+  happens to sit on the runner.
+- **Breaking:** the module requires Go 1.25, which is the version `google.golang.org/grpc` needs.
+  The toolchain it is built with is 1.27.1. Besides the newer dependencies this is worth having on
+  its own: measured on a 1.3 MB file, the compiler of 1.27 parses about a quarter faster than the
+  one of 1.22 (2.88 s to 2.19 s) and removes about a fifth of the allocations (39.2 to 31.0
+  million), without a change to this repository.
+- Updated the toolchain and the dependencies: Go 1.22 to 1.25/1.27.1, ANTLR 4.13.1 to 4.13.2 with
+  its runtime `github.com/antlr4-go/antlr/v4` v4.13.0 to v4.13.1, which the generated parser has to
+  match, `google.golang.org/grpc` v1.69.4 to v1.83.2, `google.golang.org/protobuf` v1.35.1 to
+  v1.36.12, `github.com/stretchr/testify` v1.8.4 to v1.12.1, `protoc` 29.3 to 36.1,
+  `protoc-gen-go` v1.33.0 to v1.36.12 and `protoc-gen-go-grpc` v1.3.0 to v1.6.2. The protobuf
+  messages are unchanged, and so are the `.proto` files a client generates its own sources from.
 
 ## [0.2.0] - 2026-07-31
 
