@@ -77,7 +77,8 @@ This command will create a `protobuf` directory in the `src` folder, containing 
 ## Writing the *gRPC* client
 Now that all sources are available, we can start writing the *gRPC* client in *Python*. Note that all the *gRPC* 
 methods are bidirectional streams: the A2L content is sent as a sequence of requests, and the resulting tree is 
-received as a sequence of chunks which must be concatenated before being deserialized. Here is the code:
+received as a sequence of chunks which must be concatenated before being deserialized. The warnings, if any, arrive 
+first, in responses of their own, so they must be collected from every response of the stream. Here is the code:
 ```python
 import ctypes
 import os
@@ -179,10 +180,12 @@ PROJECT {
 ---
 
 # Hints
-- As A2L files are often quite large, it might happen that *gRPC* raises an error because the message size is too 
-  large. The maximum message size accepted by the server is the second argument of `Create`, and it also defines the 
-  size of the chunks the server sends back. On the client side, the same limit must be set with the 
-  `grpc.max_receive_message_length` and `grpc.max_send_message_length` options while instantiating the *gRPC* channel.
+- The maximum message size accepted by the server is the second argument of `Create`. No response of the server 
+  exceeds it, whatever the size of the file: the tree is sent in chunks sized to fit, the warnings are spread over as 
+  many responses as they need, and an error message longer than the limit is shortened and says how many of its lines 
+  were left out. On the client side, the same limit must be set with the `grpc.max_receive_message_length` and 
+  `grpc.max_send_message_length` options while instantiating the *gRPC* channel, and the requests must be chunked 
+  below it as shown above; the value is therefore a tuning knob, not something to raise for a large file.
 - As shown in the above example, the numerical values are held in the *Value* field. The other fields hold metadata in 
   case the value must be dumped. In the case of the *UpgradeNo* for instance, the *Base* field says that the original 
   value was defined in numerical base 10, and the *Size* field says that it has 2 digits.

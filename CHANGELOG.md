@@ -29,6 +29,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- No response of the gRPC server exceeds the maximum message size any more. The warnings all rode
+  on the first response, on top of a chunk of tree sized to fill it, and an error was sent in one
+  piece whatever its length; a large file with many warnings, or a badly broken one, made gRPC
+  reject the response with `RESOURCE_EXHAUSTED`, a transport error which named neither the file nor
+  the cause, and which raising the limit on both sides merely postponed. The warnings now come in
+  responses of their own, before the chunks of the tree, spread over as many as they need, and an
+  error longer than the limit is shortened to its first lines and says how many were left out.
+  **The warnings are no longer on the first response** but on the leading ones; a client which
+  collects them from every response, as the one of the README does, is unaffected.
 - A partial identifier may begin with a digit, e.g. `SFB_R_FFO_DE.Properties.1.Qly`. Chapter 3.2
   lists two limitations for an identifier: "the first character must be a letter or an underscore,
   brackets must occur in pairs at the end of a partial string". The first one is about the first

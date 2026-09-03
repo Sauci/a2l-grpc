@@ -12,6 +12,7 @@ import (
 	"google.golang.org/protobuf/proto"
 	"io"
 	"net"
+	"strings"
 	"testing"
 	"time"
 )
@@ -88,7 +89,7 @@ func Test_GetTreeFromA2L_ConversionOverflowReturnsError(t *testing.T) {
  /end MODULE
 /end PROJECT`
 
-	impl := grpcA2LImplType{chunkSize: 4 * 1024 * 1024}
+	impl := newGrpcA2LImpl(4 * 1024 * 1024)
 
 	mockStream := newMockStreamBase[*a2l.TreeFromA2LRequest, *a2l.TreeResponse]()
 	defer mockStream.Close()
@@ -298,7 +299,7 @@ func Test_GetJSONFromTree(t *testing.T) {
 			var receivedJSON []byte
 			var response *a2l.JSONResponse
 			var firstRequest *a2l.JSONFromTreeRequest
-			grpc := grpcA2LImplType{chunkSize: 4 * 1024 * 1024}
+			grpc := newGrpcA2LImpl(4 * 1024 * 1024)
 
 			mockStream := newMockStreamBase[*a2l.JSONFromTreeRequest, *a2l.JSONResponse]()
 			defer mockStream.Close()
@@ -553,7 +554,7 @@ func TestGrpcA2LImplType_GetA2LFromTree(t *testing.T) {
 			var receivedA2L []byte
 			var response *a2l.A2LResponse
 			var firstRequest *a2l.A2LFromTreeRequest
-			grpc := grpcA2LImplType{chunkSize: 4 * 1024 * 1024}
+			grpc := newGrpcA2LImpl(4 * 1024 * 1024)
 
 			mockStream := newMockStreamBase[*a2l.A2LFromTreeRequest, *a2l.A2LResponse]()
 			defer mockStream.Close()
@@ -694,7 +695,7 @@ func Test_GetA2LFromTree_MalformedTreeReturnsError(t *testing.T) {
 		return
 	}
 
-	impl := grpcA2LImplType{chunkSize: 4 * 1024 * 1024}
+	impl := newGrpcA2LImpl(4 * 1024 * 1024)
 
 	mockStream := newMockStreamBase[*a2l.A2LFromTreeRequest, *a2l.A2LResponse]()
 	defer mockStream.Close()
@@ -712,5 +713,158 @@ func Test_GetA2LFromTree_MalformedTreeReturnsError(t *testing.T) {
 
 	if assert.NotNil(t, response.Error, "the failure should be reported in the error field") {
 		assert.Contains(t, *response.Error, "serialization of the tree to A2L")
+	}
+}
+
+// treeResponses runs GetTreeFromA2L on the passed content and returns every response of the stream.
+func treeResponses(t *testing.T, impl *grpcA2LImplType, a2lString string) (result []*a2l.TreeResponse) {
+	t.Helper()
+
+	mockStream := newMockStreamBase[*a2l.TreeFromA2LRequest, *a2l.TreeResponse]()
+	defer mockStream.Close()
+
+	mockStream.SendRequest(&a2l.TreeFromA2LRequest{A2L: []byte(a2lString)})
+
+	if err := impl.GetTreeFromA2L(mockStream); !assert.NoError(t, err) {
+		return nil
+	}
+
+	for {
+		response, err := mockStream.RecvResponse()
+		if err != nil {
+			return result
+		}
+
+		result = append(result, response)
+	}
+}
+
+// Every response must fit the maximum message size the server was created with, whatever the file
+// produces. The warnings used to ride on the first response, on top of a chunk of tree sized to
+// fill it: a large file with many of them made gRPC reject the response with RESOURCE_EXHAUSTED.
+func Test_GetTreeFromA2L_WarningsAreSpreadOverResponsesWhichFit(t *testing.T) {
+	const maxMsgSize = 2048
+	const measurements = 200
+
+	// a repeated single occurrence keyword yields one warning per measurement
+	var a2lString strings.Builder
+	a2lString.WriteString("/begin PROJECT p \"\"\n/begin MODULE m \"\"\n")
+	for i := 0; i < measurements; i++ {
+		fmt.Fprintf(&a2lString, "/begin MEASUREMENT m%d \"\" UWORD cm 1 0 0 100\n"+
+			"BYTE_ORDER MSB_LAST\nBYTE_ORDER MSB_FIRST\n/end MEASUREMENT\n", i)
+	}
+	a2lString.WriteString("/end MODULE\n/end PROJECT")
+
+	responses := treeResponses(t, newGrpcA2LImpl(maxMsgSize), a2lString.String())
+	if !assert.NotEmpty(t, responses) {
+		return
+	}
+
+	warnings, chunks, firstChunk := 0, 0, -1
+	var serializedTree []byte
+
+	for i, response := range responses {
+		assert.LessOrEqual(t, proto.Size(response), maxMsgSize, "response %d", i)
+		assert.Nil(t, response.Error, "response %d", i)
+
+		if len(response.SerializedTreeChunk) > 0 {
+			if firstChunk < 0 {
+				firstChunk = i
+			}
+			chunks++
+			serializedTree = append(serializedTree, response.SerializedTreeChunk...)
+			assert.Empty(t, response.Warnings, "a chunk fills its response, response %d", i)
+		} else {
+			assert.Less(t, firstChunk, 0, "the warnings precede the chunks, response %d", i)
+			assert.NotEmpty(t, response.Warnings, "response %d carries nothing", i)
+		}
+
+		warnings += len(response.Warnings)
+	}
+
+	assert.Equal(t, measurements, warnings, "every warning should be delivered")
+	assert.Greater(t, firstChunk, 1, "the warnings should need several responses at this size")
+	assert.Greater(t, chunks, 0)
+
+	tree := &a2l.RootNodeType{}
+	if assert.NoError(t, proto.Unmarshal(serializedTree, tree)) {
+		assert.Len(t, tree.PROJECT.MODULE[0].MEASUREMENT, measurements)
+	}
+}
+
+// An error used to be sent in one piece whatever its length; a badly broken large file made gRPC
+// reject it. It is shortened to its first lines, which name the cause, and counts the rest.
+func Test_GetTreeFromA2L_ErrorIsBoundedToTheMaximumMessageSize(t *testing.T) {
+	const maxMsgSize = 1024
+
+	// every per cent sign is a token the lexer cannot recognise, and yields one error
+	a2lString := "/begin PROJECT p \"\"\n" + strings.Repeat("%\n", 500) + "/end PROJECT"
+
+	responses := treeResponses(t, newGrpcA2LImpl(maxMsgSize), a2lString)
+	if !assert.Len(t, responses, 1) {
+		return
+	}
+
+	response := responses[0]
+	assert.LessOrEqual(t, proto.Size(response), maxMsgSize)
+
+	if assert.NotNil(t, response.Error) {
+		assert.Contains(t, *response.Error, "token recognition error", "the first errors are kept")
+		assert.Regexp(t, `\.\.\. [0-9]+ further errors omitted$`, *response.Error)
+	}
+}
+
+func Test_boundedError(t *testing.T) {
+	// twenty errors of forty characters each, as the parser reports them: one per line
+	lines := make([]string, 20)
+	for i := range lines {
+		lines[i] = fmt.Sprintf("%3d:1 %s", i, strings.Repeat("x", 34))
+	}
+	message := strings.Join(lines, "\n")
+
+	t.Run("a message which fits is untouched", func(t *testing.T) {
+		assert.Equal(t, message, boundedError(message, 1024))
+	})
+
+	t.Run("the first lines are kept and the rest is counted", func(t *testing.T) {
+		const budget = 300
+
+		bounded := boundedError(message, budget)
+		assert.LessOrEqual(t, stringFieldSize(bounded), budget)
+
+		parts := strings.Split(bounded, "\n")
+		kept, tail := parts[:len(parts)-1], parts[len(parts)-1]
+
+		if !assert.Greater(t, len(kept), 0) || !assert.Less(t, len(kept), len(lines)) {
+			return
+		}
+
+		assert.Equal(t, lines[:len(kept)], kept, "the first lines are kept as they are")
+		assert.Equal(t, fmt.Sprintf("... %d further errors omitted", len(lines)-len(kept)), tail)
+	})
+
+	t.Run("a single line longer than the budget is cut", func(t *testing.T) {
+		bounded := boundedError(strings.Repeat("x", 100), 20)
+
+		assert.True(t, strings.HasSuffix(bounded, "..."))
+		assert.LessOrEqual(t, stringFieldSize(bounded), 20)
+	})
+}
+
+// The responses are built to fit, so an oversize one is a bug of the server. It is reported through
+// the error field instead of surfacing as a transport error on the client.
+func Test_sendWithin_ReportsAnOversizeResponse(t *testing.T) {
+	mockStream := newMockStreamBase[*a2l.TreeFromA2LRequest, *a2l.TreeResponse]()
+	defer mockStream.Close()
+
+	oversize := &a2l.TreeResponse{SerializedTreeChunk: make([]byte, 100)}
+	if !assert.NoError(t, sendWithin(mockStream, oversize, 50, treeErrorResponse)) {
+		return
+	}
+
+	response, err := mockStream.RecvResponse()
+	if assert.NoError(t, err) && assert.NotNil(t, response.Error) {
+		assert.Contains(t, *response.Error, "exceeds the maximum message size of 50 bytes")
+		assert.Empty(t, response.SerializedTreeChunk)
 	}
 }

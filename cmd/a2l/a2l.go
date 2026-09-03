@@ -11,13 +11,21 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/encoding/protowire"
 	"google.golang.org/protobuf/proto"
 	"io"
 	"net"
+	"strings"
 	"sync"
+	"unicode/utf8"
 )
 
+// protocolSizeMargin is the part of the maximum message size a chunk of payload leaves to the
+// framing of its message: the tag and the length prefix of the field which carries it.
 const protocolSizeMargin = 256
+
+// tagSize is the size of the tag of a field of the responses; they are all numbered below 16.
+const tagSize = 1
 
 // chunkifyBySize splits data into chunks of at most chunkSize bytes. A chunkSize which is not
 // positive would make the loop below spin forever or slice backwards, so it is treated as "do not
@@ -47,31 +55,139 @@ func getTreeFromString(a2lString string) (result *a2l.RootNodeType, err error) {
 	return a2l.GetTreeFromString(a2lString)
 }
 
+// grpcA2LImplType serves the API. Every response it sends fits maxMsgSize, the largest message
+// either side of the connection accepts: gRPC rejects a larger one on the sending as well as on
+// the receiving side, with a transport error which reaches the client without a word about the
+// file. The payloads are chunked to that end, and the fields which are not payload, the warnings
+// and the error, are bounded as well, since a large file may produce any number of either.
 type grpcA2LImplType struct {
 	a2l.UnimplementedA2LServer
+	// maxMsgSize is the size limit of a message on the wire, in bytes
+	maxMsgSize int
+	// chunkSize is the number of bytes of payload a response carries; the rest of the limit is
+	// left to the framing of the message
 	chunkSize int
+}
+
+func newGrpcA2LImpl(maxMsgSize int) *grpcA2LImplType {
+	return &grpcA2LImplType{maxMsgSize: maxMsgSize, chunkSize: maxMsgSize - protocolSizeMargin}
+}
+
+// stringFieldSize is the number of bytes a string takes on the wire as a field of a response.
+func stringFieldSize(s string) int {
+	return tagSize + protowire.SizeBytes(len(s))
+}
+
+// fitString shortens s so that a response carrying it alone fits the budget, and marks the cut.
+// It only ever cuts when the server was created with a maximum message size of a few hundred
+// bytes, which no single message of the parser fills otherwise.
+func fitString(s string, budget int) string {
+	const mark = "..."
+
+	if stringFieldSize(s) <= budget {
+		return s
+	}
+
+	// the length prefix of the shortened string is at most as long as the one of the budget
+	n := budget - tagSize - protowire.SizeVarint(uint64(budget)) - len(mark)
+	if n < 0 {
+		n = 0
+	}
+
+	for n > 0 && !utf8.RuneStart(s[n]) {
+		n--
+	}
+
+	return s[:n] + mark
+}
+
+// boundedError shortens a multi-line error so that a response carrying it fits the budget. The
+// lines are the messages the parser reported, in order of position: the first ones name the cause
+// and the following ones tend to be its consequences, so the tail is dropped and counted.
+func boundedError(message string, budget int) string {
+	if stringFieldSize(message) <= budget {
+		return message
+	}
+
+	lines := strings.Split(message, "\n")
+	tail := func(omitted int) string {
+		return fmt.Sprintf("\n... %d further errors omitted", omitted)
+	}
+
+	// the tail is longest when it counts every line, and the length prefix of the result is at
+	// most as long as the one of the budget
+	room := budget - tagSize - protowire.SizeVarint(uint64(budget)) - len(tail(len(lines)))
+
+	kept, size := 0, 0
+	for kept < len(lines) && size+len(lines[kept])+1 <= room {
+		size += len(lines[kept]) + 1
+		kept++
+	}
+
+	if kept == 0 {
+		return fitString(message, budget)
+	}
+
+	return strings.Join(lines[:kept], "\n") + tail(len(lines)-kept)
+}
+
+// warningResponses spreads the warnings over as many responses as their number requires for each
+// response to fit the budget. They precede the chunks of the tree, which fill a message on their
+// own and leave no room for them.
+func warningResponses(warnings []a2l.SyntaxError, budget int) (result []*a2l.TreeResponse) {
+	response, size := &a2l.TreeResponse{}, 0
+
+	for _, warning := range warnings {
+		text := fitString(warning.String(), budget)
+
+		if size+stringFieldSize(text) > budget && len(response.Warnings) > 0 {
+			result = append(result, response)
+			response, size = &a2l.TreeResponse{}, 0
+		}
+
+		response.Warnings = append(response.Warnings, text)
+		size += stringFieldSize(text)
+	}
+
+	if len(response.Warnings) > 0 {
+		result = append(result, response)
+	}
+
+	return result
+}
+
+func treeErrorResponse(message string) *a2l.TreeResponse { return &a2l.TreeResponse{Error: &message} }
+func jsonErrorResponse(message string) *a2l.JSONResponse { return &a2l.JSONResponse{Error: &message} }
+func a2lErrorResponse(message string) *a2l.A2LResponse   { return &a2l.A2LResponse{Error: &message} }
+
+// sendWithin hands a response to its stream once it is known to fit the maximum message size. The
+// responses are built to fit, so a larger one is a bug of this server; it is reported through the
+// error field of a replacement response, instead of being left to gRPC, whose transport error
+// would reach the client without a word about the cause.
+func sendWithin[M proto.Message](stream interface{ Send(M) error }, response M, maxMsgSize int,
+	withError func(string) M) error {
+	if size := proto.Size(response); size > maxMsgSize {
+		response = withError(fmt.Sprintf(
+			"internal error: a response of %d bytes exceeds the maximum message size of %d bytes",
+			size, maxMsgSize))
+	}
+
+	return stream.Send(response)
 }
 
 func (s *grpcA2LImplType) GetTreeFromA2L(stream a2l.A2L_GetTreeFromA2LServer) error {
 	var buffer bytes.Buffer
-	var parseError error
-	var err error
-	var serializedTree []byte
-	var chunk []byte
-	var request *a2l.TreeFromA2LRequest
-	tree := &a2l.RootNodeType{}
-	response := &a2l.TreeResponse{}
 	options := a2l.ParseOptions{}
-	// Note: optionsParsed := false avoid to parse option for each chunk
+	// the options are read from the first request of the stream only
 	optionsParsed := false
 
 	for {
-		request, err = stream.Recv()
-		if err != nil {
-			if err == io.EOF {
-				err = nil
-			}
+		request, err := stream.Recv()
+		if err == io.EOF {
 			break
+		}
+		if err != nil {
+			return err
 		}
 		if !optionsParsed {
 			if request.EnforceVersionCheck != nil {
@@ -82,37 +198,35 @@ func (s *grpcA2LImplType) GetTreeFromA2L(stream a2l.A2L_GetTreeFromA2LServer) er
 		buffer.Write(request.A2L)
 	}
 
-	if err == nil {
-		var warnings []a2l.SyntaxError
+	tree, warnings, parseError := a2l.GetTreeFromStringWithOptions(buffer.String(), options)
 
-		tree, warnings, parseError = a2l.GetTreeFromStringWithOptions(buffer.String(), options)
-
-		// warnings are attached to the first response of the stream
-		for _, warning := range warnings {
-			response.Warnings = append(response.Warnings, warning.String())
-		}
-
-		if parseError == nil {
-			if serializedTree, err = proto.Marshal(tree); err == nil {
-				for _, chunk = range chunkifyBySize(serializedTree, s.chunkSize) {
-					response.SerializedTreeChunk = chunk
-					if err = stream.Send(response); err != nil {
-						break
-					}
-					response.Warnings = nil
-				}
-			} else {
-				response.Error = proto.String(fmt.Sprintf("An error occured during serialization of Tree: %v", err))
-				err = stream.Send(response)
-			}
-		} else {
-			errString := parseError.Error()
-			response.Error = &errString
-			err = stream.Send(response)
+	// the warnings come first, in responses of their own, whether the file parsed or not
+	for _, response := range warningResponses(warnings, s.maxMsgSize) {
+		if err := sendWithin(stream, response, s.maxMsgSize, treeErrorResponse); err != nil {
+			return err
 		}
 	}
 
-	return err
+	if parseError != nil {
+		return sendWithin(stream, treeErrorResponse(boundedError(parseError.Error(), s.maxMsgSize)),
+			s.maxMsgSize, treeErrorResponse)
+	}
+
+	serializedTree, err := proto.Marshal(tree)
+	if err != nil {
+		return sendWithin(stream, treeErrorResponse(boundedError(
+			fmt.Sprintf("an error occurred during serialization of the tree: %v", err), s.maxMsgSize)),
+			s.maxMsgSize, treeErrorResponse)
+	}
+
+	for _, chunk := range chunkifyBySize(serializedTree, s.chunkSize) {
+		response := &a2l.TreeResponse{SerializedTreeChunk: chunk}
+		if err := sendWithin(stream, response, s.maxMsgSize, treeErrorResponse); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (s *grpcA2LImplType) GetJSONFromTree(stream a2l.A2L_GetJSONFromTreeServer) (err error) {
@@ -168,23 +282,22 @@ func (s *grpcA2LImplType) GetJSONFromTree(stream a2l.A2L_GetJSONFromTreeServer) 
 					rawData = indentedBuffer.Bytes()
 					for _, chunk = range chunkifyBySize(rawData, s.chunkSize) {
 						response.Json = chunk
-						if err = stream.Send(response); err != nil {
+						if err = sendWithin(stream, response, s.maxMsgSize, jsonErrorResponse); err != nil {
 							break
 						}
 					}
 				} else {
-					response.Error = proto.String(fmt.Sprintf("An error occured during json indent: %v", err))
-					err = stream.Send(response)
+					response.Error = proto.String(boundedError(
+						fmt.Sprintf("an error occurred during json indent: %v", err), s.maxMsgSize))
+					err = sendWithin(stream, response, s.maxMsgSize, jsonErrorResponse)
 				}
 			} else {
-				errString := parseError.Error()
-				response.Error = &errString
-				err = stream.Send(response)
+				response.Error = proto.String(boundedError(parseError.Error(), s.maxMsgSize))
+				err = sendWithin(stream, response, s.maxMsgSize, jsonErrorResponse)
 			}
 		} else {
-			errString := parseError.Error()
-			response.Error = &errString
-			err = stream.Send(response)
+			response.Error = proto.String(boundedError(parseError.Error(), s.maxMsgSize))
+			err = sendWithin(stream, response, s.maxMsgSize, jsonErrorResponse)
 		}
 	}
 
@@ -229,18 +342,18 @@ func (s *grpcA2LImplType) GetTreeFromJSON(stream a2l.A2L_GetTreeFromJSONServer) 
 			if serializedTree, err = proto.Marshal(tree); err == nil {
 				for _, chunk = range chunkifyBySize(serializedTree, s.chunkSize) {
 					response.SerializedTreeChunk = chunk
-					if err = stream.Send(response); err != nil {
+					if err = sendWithin(stream, response, s.maxMsgSize, treeErrorResponse); err != nil {
 						break
 					}
 				}
 			} else {
-				response.Error = proto.String(fmt.Sprintf("An error occured during serialization of Tree: %v", err))
-				err = stream.Send(response)
+				response.Error = proto.String(boundedError(
+					fmt.Sprintf("an error occurred during serialization of the tree: %v", err), s.maxMsgSize))
+				err = sendWithin(stream, response, s.maxMsgSize, treeErrorResponse)
 			}
 		} else {
-			errString := parseError.Error()
-			response.Error = &errString
-			err = stream.Send(response)
+			response.Error = proto.String(boundedError(parseError.Error(), s.maxMsgSize))
+			err = sendWithin(stream, response, s.maxMsgSize, treeErrorResponse)
 		}
 	}
 
@@ -291,13 +404,13 @@ func (s *grpcA2LImplType) GetA2LFromTree(stream a2l.A2L_GetA2LFromTreeServer) (e
 		if marshalError == nil {
 			for _, chunk = range chunkifyBySize(a2lDataBytes, s.chunkSize) {
 				response.A2L = chunk
-				if err = stream.Send(response); err != nil {
+				if err = sendWithin(stream, response, s.maxMsgSize, a2lErrorResponse); err != nil {
 					break
 				}
 			}
 		} else {
-			response.Error = proto.String(marshalError.Error())
-			err = stream.Send(response)
+			response.Error = proto.String(boundedError(marshalError.Error(), s.maxMsgSize))
+			err = sendWithin(stream, response, s.maxMsgSize, a2lErrorResponse)
 		}
 	}
 
@@ -381,7 +494,7 @@ func createServer(port int, maxMsgSize int) int {
 		grpc.ChainUnaryInterceptor(recoverUnaryInterceptor),
 		grpc.ChainStreamInterceptor(recoverStreamInterceptor))
 
-	a2l.RegisterA2LServer(newServer, &grpcA2LImplType{chunkSize: maxMsgSize - protocolSizeMargin})
+	a2l.RegisterA2LServer(newServer, newGrpcA2LImpl(maxMsgSize))
 
 	server = newServer
 

@@ -39,8 +39,12 @@ message A2LFromTreeRequest {
 message TreeResponse {
   bytes serializedTreeChunk = 1;
   optional string error = 2;
-  // constructs requiring a newer ASAP2 version than the one the file declares, reported on the
-  // first response of the stream
+  // the warnings the parser reported: constructs requiring a newer ASAM MCD-2 MC version than the
+  // one the file declares, keywords used more often than the specification allows, and the like.
+  // They come in responses of their own, which precede the chunks of the tree, and are spread over
+  // as many of them as their number requires for each response to fit the maximum message size;
+  // a client collects them from every response of the stream. They are sent whether the file
+  // parsed or not, so a response carrying the error may follow them.
   repeated string warnings = 3;
 }
 
