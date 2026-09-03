@@ -7,9 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-09-03
+
 ### Added
 
-- Windows ARM64 shared library (`a2l_grpc_windows_arm64.dll`), built and tested natively in CI.
 - Report of an `/include` statement, naming the file it refers to. The mechanism is a text
   replacement which needs the file system the file was read from (chapter 4), so a parser working
   on the content of a single file cannot resolve it; substituting the included files is left to the
@@ -26,6 +27,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (chapter 3.5.1). Such a repeat parsed silently before and only the last occurrence was kept.
 - Report of a missing `ASAP2_VERSION` when `EnforceVersionCheck` is set. The keyword is mandatory
   since 1.6.1 (chapters 1.4.4 and 3.5.16), and without it no version gate can run at all.
+
+### Changed
+
+- **Breaking:** the gRPC server is bound to the loopback interface instead of every interface. It
+  is an unauthenticated endpoint serving the process which loaded the library, and the documented
+  usage connects to `localhost`; it used to be reachable from the whole network.
+- **Breaking:** a taggedstruct member must carry its tag, which chapter 5.2 makes mandatory in both
+  forms of `taggedstruct_definition`. A tagless member parsed before and then made the serializer
+  dereference a nil tag.
+- **Breaking:** the array specifier of A2ML takes a constant, as chapter 5.2 declares it. It used
+  to share the rule of the A2L grammar, which also accepts an alphabetic string, because chapter
+  3.2 allows one as the index of a partial identifier; a symbolic size reached an unimplemented
+  conversion and was reported as an internal error.
+- The `Mask` of `BIT_MASK` and `ERROR_MASK` is a `ULongType` instead of a `LongType`, so that it
+  can carry the unsigned 64 bit range. **This changes the protobuf message shape.**
+- The labels of the grammar now match the cardinality of the specification, and the parser uses
+  them to detect a repeated single occurrence keyword.
+- `StringType` documents that it carries the string as written in the file: the escape sequences of
+  chapter 3.2 are left in place, so that the value is reproduced verbatim when the tree is
+  serialized back to A2L.
+- The ANTLR generator is pinned to 4.13.2 and verified against its checksum, instead of being built
+  from a clone of the default branch of the upstream repository on every run. `protoc` is pinned
+  and verified the same way.
+- CI no longer runs `go get`, which resolved the ANTLR runtime to its latest version and rewrote
+  `go.mod`, so the dependency versions the module declares are the ones tested and released. Every
+  job which runs Go now installs the toolchain `go.mod` declares, instead of taking the one which
+  happens to sit on the runner.
+- **Breaking:** the module requires Go 1.25, which is the version `google.golang.org/grpc` needs.
+  The toolchain it is built with is 1.27.1. Besides the newer dependencies this is worth having on
+  its own: measured on a 1.3 MB file, the compiler of 1.27 parses about a quarter faster than the
+  one of 1.22 (2.88 s to 2.19 s) and removes about a fifth of the allocations (39.2 to 31.0
+  million), without a change to this repository.
+- Updated the toolchain and the dependencies: Go 1.22 to 1.25/1.27.1, ANTLR 4.13.1 to 4.13.2 with
+  its runtime `github.com/antlr4-go/antlr/v4` v4.13.0 to v4.13.1, which the generated parser has to
+  match, `google.golang.org/grpc` v1.69.4 to v1.83.2, `google.golang.org/protobuf` v1.35.1 to
+  v1.36.12, `github.com/stretchr/testify` v1.8.4 to v1.12.1, `protoc` 29.3 to 36.1,
+  `protoc-gen-go` v1.33.0 to v1.36.12 and `protoc-gen-go-grpc` v1.3.0 to v1.6.2. The protobuf
+  messages are unchanged, and so are the `.proto` files a client generates its own sources from.
 
 ### Fixed
 
@@ -92,43 +131,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   malformed one such as `a.`, `a..b` or `a.0b` is rejected instead of being taken as a single
   identifier. A signed or dotted array index, e.g. `a[-1]` or `a[x.y]`, is rejected as well.
 
-### Changed
+## [0.2.1] - 2026-07-31
 
-- **Breaking:** the gRPC server is bound to the loopback interface instead of every interface. It
-  is an unauthenticated endpoint serving the process which loaded the library, and the documented
-  usage connects to `localhost`; it used to be reachable from the whole network.
-- **Breaking:** a taggedstruct member must carry its tag, which chapter 5.2 makes mandatory in both
-  forms of `taggedstruct_definition`. A tagless member parsed before and then made the serializer
-  dereference a nil tag.
-- **Breaking:** the array specifier of A2ML takes a constant, as chapter 5.2 declares it. It used
-  to share the rule of the A2L grammar, which also accepts an alphabetic string, because chapter
-  3.2 allows one as the index of a partial identifier; a symbolic size reached an unimplemented
-  conversion and was reported as an internal error.
-- The `Mask` of `BIT_MASK` and `ERROR_MASK` is a `ULongType` instead of a `LongType`, so that it
-  can carry the unsigned 64 bit range. **This changes the protobuf message shape.**
-- The labels of the grammar now match the cardinality of the specification, and the parser uses
-  them to detect a repeated single occurrence keyword.
-- `StringType` documents that it carries the string as written in the file: the escape sequences of
-  chapter 3.2 are left in place, so that the value is reproduced verbatim when the tree is
-  serialized back to A2L.
-- The ANTLR generator is pinned to 4.13.2 and verified against its checksum, instead of being built
-  from a clone of the default branch of the upstream repository on every run. `protoc` is pinned
-  and verified the same way.
-- CI no longer runs `go get`, which resolved the ANTLR runtime to its latest version and rewrote
-  `go.mod`, so the dependency versions the module declares are the ones tested and released. Every
-  job which runs Go now installs the toolchain `go.mod` declares, instead of taking the one which
-  happens to sit on the runner.
-- **Breaking:** the module requires Go 1.25, which is the version `google.golang.org/grpc` needs.
-  The toolchain it is built with is 1.27.1. Besides the newer dependencies this is worth having on
-  its own: measured on a 1.3 MB file, the compiler of 1.27 parses about a quarter faster than the
-  one of 1.22 (2.88 s to 2.19 s) and removes about a fifth of the allocations (39.2 to 31.0
-  million), without a change to this repository.
-- Updated the toolchain and the dependencies: Go 1.22 to 1.25/1.27.1, ANTLR 4.13.1 to 4.13.2 with
-  its runtime `github.com/antlr4-go/antlr/v4` v4.13.0 to v4.13.1, which the generated parser has to
-  match, `google.golang.org/grpc` v1.69.4 to v1.83.2, `google.golang.org/protobuf` v1.35.1 to
-  v1.36.12, `github.com/stretchr/testify` v1.8.4 to v1.12.1, `protoc` 29.3 to 36.1,
-  `protoc-gen-go` v1.33.0 to v1.36.12 and `protoc-gen-go-grpc` v1.3.0 to v1.6.2. The protobuf
-  messages are unchanged, and so are the `.proto` files a client generates its own sources from.
+### Added
+
+- Windows ARM64 shared library (`a2l_grpc_windows_arm64.dll`), built and tested natively in CI.
 
 ## [0.2.0] - 2026-07-31
 
@@ -330,7 +337,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial release: ANTLR based A2L parser exposed through a gRPC API, shipped as a shared library
   for Linux and Windows, together with the protobuf definitions.
 
-[Unreleased]: https://github.com/Sauci/a2l-grpc/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/Sauci/a2l-grpc/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/Sauci/a2l-grpc/compare/v0.2.1...v0.3.0
+[0.2.1]: https://github.com/Sauci/a2l-grpc/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/Sauci/a2l-grpc/compare/v0.1.22...v0.2.0
 [0.1.22]: https://github.com/Sauci/a2l-grpc/compare/v0.1.21...v0.1.22
 [0.1.21]: https://github.com/Sauci/a2l-grpc/compare/v0.1.20...v0.1.21
