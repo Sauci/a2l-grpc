@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: '17'
@@ -55,8 +55,12 @@ jobs:
         with:
           name: grpc
           path: pkg/a2l
-      - run: |
-          go vet ./cmd/a2l/... ./pkg/a2l/...
+      # bash everywhere: the PowerShell default of the Windows runners only checks the exit code
+      # of the last command, which silently discarded a failing vet. pkg/a2l/parser stays out of
+      # vet, ANTLR emits an unreachable "goto errorExit" there on purpose.
+      - shell: bash
+        run: |
+          go vet ./cmd/a2l/... ./pkg/a2l
           go test ./cmd/a2l/... ./pkg/a2l/...
   test-windows:
     runs-on: windows-latest
@@ -78,8 +82,12 @@ jobs:
         with:
           name: grpc
           path: pkg/a2l
-      - run: |
-          go vet ./cmd/a2l/... ./pkg/a2l/...
+      # bash everywhere: the PowerShell default of the Windows runners only checks the exit code
+      # of the last command, which silently discarded a failing vet. pkg/a2l/parser stays out of
+      # vet, ANTLR emits an unreachable "goto errorExit" there on purpose.
+      - shell: bash
+        run: |
+          go vet ./cmd/a2l/... ./pkg/a2l
           go test ./cmd/a2l/... ./pkg/a2l/...
   test-windows-arm64:
     runs-on: windows-11-arm
@@ -112,8 +120,12 @@ jobs:
           Expand-Archive -Path "$env:RUNNER_TEMP/toolchain.zip" -DestinationPath $env:RUNNER_TEMP
           "$env:RUNNER_TEMP\$name\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           "CC=aarch64-w64-mingw32-gcc" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-      - run: |
-          go vet ./cmd/a2l/... ./pkg/a2l/...
+      # bash everywhere: the PowerShell default of the Windows runners only checks the exit code
+      # of the last command, which silently discarded a failing vet. pkg/a2l/parser stays out of
+      # vet, ANTLR emits an unreachable "goto errorExit" there on purpose.
+      - shell: bash
+        run: |
+          go vet ./cmd/a2l/... ./pkg/a2l
           go test ./cmd/a2l/... ./pkg/a2l/...
   test-mac:
     runs-on: macos-latest-xlarge
@@ -135,8 +147,12 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
-      - run: |
-          go vet ./cmd/a2l/... ./pkg/a2l/...
+      # bash everywhere: the PowerShell default of the Windows runners only checks the exit code
+      # of the last command, which silently discarded a failing vet. pkg/a2l/parser stays out of
+      # vet, ANTLR emits an unreachable "goto errorExit" there on purpose.
+      - shell: bash
+        run: |
+          go vet ./cmd/a2l/... ./pkg/a2l
           go test ./cmd/a2l/... ./pkg/a2l/...
   build-linux:
     runs-on: ubuntu-22.04
