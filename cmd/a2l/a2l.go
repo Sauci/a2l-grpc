@@ -460,9 +460,13 @@ var serverMutex sync.Mutex
 
 var server *grpc.Server
 
+// serverPort is the port the running server listens on, 0 while no server is running.
+var serverPort int
+
 // createServer starts the gRPC server on the passed port and returns 0 on success, 1 on failure.
 // It fails when a server is already running, when maxMsgSize leaves no room for a chunk of tree,
-// and when the port cannot be bound.
+// and when the port cannot be bound. A port of 0 lets the operating system choose a free one,
+// which getPort reports; that is how several processes run a server each without colliding.
 //
 // The server is bound to the loopback interface: it is an unauthenticated endpoint which serves
 // the process which loaded this library, not the network it sits on.
@@ -497,6 +501,7 @@ func createServer(port int, maxMsgSize int) int {
 	a2l.RegisterA2LServer(newServer, newGrpcA2LImpl(maxMsgSize))
 
 	server = newServer
+	serverPort = listener.Addr().(*net.TCPAddr).Port
 
 	go func() {
 		// Serve returns when closeServer stops the server; there is nobody left to report to
@@ -517,8 +522,17 @@ func closeServer() int {
 
 	server.Stop()
 	server = nil
+	serverPort = 0
 
 	return 0
+}
+
+// getPort returns the port the running server listens on, or 0 when no server is running.
+func getPort() int {
+	serverMutex.Lock()
+	defer serverMutex.Unlock()
+
+	return serverPort
 }
 
 //export Create
@@ -529,6 +543,14 @@ func Create(port C.int, maxMsgSize C.int) (result C.int) {
 //export Close
 func Close() (result C.int) {
 	return C.int(closeServer())
+}
+
+// GetPort returns the TCP port the server listens on, or 0 when no server is running. It is the
+// way to learn the port when Create was given 0 and the operating system chose one.
+//
+//export GetPort
+func GetPort() (result C.int) {
+	return C.int(getPort())
 }
 
 func main() {

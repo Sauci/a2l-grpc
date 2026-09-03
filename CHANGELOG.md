@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `Create` accepts a port of 0, which lets the operating system choose a free one, and the new
+  `GetPort` export reports the port the server listens on. Several processes can thus run a server
+  each without agreeing on a port, which the fixed default of 3333 did not allow.
+
+### Changed
+
+- The parser predicts in two stages, as ANTLR recommends: SLL first, which is many times faster than
+  full LL but may report an error on a valid file for lack of the full context, and full LL with
+  error recovery only when the first stage reported anything. A valid file is thus parsed once, in
+  the fast mode, and an invalid one twice, with the same errors as before. Measured on a 1.3 MB
+  file, the parse takes 0.21 s instead of 2.2 s and allocates 107 MB instead of 2.1 GB, in 1.3
+  instead of 31 million allocations.
+
 ## [0.3.0] - 2026-09-03
 
 ### Added
