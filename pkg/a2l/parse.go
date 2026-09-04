@@ -45,7 +45,10 @@ type ParseOptions struct {
 }
 
 // maxQuotedTokens is the number of tokens a syntax error quotes of the input which precedes it.
-const maxQuotedTokens = 32
+// Eight reaches the beginning of the element which failed together with the parameters it did
+// accept, which is what names the mistake; more than that only adds the elements before it, which
+// are already closed and have nothing to do with the failure.
+const maxQuotedTokens = 8
 
 // boundedTokenStream quotes a bounded part of the input in a syntax error.
 //
