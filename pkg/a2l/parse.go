@@ -44,6 +44,105 @@ type ParseOptions struct {
 	EnforceVersionCheck bool
 }
 
+// maxQuotedTokens is the number of tokens a syntax error quotes of the input which precedes it.
+// Eight reaches the beginning of the element which failed together with the parameters it did
+// accept, which is what names the mistake; more than that only adds the elements before it, which
+// are already closed and have nothing to do with the failure.
+const maxQuotedTokens = 8
+
+// boundedTokenStream quotes a bounded part of the input in a syntax error.
+//
+// ANTLR reports a dead end with "no viable alternative at input" followed by the whole text between
+// the token where the failed decision started and the offending one. The decisions of this grammar
+// are the loops of optional elements, which start at the beginning of a block, so for an error in
+// the last MODULE of a file that text is nearly the entire file: a single message of a 10 MB file
+// measured 9.3 million characters. Building it is quadratic in the size of the file, since the
+// parser reports again as it recovers, which made an error in a large file take longer than the
+// parse itself by two orders of magnitude, and made an error in a 100 MB file unbounded in
+// practice.
+//
+// The parser reaches the stream through the TokenStream interface, so bounding the text here is
+// enough, and it needs neither a fork of the runtime nor an error strategy of our own: the fields
+// the strategy would have to reach are not exported. Quoting the last few tokens before the error
+// is also the more useful message.
+type boundedTokenStream struct {
+	*antlr.CommonTokenStream
+}
+
+func (s *boundedTokenStream) GetTextFromTokens(start, end antlr.Token) string {
+	if start == nil || end == nil {
+		return s.CommonTokenStream.GetTextFromTokens(start, end)
+	}
+
+	if end.GetTokenIndex()-start.GetTokenIndex() <= maxQuotedTokens {
+		return s.CommonTokenStream.GetTextFromTokens(start, end)
+	}
+
+	return "..." + s.CommonTokenStream.GetTextFromTokens(s.Get(end.GetTokenIndex()-maxQuotedTokens), end)
+}
+
+// sllBailOut abandons the first stage. The BailErrorStrategy of the Go runtime does not stop the
+// parse the way the one of the Java runtime does: it marks the state of the parser, which the
+// generated errorExit reports and then clears, so the parse carries on. A file the first stage
+// cannot parse would thus be walked to its end on the error path, which is far slower than the
+// parse itself, and only then be parsed again. Leaving the parse by a panic is what actually
+// abandons it; parseFast recovers it at once and throws the parser away, so nothing ever observes
+// the state it was interrupted in.
+type sllBailOut struct{}
+
+// sllErrorListener abandons the first stage at the first error it is told about.
+type sllErrorListener struct {
+	*antlr.DefaultErrorListener
+}
+
+func (l *sllErrorListener) SyntaxError(_ antlr.Recognizer, _ interface{}, _, _ int, _ string, _ antlr.RecognitionException) {
+	panic(sllBailOut{})
+}
+
+// parseFast is the first stage: SLL prediction, no error recovery, abandoned at the first error.
+func parseFast(tokenStream *antlr.CommonTokenStream) (fileTree parser.IA2lFileContext, ok bool) {
+	defer func() {
+		if r := recover(); r != nil {
+			if _, bail := r.(sllBailOut); !bail {
+				panic(r)
+			}
+
+			fileTree, ok = nil, false
+		}
+	}()
+
+	p := parser.NewA2LParser(&boundedTokenStream{CommonTokenStream: tokenStream})
+	p.RemoveErrorListeners()
+	p.AddErrorListener(&sllErrorListener{DefaultErrorListener: antlr.NewDefaultErrorListener()})
+	p.GetInterpreter().SetPredictionMode(antlr.PredictionModeSLL)
+	p.SetErrorHandler(antlr.NewBailErrorStrategy())
+	p.BuildParseTrees = true
+
+	return p.A2lFile(), true
+}
+
+// parseA2lFile parses the token stream in the two stages ANTLR recommends. The first one predicts
+// with SLL, which is many times faster than full LL but may report an error on a valid file, for
+// lack of the full context; it bails out at the first error instead of recovering. Only when it
+// reported anything is the file parsed again, with full LL prediction and error recovery, and that
+// second parse is the one whose errors reach the caller. A valid file is thus parsed once, in the
+// fast mode, and an invalid one twice, with exactly the errors the slow mode reports on its own;
+// the errors of the lexer are recorded once either way, since the tokens are read once.
+func parseA2lFile(tokenStream *antlr.CommonTokenStream, errorListener antlr.ErrorListener) parser.IA2lFileContext {
+	if fileTree, ok := parseFast(tokenStream); ok {
+		return fileTree
+	}
+
+	tokenStream.Seek(0)
+
+	second := parser.NewA2LParser(&boundedTokenStream{CommonTokenStream: tokenStream})
+	second.RemoveErrorListeners()
+	second.AddErrorListener(errorListener)
+	second.BuildParseTrees = true
+
+	return second.A2lFile()
+}
+
 // unresolvedIncludes reports every /include statement of the file. The include mechanism of ASAM
 // MCD-2 MC 1.6.1 chapter 4 is a text replacement, which needs the file system the file was read
 // from; this parser is given the content of a single file, so it can only name the references it
@@ -104,14 +203,10 @@ func GetTreeFromStringWithOptions(a2lString string, options ParseOptions) (resul
 	lexer.RemoveErrorListeners()
 	lexer.AddErrorListener(&errorListener)
 	tokenStream := antlr.NewCommonTokenStream(lexer, 0)
-	p := parser.NewA2LParser(tokenStream)
-	p.RemoveErrorListeners()
-	p.AddErrorListener(&errorListener)
-	p.BuildParseTrees = true
 
 	listener := NewListener()
 
-	fileTree := p.A2lFile()
+	fileTree := parseA2lFile(tokenStream, &errorListener)
 
 	errorListener.Errors = append(errorListener.Errors, unresolvedIncludes(tokenStream)...)
 

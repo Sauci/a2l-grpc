@@ -180,6 +180,9 @@ PROJECT {
 ---
 
 # Hints
+- The first argument of `Create` is the TCP port the server listens on. A port of 0 lets the operating system choose a 
+  free one, and `GetPort` then reports which; this is how several processes run a server each without agreeing on a 
+  port. A process runs one server at a time: a second `Create` fails while the first server is running.
 - The maximum message size accepted by the server is the second argument of `Create`. No response of the server 
   exceeds it, whatever the size of the file: the tree is sent in chunks sized to fit, the warnings are spread over as 
   many responses as they need, and an error message longer than the limit is shortened and says how many of its lines 

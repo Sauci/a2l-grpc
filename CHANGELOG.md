@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `Create` accepts a port of 0, which lets the operating system choose a free one, and the new
+  `GetPort` export reports the port the server listens on. Several processes can thus run a server
+  each without agreeing on a port, which the fixed default of 3333 did not allow.
+
+### Fixed
+
+- A syntax error in a large file is reported in a fraction of a second instead of taking longer than
+  the parse itself. ANTLR reports a dead end with "no viable alternative at input" followed by the
+  whole text between the token where the failed decision started and the offending one; the
+  decisions of this grammar are the loops of optional elements, which start at the beginning of a
+  block, so for an error in the last `MODULE` that text was nearly the entire file. One message of a
+  10 MB file measured 9.3 million characters, and building it as the parser recovered was quadratic
+  in the size of the file: a 10 MB file with a single syntax error took 713 s and allocated 5.1 TB,
+  a 100 MB one did not finish in half an hour. The error now quotes the last tokens before the
+  offending one, which is the more useful message as well: the same 10 MB file takes 0.76 s, the
+  100 MB one 8.7 s, and the cost is linear in the size of the file.
+
+### Changed
+
+- The parser predicts in two stages, as ANTLR recommends: SLL first, which is many times faster than
+  full LL but may report an error on a valid file for lack of the full context, and full LL with
+  error recovery only when the first stage reported anything. A valid file is thus parsed once, in
+  the fast mode, and an invalid one twice, with the same errors as before. Measured on a 1.3 MB
+  file, the parse takes 0.21 s instead of 2.2 s and allocates 107 MB instead of 2.1 GB, in 1.3
+  instead of 31 million allocations.
+
 ## [0.3.0] - 2026-09-03
 
 ### Added

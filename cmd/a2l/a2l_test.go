@@ -679,8 +679,30 @@ func Test_CreateServer(t *testing.T) {
 		}
 	})
 
+	// A port of 0 lets the operating system choose a free one, so that several processes can run
+	// a server each without agreeing on a port; getPort tells the caller which one was chosen.
+	t.Run("an ephemeral port is chosen and reported", func(t *testing.T) {
+		assert.Equal(t, 0, getPort(), "no server is running yet")
+
+		if !assert.Equal(t, 0, createServer(0, maxMsgSize)) {
+			return
+		}
+		defer func() { assert.Equal(t, 0, closeServer()) }()
+
+		chosen := getPort()
+		if !assert.Greater(t, chosen, 0, "the chosen port should be reported") {
+			return
+		}
+
+		connection, err := net.DialTimeout("tcp", fmt.Sprintf("127.0.0.1:%v", chosen), time.Second)
+		if assert.NoError(t, err, "the chosen port should be served") {
+			assert.NoError(t, connection.Close())
+		}
+	})
+
 	t.Run("closeServer reports that no server is running", func(t *testing.T) {
 		assert.Equal(t, 1, closeServer())
+		assert.Equal(t, 0, getPort(), "the port is forgotten with the server")
 	})
 }
 
